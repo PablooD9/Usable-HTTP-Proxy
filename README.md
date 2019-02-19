@@ -1,2 +1,3 @@
 # Usable-HTTP-Proxy
-HTTP-Proxy managed through an usable web interface.
+
+Puerto por defecto del Proxy: 8080
