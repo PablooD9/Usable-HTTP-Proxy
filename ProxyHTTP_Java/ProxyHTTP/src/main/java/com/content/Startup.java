@@ -1,4 +1,4 @@
-package main;
+package com.content;
 
 public class Startup {
 	

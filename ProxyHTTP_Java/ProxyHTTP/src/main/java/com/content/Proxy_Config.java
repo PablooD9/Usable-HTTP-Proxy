@@ -1,6 +1,6 @@
-package main;
+package com.content;
 
-/** Clase encargada de almacenar la configuración del Proxy
+/** Clase encargada de almacenar la configuraciï¿½n del Proxy
  * @author Pablo
  *
  */
