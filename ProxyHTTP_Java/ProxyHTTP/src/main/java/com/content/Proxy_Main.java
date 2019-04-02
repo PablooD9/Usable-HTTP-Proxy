@@ -1,10 +1,10 @@
-package main;
+package com.content;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/** Clase encargada de crear un manejador de peticiones por cada petición recibida
+/** Clase encargada de crear un manejador de peticiones por cada peticiï¿½n recibida
  * @author Pablo
  *
  */
@@ -24,7 +24,7 @@ public class Proxy_Main extends Thread {
     	
 			Socket socket;
 	    	try {
-	    		// Cuando haya una conexión abierta en el socket servidor, la abrimos/aceptamos y la manejamos.
+	    		// Cuando haya una conexiï¿½n abierta en el socket servidor, la abrimos/aceptamos y la manejamos.
 	            while ( (socket = socketServidor.accept() ) != null) {
 	                (new Proxy_Handler( socket )).start();
 	            }
