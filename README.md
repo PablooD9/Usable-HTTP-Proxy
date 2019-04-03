@@ -1,3 +1,3 @@
 # Usable-HTTP-Proxy
 
-Puerto por defecto del Proxy: 8080
+Rama creada para integrar Spring Boot en el proyecto.
