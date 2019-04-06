@@ -1,4 +1,4 @@
-package com.content;
+package com.proxy.handler;
 
 /** Clase encargada de almacenar la configuraci�n del Proxy
  * @author Pablo

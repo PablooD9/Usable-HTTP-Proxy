@@ -1,18 +1,12 @@
-package com.content;
+package com.proxy.handler;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Reader;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 
 /** Clase encargada de realizar las siguientes operaciones:
  * 		1. Recoger y procesar la informaci�n de la petici�n del cliente (navegador)

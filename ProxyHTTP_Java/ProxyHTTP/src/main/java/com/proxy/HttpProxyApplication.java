@@ -1,10 +1,10 @@
-package com.uniovi;
+package com.proxy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.content.Proxy_Config;
-import com.content.Proxy_Main;
+import com.proxy.handler.Proxy_Config;
+import com.proxy.handler.Proxy_Main;
 
 @SpringBootApplication
 public class HttpProxyApplication {
