@@ -41,14 +41,17 @@ public class Proxy_Handler extends Thread {
 			
     	} catch (NumberFormatException nfe) {
 			System.err.println("Error: Server port is not an integer.");
+			// TODO Almacenar error en log
 			nfe.printStackTrace();
         	escribeEncabezadoRespuesta( 505 );
             return ;
         } catch (IOException ioe) {
     		System.out.print("Error [3]! :>>> ");
+    		// TODO Almacenar error en log
     		ioe.printStackTrace();
     	} catch (ArrayIndexOutOfBoundsException aioobe){
     		System.out.print("Error: Impossible to get URL or server port (URL without colon?) :>>> ");
+    		// TODO Almacenar error en log
     		aioobe.printStackTrace();
     	} finally {
             try {
@@ -56,7 +59,8 @@ public class Proxy_Handler extends Thread {
             		socketCliente.close();
             } catch (IOException e) {
             	System.out.print("Error [4]! :>>> ");
-                e.printStackTrace();  // TODO
+            	// TODO Almacenar error en log
+                e.printStackTrace();  
             }
         }
 	}
@@ -68,10 +72,12 @@ public class Proxy_Handler extends Thread {
 				
 			} catch (NumberFormatException nfe) {
 				System.err.println("Error: Impossible to connect (Unknown Server Port) :>>> " + puertoServidor);
+				// TODO Almacenar error en log
 		    	escribeEncabezadoRespuesta( 505 );
 		    	return ;
 			} catch (UnknownHostException uhe) {
 				System.err.println("Error: Impossible to connect (Unknown Host) :>>> " + URL);
+				// TODO Almacenar error en log
 				uhe.printStackTrace();
 				escribeEncabezadoRespuesta( 505 );
 		    	return ;
@@ -116,6 +122,7 @@ public class Proxy_Handler extends Thread {
 			
 		} catch (IOException e) {
 			System.err.println("Error X :>>> ");
+			// TODO Almacenar error en log
 			e.printStackTrace();
 		}
 		
@@ -187,6 +194,7 @@ public class Proxy_Handler extends Thread {
             }
         } catch (IOException e) {
         	System.err.println("Error: Couldn't read from the buffer :>>> ");
+        	// TODO Almacenar error en log
 			e.printStackTrace();
 		} finally 
         {
@@ -200,10 +208,10 @@ public class Proxy_Handler extends Thread {
                 
                 servidorACliente.join();
             } catch (InterruptedException e) {
-            	// TODO:
+            	// TODO Almacenar error en log
               	e.printStackTrace();
             } catch (IOException e) {
-				// TODO
+            	// TODO Almacenar error en log
 				e.printStackTrace();
 			}
         } 
@@ -256,6 +264,7 @@ public class Proxy_Handler extends Thread {
             
         } catch (IOException e) {
         	System.out.print("Error [5]! :>>> ");
+        	// TODO Almacenar error en log
             e.printStackTrace();
         }
 	}
@@ -286,7 +295,7 @@ public class Proxy_Handler extends Thread {
 			}
 			
 		} catch (IOException e) {
-			// TODO
+			// TODO Almacenar error en log
 			e.printStackTrace();
 		}
 		

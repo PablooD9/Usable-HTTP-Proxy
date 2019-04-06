@@ -29,11 +29,21 @@ public class HostService {
 	
 	private List<String> maliciousHosts;
 	
+	
+	/** Método encargado de actualizar la lista de hosts maliciosos, usada para bloquearlos al usuario.
+	 * Se encarga de lo siguiente:
+	 * 1º - Actualiza la lista que ofrece la URL 
+	 * 		"https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts"
+	 * 2º - Se conecta a la base de datos MongoDB
+	 * 3º - Borra todos los documentos (que almacenan los hosts) de una colección
+	 * 4º - Vuelve a cargar la lista descargada desde la URL anterior
+	 * 5º - Cierra la conexión con la base de datos
+	 */
 	public void updateHostsList() {
 		getHostsList();
 //		parsedHostsList.forEach((host) -> System.out.println( host ));
 		
-		MongoClient client = createConnectionToDB();
+		MongoClient client = createConnectionToMongoClient();
 		MongoDatabase dbConnection = connectToDatabase(client);
 		MongoCollection<Document> collection = getHostsCollection(dbConnection);
 		
@@ -47,31 +57,45 @@ public class HostService {
 		client.close();
 	}
 	
+	/** Obtiene la lista de hosts maliciosos desde la URL:
+	 * 		"https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts"
+	 * Los hosts obtenidos de la lista anterior son parseados e insertados en una lista.
+	 */
 	public void getHostsList(){
 		maliciousHosts = new ArrayList<>();
 		
+		HostParser parser = new HostParser();
 		URL url;
 		URLConnection conn;
+		BufferedReader reader = null;
 		try {
 			url = new URL( URL_hosts );
 			conn = url.openConnection();
 			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				maliciousHosts.add( line );
+				if (parser.parse( line ) != null)
+					maliciousHosts.add( line );
 			}
 		} catch (MalformedURLException e) {
+			// TODO Almacenar error en log
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Almacenar error en log
 			e.printStackTrace();
+		} finally {
+			if (reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+					// TODO Almacenar error en log
+					e.printStackTrace();
+				}
 		}
-		
-		HostParser parser = new HostParser( maliciousHosts );
-		maliciousHosts = parser.parse();
 	}
 	
-	public MongoClient createConnectionToDB() {
+	public MongoClient createConnectionToMongoClient() {
         MongoClient client = MongoClients.create( CONNECTION_STRING );
         return client;
 	}

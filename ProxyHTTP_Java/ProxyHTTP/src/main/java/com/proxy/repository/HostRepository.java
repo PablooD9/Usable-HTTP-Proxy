@@ -1,3 +1,4 @@
+/*
 package com.proxy.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -9,3 +10,4 @@ import com.proxy.entities.Host;
 public interface HostRepository extends MongoRepository<Host, Integer> {
 	
 }
+*/

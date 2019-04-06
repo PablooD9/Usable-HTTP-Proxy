@@ -1,3 +1,4 @@
+/*
 package com.proxy.entities;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -28,3 +29,4 @@ public class Host {
 		this.hostName = hostName;
 	}
 }
+*/
