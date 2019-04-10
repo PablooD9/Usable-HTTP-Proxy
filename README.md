@@ -18,5 +18,5 @@ El objetivo del Proxy es ofrecer una interfaz de usuario fácilmente configurabl
 * Java
 * Spring Boot
 * Socket (Servidor y Cliente)
-* Tomcat (integrado con el framework de Spring Boot)
+* Tomcat (integrado con el framework Spring Boot)
 * Bootstrap
