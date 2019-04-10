@@ -1,5 +1,7 @@
 # Usable-HTTP-Proxy
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad9b0efe67c746ddb7bb0dab7ede6dfd)](https://app.codacy.com/app/PablooD9/Usable-HTTP-Proxy?utm_source=github.com&utm_medium=referral&utm_content=PablooD9/Usable-HTTP-Proxy&utm_campaign=Badge_Grade_Dashboard)
+
 ## ¿Qué es un Proxy?
 Un Proxy permite a un usuario interceptar y manipular las peticiones (enviadas a través de un navegador) y las respuestas (recibidas a través de un servidor). Por ejemplo, podemos visitar ciertos sitios web para ver noticias que, de forma fraudulenta, obtienen información nuestra (con qué frecuencia visitamos la página, cuánto tiempo pasamos en ella, etc). Usando el Proxy y configurándolo de una forma muy sencilla, evitaremos que sucedan este tipo de cosas.
 
