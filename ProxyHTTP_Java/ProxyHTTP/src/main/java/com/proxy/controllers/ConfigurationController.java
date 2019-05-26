@@ -13,16 +13,16 @@ public class ConfigurationController {
 	@Autowired
 	private HostService hostService;
 	
-	@RequestMapping("/configuration")
+	@RequestMapping(value={"", "/", "/configuration"})
 	public String getConfiguration(Model model) {
 		// model.addAttribute("hostsList", hostService.getHostsList());
-		return "configuration/config";
+		return "configuration/configuration";
 	}
 	
 	@RequestMapping("/configuration/updateMaliciousHosts")
 	public String updateMaliciousHosts() {
 		hostService.updateHostsList();
-		return "redirect:/configuration";
+		return "redirect:/";
 	}
 	
 }

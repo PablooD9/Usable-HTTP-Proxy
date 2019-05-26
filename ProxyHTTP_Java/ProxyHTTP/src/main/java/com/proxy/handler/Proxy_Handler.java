@@ -43,7 +43,7 @@ public class Proxy_Handler extends Thread {
 			System.err.println("Error: Server port is not an integer.");
 			// TODO Almacenar error en log
 			nfe.printStackTrace();
-        	escribeEncabezadoRespuesta( 505 );
+//        	escribeEncabezadoRespuesta( 502 );
             return ;
         } catch (IOException ioe) {
     		System.out.print("Error [3]! :>>> ");
@@ -73,17 +73,17 @@ public class Proxy_Handler extends Thread {
 			} catch (NumberFormatException nfe) {
 				System.err.println("Error: Impossible to connect (Unknown Server Port) :>>> " + puertoServidor);
 				// TODO Almacenar error en log
-		    	escribeEncabezadoRespuesta( 505 );
+//		    	escribeEncabezadoRespuesta( 502 );
 		    	return ;
 			} catch (UnknownHostException uhe) {
 				System.err.println("Error: Impossible to connect (Unknown Host) :>>> " + URL);
 				// TODO Almacenar error en log
 				uhe.printStackTrace();
-				escribeEncabezadoRespuesta( 505 );
+//				escribeEncabezadoRespuesta( 502 );
 		    	return ;
 		    }
 			
-			escribeEncabezadoRespuesta( 200 );
+			escribeEncabezadoRespuesta();
 			enviarRespuesta();
 			
 			if (!socketServidor.isClosed())
@@ -109,7 +109,7 @@ public class Proxy_Handler extends Thread {
 			URLYPuerto = obtenerURL( lineaPeticion );
 			
 			if (URLYPuerto == null) {
-				throw new IllegalStateException("Error en la obtenci�n de la URL y el puerto remoto");
+				throw new IllegalStateException("Error getting URL and remote port");
 			}
 				
 			// Una vez recogida la URL y el puerto, continuamos procesando las distintas 
@@ -150,7 +150,7 @@ public class Proxy_Handler extends Thread {
 		while (( (caracterLeido = socketCliente.getInputStream().read()) != -1) && !finDeLinea) {
 			switch (caracterLeido)
 			{
-				case '\n': // si se encuentra un salto de l�nea, se entiende que estamos en el final de una linea
+				case '\n': // si se encuentra un salto de linea, se entiende que estamos en el final de una linea
 					finDeLinea=true;
 					break;
 				case '\r': // idem que para \n
@@ -179,7 +179,7 @@ public class Proxy_Handler extends Thread {
         
         try {
             int read = socketCliente.getInputStream().read();
-            
+            System.err.println("Aquiiiiii");
             // Si no falta por leer informaci�n enviada desde el navegador, m�todo read() devolver� -1.
             if (read != -1) {
                 socketServidor.getOutputStream().write(read);
@@ -192,6 +192,8 @@ public class Proxy_Handler extends Thread {
                     socketCliente.shutdownInput();
                 }
             }
+            
+//            System.err.println("Aquiiiiii");
         } catch (IOException e) {
         	System.err.println("Error: Couldn't read from the buffer :>>> ");
         	// TODO Almacenar error en log
@@ -271,28 +273,18 @@ public class Proxy_Handler extends Thread {
 	
 	
 	/**
-	 * << En futuras versiones, este m�todo ser� sustitu�do por un Factory. >>
-	 * Devuelve encabezados HTTP, dependiendo del c�digo HTTP correspondiente.
+	 * Devuelve el encabezado OK del protocolo HTTP (código 200)
 	 */
-	private void escribeEncabezadoRespuesta(int codigoError) {
+	private void escribeEncabezadoRespuesta() {
+		
 		OutputStreamWriter streamWriterSalida;
 		try {
 			streamWriterSalida = new OutputStreamWriter(socketCliente.getOutputStream(), ISO);
 			
-			switch (codigoError) {
-				case 200:
-					streamWriterSalida.write(versionHTTP + " 200\r\n");
-//        			streamWriterSalida.write("Proxy-agent: Simple/0.1\r\n");
-        			streamWriterSalida.write("\r\n");
-        			streamWriterSalida.flush();
-        			break;
-				case 502:
-					streamWriterSalida.write(versionHTTP + " 502\r\n");
-//                  streamWriterSalida.write("Proxy-agent: Simple/0.1\r\n");
-                    streamWriterSalida.write("\r\n");
-                    streamWriterSalida.flush();
-                    break;
-			}
+			streamWriterSalida.write(versionHTTP + " 200\r\n");
+//			streamWriterSalida.write("Proxy-agent: Simple/0.1\r\n");
+			streamWriterSalida.write("\r\n");
+			streamWriterSalida.flush();
 			
 		} catch (IOException e) {
 			// TODO Almacenar error en log
