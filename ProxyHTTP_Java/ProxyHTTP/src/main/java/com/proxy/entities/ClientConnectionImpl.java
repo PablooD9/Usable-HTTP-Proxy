@@ -27,40 +27,31 @@ public class ClientConnectionImpl extends ClientConnection {
 	void sendRequest() {
 		String URLandPort = null;
 		try {
+			
 			// Obtenemos la primera linea de la peticion (obtenemos la URL, version HTTP y puerto remoto)		
 			String requestLine = readRequest();
 		
 			setHTTPVersion( obtenerVersionHTTP( requestLine ) );
 
 			URLandPort = obtenerURL( requestLine );
-			if (URLandPort == null) {
-				throw new IllegalStateException("Error getting URL and remote port");
-			}
 			
+			setHost( URLandPort.split(":")[0] );
 			
-			
-			/*
-			
-			if (URLandPort.contains(":")) {
-				this.setHostURL( URLandPort.split(":")[0] );
+			try {
 				setServerPort(Integer.parseInt( URLandPort.split(":")[1] ));
-				
-				// Una vez recogida la URL y el puerto, continuamos procesando las distintas 
-				// cabeceras de la petici�n hasta que no quede ninguna.
-				String aux = readRequest();
-				while (!aux.equals(""))
-					aux = readRequest();
-			}
-			
-			else // Va por HTTP
-			{
-				this.setHostURL( URLandPort.split(":")[0] );
+			} catch (ArrayIndexOutOfBoundsException aie) {
+				setHost( URLandPort.split(":")[0].split("/")[0] );
 				setServerPort( 80 );
 			}
 			
-			*/
+			// Una vez recogida la URL y el puerto, continuamos procesando las distintas 
+			// cabeceras de la petici�n hasta que no quede ninguna.
+			String aux = readRequest();
+			while (!aux.equals(""))
+				aux = readRequest();
 			
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			System.err.println("Error X :>>> ");
 			// TODO Almacenar error en log
 			e.printStackTrace();
@@ -89,12 +80,12 @@ public class ClientConnectionImpl extends ClientConnection {
 		while (( (characterRead = getClientSocket().getInputStream().read()) != -1) && !endOfLine) {
 			switch (characterRead)
 			{
-				case '\n': // si se encuentra un salto de l�nea, se entiende que estamos en el final de una linea
+				case '\n': // si se encuentra un salto de linea, se entiende que estamos en el final de una linea
 					endOfLine=true;
 					break;
-				case '\r': // idem que para \n
+				case '\r':
 					endOfLine=true;
-		            break;
+					break;
 		        default:
 		        	contentClientRequest.write( characterRead );
 		            break;
@@ -115,12 +106,13 @@ public class ClientConnectionImpl extends ClientConnection {
 				requestStr.contains("POST ") ||
 					requestStr.contains("GET "))
 		{
+
 			return requestStr.split(" ")[1].replaceAll("http[s]*://", "");
 		}
 		
-		System.out.println("esto: " + requestStr);
+		System.err.println( requestStr );
 		
-		return null;
+		throw new IllegalStateException("Error getting URL and remote port");
 	}
 	
 	/** MOVER A UNA CLASE

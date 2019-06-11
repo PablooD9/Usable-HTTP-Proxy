@@ -4606,7 +4606,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	}
 }
 
-@media ( min-width :768px) {
+@media ( min-width :768px){
 	.navbar-expand-md {
 		-webkit-box-orient: horizontal;
 		-webkit-box-direction: normal;
@@ -4650,6 +4650,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 		padding-right: 0;
 		padding-left: 0
 	}
+	
 }
 
 @media ( min-width :992px) {
@@ -10627,10 +10628,12 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+
 }
 
-
-
+.switch{
+	float: right;
+}
 
 
 /* Linea horizontal */
@@ -10639,4 +10642,12 @@ hr {
   margin-bottom: 1rem;
   border: 0;
   border-top: 3px solid green;
+}
+
+
+#dropdownMenuButton {
+	margin: 2rem auto auto auto;
+	display: block;
+	padding: .8rem 5rem;
+	font-size: 1.2rem;
 }

@@ -4,6 +4,9 @@ public abstract class Connection extends Thread implements Proxy
 {
 	private Connection clientConn;
 	private Connection serverConn;
+	private String URL;
+	private int serverPort;
+	
 	private final String ISO = "ISO-8859-1"; // Norma ISO correspondiente al alfabeto latino (�, �, �, etc.)
 	
 	public Connection() {}
@@ -17,9 +20,22 @@ public abstract class Connection extends Thread implements Proxy
 		return ISO;
 	}
 	
+	public String getHost() {
+		return URL;
+	}
+	void setHost(String uRL) {
+		URL = uRL;
+	}
+	public int getServerPort() {
+		return serverPort;
+	}
+	void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
+	}
+	
 	@Override
 	public void run() {
-		connection();
+		this.connection();
 	}
 	
 	@Override

@@ -25,4 +25,19 @@ public class ConfigurationController {
 		return "redirect:/";
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	public void pruebas() {
+		
+	}
+	
+	
+	
+	
+	
 }

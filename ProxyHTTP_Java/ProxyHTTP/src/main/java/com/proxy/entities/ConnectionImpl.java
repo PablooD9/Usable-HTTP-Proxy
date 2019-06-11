@@ -1,11 +1,13 @@
 package com.proxy.entities;
 
 public class ConnectionImpl extends Connection {
-
-	public ConnectionImpl(Connection clientConn) {
-		super( clientConn );
-	}
 	
+	public ConnectionImpl() {}
+	
+	public ConnectionImpl(Connection clientConnectionImpl) {
+		super(clientConnectionImpl);
+	}
+
 	@Override
 	void manageConnection(Connection conn) {
 		Thread thread = new Thread(new Runnable() {
@@ -16,6 +18,11 @@ public class ConnectionImpl extends Connection {
 		});  
 		thread.start();
 		
+	}
+	
+	@Override
+	public void run() {
+		connection();
 	}
 
 }

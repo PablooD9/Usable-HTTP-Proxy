@@ -14,5 +14,5 @@ public class ProxyConfig {
 	int getPuertoLocal() {
 		return puertoLocal;
 	}
-    
+
 }
