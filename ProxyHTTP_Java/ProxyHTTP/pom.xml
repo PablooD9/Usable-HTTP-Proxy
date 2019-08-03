@@ -40,29 +40,30 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver -->
+		<!--
 		<dependency>
-        	<groupId>org.mongodb</groupId>
-        	<artifactId>mongodb-driver-sync</artifactId>
-        	<version>3.10.1</version>
-    	</dependency>
-    	
-    	<!-- 
+		    <groupId>org.mongodb</groupId>
+		    <artifactId>mongo-java-driver</artifactId>
+		</dependency>
+		
+
     	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 		-->
 		
-		<dependency>
-        	<groupId>org.mongodb</groupId>
-        	<artifactId>mongodb-driver-sync</artifactId>
-        	<version>3.10.1</version>
-    	</dependency>
-		
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
+		</dependency>
+		
+		<dependency>
+    		<groupId>org.bouncycastle</groupId>
+    		<artifactId>bcpkix-jdk15on</artifactId>
+    		<version>1.62</version>
 		</dependency>
 		
 		

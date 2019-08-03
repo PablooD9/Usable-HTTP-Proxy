@@ -1,4 +1,4 @@
-package com.proxy.entities;
+package com.proxy.entity;
 
 public abstract class ProxyHttp {
 	

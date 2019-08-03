@@ -3,7 +3,7 @@ package com.proxy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.proxy.entities.DesignTest;
+import com.proxy.entity.DesignTest;
 
 @SpringBootApplication
 public class HttpProxyApplication {

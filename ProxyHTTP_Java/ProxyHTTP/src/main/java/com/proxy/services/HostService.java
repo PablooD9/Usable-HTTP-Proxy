@@ -1,5 +1,5 @@
 package com.proxy.services;
-
+/*
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,7 +29,7 @@ public class HostService {
 	
 	private List<String> maliciousHosts;
 	
-	
+*/	
 	/** Método encargado de actualizar la lista de hosts maliciosos, usada para bloquearlos al usuario.
 	 * Se encarga de lo siguiente:
 	 * 1º - Actualiza la lista que ofrece la URL 
@@ -39,6 +39,7 @@ public class HostService {
 	 * 4º - Vuelve a cargar la lista descargada desde la URL anterior
 	 * 5º - Cierra la conexión con la base de datos
 	 */
+/*
 	public void updateHostsList() {
 		getHostsList();
 //		parsedHostsList.forEach((host) -> System.out.println( host ));
@@ -56,11 +57,12 @@ public class HostService {
 		
 		client.close();
 	}
-	
+*/	
 	/** Obtiene la lista de hosts maliciosos desde la URL:
 	 * 		"https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts"
 	 * Los hosts obtenidos de la lista anterior son parseados e insertados en una lista.
 	 */
+/*
 	public void getHostsList(){
 		maliciousHosts = new ArrayList<>();
 		
@@ -121,7 +123,7 @@ public class HostService {
 	public void deleteAllHosts(MongoCollection<Document> collection) {
 		collection.deleteMany(new Document());
 	}
-	
+*/	
 	
 	
 	// ==== Usando repositorios (muy lento...) ==== \\
@@ -151,4 +153,4 @@ public class HostService {
 	}
 	*/
 	
-}
+//}

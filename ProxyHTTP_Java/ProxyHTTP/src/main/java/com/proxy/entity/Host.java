@@ -1,5 +1,5 @@
 /*
-package com.proxy.entities;
+package com.proxy.entity;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
