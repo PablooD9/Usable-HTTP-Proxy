@@ -1,11 +1,11 @@
 package com.proxy.entity.request;
 
-import java.io.InputStream;
+import java.util.List;
 
-public interface HttpRequest {
-	void loadHeaders(byte[] headerBytes);
+public interface IHttpRequest {
+//	void loadHeaders(byte[] headerBytes);
 	byte[] getHeadersByte();
-	Header[] getHeaders();
+//	Header[] getHeaders();
 	Header getHeader(String name);
 	
 	String getMethod();
@@ -14,9 +14,11 @@ public interface HttpRequest {
 	int getPort();
 	String getHost();
 	
-	void setSSLConnection(boolean sslConnection);
+	void setSSL(boolean ssl);
 	boolean isSSL();
 	
-	void setContent(InputStream content);
-	InputStream getContent();
+	// ==== LO NUEVO ====
+	
+	void parse(String headers);
+	List<Header> getHeaders();
 }

@@ -66,7 +66,7 @@ public class OtrasCosasDeUtilidad {
 	
 	
 
-	void manageConnection(Connection conn) {
+	void manageConnection(ConnectionImpl conn) {
 		
 		/*
 		OutputStream outstream;

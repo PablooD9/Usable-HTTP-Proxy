@@ -5,6 +5,8 @@ public class ProxyConfig {
 	private final int localPort = 8080;
 	private final int maxNumOfClientReqWaiting = 20;
 	private final String host = "localhost";
+	
+	private final int socketTimeOut = 120000;
 	 
     private ProxyConfig(){}
  
@@ -23,5 +25,9 @@ public class ProxyConfig {
 	
 	String getHost() {
 		return host;
+	}
+	
+	int getSocketTimeOut() {
+		return socketTimeOut;
 	}
 }

@@ -1,5 +1,6 @@
 package com.proxy.entity.certificate;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.security.Key;
+import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -17,6 +18,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -25,15 +27,19 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -46,6 +52,9 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
+import com.proxy.entity.SingleX509KeyManager;
+import com.proxy.entity.util.Base64;
 
 /**
  * @author Pablo
@@ -77,13 +86,10 @@ public class SSLManager {
 	}
 	*/
 	private X509Certificate[] certsChain;
-	
 	private X509Certificate CACertificate;
-	private KeyPair CAKeyPair;
-	private Date startDate, endDate;
 	private PrivateKey caPrivateKey;
-	
-	private File CAKeyStoreFile;
+
+	private Date startDate, endDate;
 	
 	private final String CAKeyStore = "ProxyCA.p12";
 	private final String ksPassword = "PassWorD!";
@@ -92,7 +98,6 @@ public class SSLManager {
 	
 	public SSLManager() {
 		setDates();
-		CAKeyStoreFile = new File( CAKeyStore );
 		Security.addProvider(new BouncyCastleProvider()); 
 		
 		try {
@@ -167,14 +172,14 @@ public class SSLManager {
 		    		.build(CAkp.getPrivate()))); // private key of signing authority , here it is self signed
 		    
 		    CACertificate = CACert;
-		    CAKeyPair = CAkp;
 		    certsChain = new X509Certificate[1]; // this array will store the CACertificate
 		    certsChain[0] = CACertificate;
 		    
 		    saveCACertToFile();
 		    System.err.println("<=== CA Certificate created! ===>");
 		    
-		    saveCertToKeyStore( CAAlias, CAKeyPair.getPrivate(), certsChain);
+		    saveCertToKeyStore( CAAlias, CAkp.getPrivate(), certsChain);
+			
 		}
 		else
 		{
@@ -183,8 +188,6 @@ public class SSLManager {
 	}
 	
 	private void loadCAFromKeyStore(File CAKeyStoreFile) {
-		if (!CAKeyStoreFile.exists())
-			return ;
 		
 		InputStream in = null; 
 		try {
@@ -200,9 +203,8 @@ public class SSLManager {
 			
 			CACertificate = certsChain[0];
 			
-			// Create self signed Root CA certificate  
-		    KeyPair CAkp = generateKeyPair();  
-			CAKeyPair = CAkp;
+//			System.setProperty("javax.net.ssl.keyStorePassword", ksPassword);
+//			System.setProperty("javax.net.ssl.keyStore", "ProxyCA.p12");
 		    
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -250,7 +252,7 @@ public class SSLManager {
 							builder.build(
 									new JcaContentSignerBuilder("SHA256withRSA")
 									.setProvider("BC")
-							.build(CAKeyPair.getPrivate()))); // private key of signing authority
+							.build(caPrivateKey))); // private key of signing authority
 				
 				X509Certificate[] certsChain = getCertChain( endUserCert );
 			    saveCertToKeyStore( hostname, endEntityCertKeyPair.getPrivate(), certsChain );
@@ -325,7 +327,11 @@ public class SSLManager {
 				os = new FileOutputStream(hostnameAsAlias + ".p12");
 				ks = KeyStore.getInstance( ksType );
 				ks.load( null, ksPassword.toCharArray() );
-				addEntryToKS(hostnameAsAlias, certPrivKey, certsChain, ks);
+				
+//				if (certsChain.length < 2) // CA certificate if .length < 2
+					addEntryToKS(hostnameAsAlias, certPrivKey, certsChain, ks);
+//				else
+//					addEntryToKS(hostnameAsAlias, certsChain[1], ks);
 				initializeKSfromKS( ks, os );
 			} catch (KeyStoreException e) {
 				// TODO Auto-generated catch block
@@ -342,7 +348,6 @@ public class SSLManager {
 			}
 		
 	}
-
 	
 	private void initializeKSfromKS(KeyStore ks, OutputStream out) {
 		try {
@@ -378,32 +383,65 @@ public class SSLManager {
 			throws KeyStoreException {
 		ks.setKeyEntry(hostnameAsAlias, certPrivKey, ksPassword.toCharArray(), certsChain);
 	}
+	
+	private void addEntryToKS(String hostnameAsAlias, X509Certificate cert, KeyStore ks)
+			throws KeyStoreException {
+		KeyStore.Entry entry = new KeyStore.TrustedCertificateEntry(cert);
+		ks.setEntry(hostnameAsAlias, entry, null);
+	}
 
-	public SSLContext generateContext(String host) throws NoSuchAlgorithmException, CertificateException, FileNotFoundException, KeyStoreException, 
-																												IOException, UnrecoverableKeyException, KeyManagementException 
+	public SSLContext generateContext(String host) 
 	{
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+		KeyManagerFactory kmf;
+		try {
+			kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+			
+			KeyStore ks = getKeyStore(host);
+			kmf.init(ks, ksPassword.toCharArray());
+			
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
+			tmf.init(ks);
+			
+			PrivateKey pk = (PrivateKey) ks.getKey(host, ksPassword.toCharArray());
+			Certificate[] chain = ks.getCertificateChain(host);
+			X509Certificate[] certChain = new X509Certificate[chain.length];
+			System.arraycopy(chain, 0, certChain, 0, chain.length);
+			
+			X509KeyManager km = new SingleX509KeyManager(host,
+					pk, certChain);
+
+			SSLContext sslContext = SSLContext.getInstance("TLS");
+//			sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+			sslContext.init(new KeyManager[] { km }, new TrustManager[] { new DefaultTrustManager() }, null);
+//			sslContext.init(kmf.getKeyManagers(), new TrustManager[] { new DefaultTrustManager() }, new SecureRandom()); // accept all certificates (yuyu)
+			
+			return sslContext;
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnrecoverableKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		KeyStore ks = getKeyStore(host);
-		kmf.init(ks, ksPassword.toCharArray());
-		
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
-		tmf.init(ks);
-		
-		SSLContext sslContext = SSLContext.getInstance("TLS");
-		sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
-		
-		return sslContext;
+		return null;
 	}
 	
 	private KeyStore getKeyStore(String hostname) {
 		File file = new File(hostname + ".p12");
-		InputStream in;
+		InputStream in = null;
 		KeyStore ks = null;
 		try {
 			in = new FileInputStream(file);
 			ks = KeyStore.getInstance( ksType );
 			ks.load(in, ksPassword.toCharArray());
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -419,21 +457,43 @@ public class SSLManager {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return ks;
 	}
 	
 	private String getCACert() throws CertificateEncodingException {
 		try {
-			// TODO intentar cambiar esto, para ver si se puede prescindir de la mierda esa de Base64.
 			return "-----BEGIN CERTIFICATE-----\n"
-					+ Base64(certsChain[0].getEncoded(), // certsChain[0] => CA cert
-							Base64.)
+					+ Base64.encodeBytes(certsChain[0].getEncoded(),
+							Base64.DO_BREAK_LINES)
 					+ "\n-----END CERTIFICATE-----\n";
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
-
 	}
+
 }
+
+
+class DefaultTrustManager implements X509TrustManager {
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+    @Override
+    public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+        return null;
+    }
+}
+

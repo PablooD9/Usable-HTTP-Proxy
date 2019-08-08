@@ -1,7 +1,5 @@
 package com.proxy.entity.request;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -11,31 +9,25 @@ import java.util.List;
  * @author Pablo
  *
  */
-public class HttpRequestImpl implements HttpRequest {
+public class HttpRequestImpl implements IHttpRequest {
 
 	private String method;
 	private String requestedResource;
 	private String httpVersion;
 	private String host;
 	private int port = -1;
-	private Header[] headers;
+//	private Header[] headers;
+	private List<Header> headers;
 	private String[] body;
 	private boolean isSSL;
 	
 	private byte[] headersByte;
-	private InputStream reqContent;
 	
-	private final static String ASCII = "ASCII";
+//	private final static String ASCII = "ASCII";
 	
-	
-	@Override
-	public void setContent(InputStream content) {
-		this.reqContent = content;
-	}
-
-	@Override
-	public InputStream getContent() {
-		return reqContent;
+	public List<Header> getHeaders() {
+		// TODO Auto-generated method stub
+		return headers;
 	}
 	
 	public byte[] getHeadersByte() {
@@ -82,18 +74,24 @@ public class HttpRequestImpl implements HttpRequest {
 		this.body = body;
 	}
 	
-	public void setSSLConnection(boolean sslConnection) {
-		this.isSSL = sslConnection;
+	public void setSSL(boolean ssl) {
+		this.isSSL = ssl;
 	}
 	
 	public boolean isSSL() {
 		return isSSL;
 	}
 	
-	public Header[] getHeaders() {
-		return headers;
+	
+	public HttpRequestImpl() {
+		headers = new ArrayList<>();
 	}
 	
+//	public Header[] getHeaders() {
+//		return headers;
+//	}
+	
+	/*
 	public void loadHeaders(byte[] headersByte) {
 		this.headersByte = headersByte;
 		String[] headerLines = getHeaderLines(headersByte);
@@ -121,12 +119,15 @@ public class HttpRequestImpl implements HttpRequest {
 		}
 		
 		System.out.print("Method: " + method + ", ");
-		System.out.println("Requested Resource: " + requestedResource + ", ");
+		System.out.print("Requested Resource: " + requestedResource + ", ");
 		System.out.print("HttpVersion: " + httpVersion + ", ");
 		System.out.print("Host: " + host + ", ");
 		System.out.println("Port: " + port + ".");
+		
 	}
+	*/
 	
+	/*
 	public Header getHeader(String name) {
 		if (headers != null) {
 			for (int i=0; i< headers.length; i++) {
@@ -138,7 +139,9 @@ public class HttpRequestImpl implements HttpRequest {
 		
 		throw new IllegalStateException("Impossible to get the list of headers.");
 	}
+	*/
 	
+	/*
 	private String[] getHeaderLines(byte[] headersByte) {
 		List<String> headerLines = new ArrayList<>();
 		byte[] separators = new byte[] {'\r', '\n'};
@@ -164,8 +167,9 @@ public class HttpRequestImpl implements HttpRequest {
 		
 		return headerLines.toArray(new String[headerLines.size()]);
 	}
+	*/
 	
-	
+	/*
 	private Header[] getHeaders(String[] headerLines) {
 		if (headerLines.length <= 0)
 			return null;
@@ -182,6 +186,7 @@ public class HttpRequestImpl implements HttpRequest {
 		
 		return headers.toArray(new Header[headers.size()]);
 	}
+	*/
 	
 	
 	private String getKeyOfHeader(String headerLine) {
@@ -206,7 +211,7 @@ public class HttpRequestImpl implements HttpRequest {
 	 * @param start
 	 * @return
 	 */
-	private int indexOf(byte[] separator, int start, byte[] headersByte) {
+	/*private int indexOf(byte[] separator, int start, byte[] headersByte) {
 		if (headersByte == null)
 			throw new NullPointerException("array is null");
 		if (headersByte.length - start < separator.length)
@@ -226,11 +231,51 @@ public class HttpRequestImpl implements HttpRequest {
 			return sep;
 		return -1;
 	}
-
-	public void setContent() {
+	*/
+	
+	@Override
+	public void parse(String headerLines) {
+		String[] headersSplitted = headerLines.split("\r\n");
 		
+		try {
+		loadFirstReqLine(headersSplitted[0]);
+		} catch(IllegalStateException ise) {
+			// TODO
+			System.err.println("Ojito! Petición vacía.");
+//			ise.printStackTrace();
+		}
+		
+		int counter=0;
+		while(headersSplitted.length > counter 
+				&& headersSplitted[counter] != null 
+				&& !headersSplitted[counter].equals("") )
+		{
+			loadHeader( headersSplitted[counter++] );
+		}
+		
+		if (port == -1){
+			if (isSSL())
+				port = 443;
+			else
+				port = 80;
+		}
+			
+		if (headers.isEmpty())
+			return;
+		
+		host = headers.stream().filter(header -> header.getKey().equalsIgnoreCase("host"))
+								.findFirst()
+								.orElse(null)
+								.getValues();
+		
+		System.out.print("Method: " + method + ", \t");
+		System.out.print("Requested Resource: " + requestedResource + ", \t");
+		System.out.print("HttpVersion: " + httpVersion + ", \t");
+		System.out.print("Host: " + host + ", \t");
+		System.out.println("Port: " + port + ".");
+		
+		// Ahora iría el Body........
 	}
-
 	
 	
 	/** CONNECT www.google.com:443 HTTP/1.1
@@ -277,20 +322,19 @@ public class HttpRequestImpl implements HttpRequest {
 			requestedResource = resource;
 	}
 
-	
-	/* Crear métodos para, a partir de las cabeceras recopiladas:
+	private void loadHeader(String headerLine) {
+		String key = getKeyOfHeader(headerLine);
+		String values = getValuesOfHeader(headerLine);
+		headers.add(new Header(key, values));
+	}
+
+	@Override
+	public Header getHeader(String name) {
+		Header headerFound = headers.parallelStream().filter(header -> header.getKey().equalsIgnoreCase(name))
+													 .findFirst()
+													 .orElse(null);
 		
-		1º. ARREGLAR BUG: la cabecera de la petición (CONNECT http://.... http/1.1), ahora mismo, está incluida dentro de la lista "headers". Hay que quitarla de ahí
-		y, en su lugar, rellenar las propiedades "method", "requestedResource" y "httpVersion" con lo que se vea en esa línea.
-		2º. Obtener host a partir de la cabecera "Host".
-		3º. Obtener el body (esto en principio será algo más complejo).
-		
-		
-	*/
-	
-	
-	
-	
-	
-	
+		return headerFound;
+	}
+
 }
