@@ -1,10 +1,6 @@
 package com.proxy.entity;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -16,7 +12,7 @@ public class OtrasCosasDeUtilidad {
 	
 	
 	public static void main(String[] args) {
-		HttpClient client = HttpClient.newBuilder()
+		/*HttpClient client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
                 .priority(1)
                 .version(HttpClient.Version.HTTP_2)
@@ -62,6 +58,7 @@ public class OtrasCosasDeUtilidad {
 		responseString += response.body();
 		
 		System.out.println( responseString );
+		*/
 	}
 	
 	

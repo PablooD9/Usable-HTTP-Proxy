@@ -65,11 +65,11 @@ body {
 	font-family: Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 		"Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
 		"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-	font-size: 1rem;
-	font-weight: 400;
-	line-height: 1.5;
+	font-size: 1.2rem;
+	font-weight: 300;
+	line-height: 1.2;
 	color: #212529;
-	text-align: left;
+	text-align: center;
 	background-color: #fff
 }
 
@@ -158,7 +158,8 @@ sup {
 a {
 	color: #1abc9c;
 	text-decoration: none;
-	background-color: transparent
+	background-color: transparent;
+	font-size: 1rem
 }
 
 a:hover {
@@ -357,7 +358,7 @@ template {
 }
 
 .h1, h1 {
-	font-size: 2.5rem
+	font-size: 2.2rem
 }
 
 .h2, h2 {
@@ -4444,6 +4445,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	display: block
 }
 
+/*
 .navbar {
 	position: relative;
 	display: -webkit-box;
@@ -4458,6 +4460,16 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	-ms-flex-pack: justify;
 	justify-content: space-between;
 	padding: .5rem 1rem
+}
+*/
+
+.navbar {
+	position: relative;
+	padding: 1rem 1rem;
+	margin-left: .6rem;
+	width: 14.5rem;
+	background-color: #111;
+	text-align: center;
 }
 
 .navbar>.container, .navbar>.container-fluid {
@@ -4479,10 +4491,10 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	padding-top: 1.4rem;
 	padding-bottom: .3125rem;
 	margin-right: 1rem;
-	font-size: 1.25rem;
+	margin-bottom: 0.6rem;
+	font-size: 1rem;
 	line-height: inherit;
 	white-space: nowrap;
-	font-size: 1.5em;
 }
 
 .navbar-brand:focus, .navbar-brand:hover {
@@ -10025,6 +10037,7 @@ supports ((position:-webkit-sticky ) or (position:sticky )){ .
 }
 
 .text-uppercase {
+	font-size: 0.7rem;
 	text-transform: uppercase !important
 }
 
@@ -10249,7 +10262,7 @@ a.text-dark:focus, a.text-dark:hover {
 
 @media ( min-width :992px) {
 	.page-section .page-section-heading {
-		font-size: 3rem;
+		font-size: 2.2rem;
 		line-height: 2.5rem
 	}
 }
@@ -10384,7 +10397,7 @@ a.text-dark:focus, a.text-dark:hover {
 		transition: padding-top .3s, padding-bottom .3s
 	}
 	#mainNav .navbar-brand {
-		font-size: 1.9em;
+		font-size: 1.75em;
 		-webkit-transition: font-size .3s;
 		transition: font-size .3s
 	}
@@ -10410,13 +10423,13 @@ a.text-dark:focus, a.text-dark:hover {
 }
 
 .masthead {
-	padding-top: calc(6rem + 74px);
+	padding-top: calc(2.2rem + 74px);
 	padding-bottom: 6rem
 }
 
 .masthead .masthead-heading {
-	font-size: 2.75rem;
-	line-height: 2.75rem
+	font-size: 2.2rem;
+	line-height: 2.2rem
 }
 
 .masthead .masthead-subheading {
@@ -10429,11 +10442,11 @@ a.text-dark:focus, a.text-dark:hover {
 
 @media ( min-width :992px) {
 	.masthead {
-		padding-top: calc(6rem + 104px);
+		padding-top: calc(1.5rem + 104px);
 		padding-bottom: 6rem
 	}
 	.masthead .masthead-heading {
-		font-size: 4rem;
+		font-size: 2.6rem;
 		line-height: 3.5rem
 	}
 	.masthead .masthead-subheading {
@@ -10650,4 +10663,111 @@ hr {
 	display: block;
 	padding: .8rem 5rem;
 	font-size: 1.2rem;
+}
+
+.btn-info {
+	background-color: #1ab5ff;
+	border-style: solid;
+	border-radius: 10%;
+	border-color: #000;
+	font-size: 2.5rem;
+	padding: 1.5rem;
+	margin-top: 3rem;
+}
+
+.feature {
+	padding-left: 0.5rem
+}
+
+.fa-question-circle {
+	cursor: pointer;
+	color: blue;
+}
+
+.btn {
+	cursor: pointer
+}
+
+.fa-5x {
+	padding-bottom: 2rem
+}
+
+.sidenav {
+  padding-top: 2%;
+  margin-top: 2.55rem;
+  margin-left: .6rem;
+  border-bottom-right-radius: 1.5rem;
+  border-top-left-radius: .5rem;
+  border-bottom-left-radius: .5rem;
+  height: 8rem;
+  width: 0; /* Unfolded menu */
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  -webkit-box-shadow: .75rem .9rem .6rem rgba(0, 0, 0, .15) !important; /* width heigth "strength" color*/
+  box-shadow: .75rem .9rem .6rem rgba(0, 0, 0, .15) !important
+}
+
+.sidenav a {
+  padding-left: 1.2rem;
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: #FFF;
+  display: block;
+  transition: 0.3s;
+  text-align: left;
+  padding-bottom: .7rem;
+}
+
+.sidenav a:hover {
+  color: #828282;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 8%;
+  font-size: 1.7rem;
+  margin-left: 1rem;
+}
+
+@media screen and (max-width: 450px) {
+  .sidenav {
+    margin-top: 2.1rem;
+	margin-left: .6rem;
+	height: 6.7rem;
+	width: 0; /* Unfolded menu */
+	/*width: 11.5rem !important;*/
+	padding-top: 38px;
+  }
+  .sidenav a {
+    padding-left: .7rem;
+  	font-size: 15.5px;
+  }
+  .navbar {
+	position: fixed;
+	padding: .5rem .5rem;
+	margin-left: .6rem;
+	width: 10rem;
+	background-color: #111;
+	text-align: center;
+  }
+  #configNav {
+  	font-size: .8rem;
+  }
+}
+
+#configNav {
+	float: left;
+	-webkit-box-shadow: .75rem .4rem .6rem rgba(0, 0, 0, .15) !important; /* width heigth "strength" color*/
+    box-shadow: .75rem .4rem .6rem rgba(0, 0, 0, .15) !important
+}
+
+nav span {
+	color: #FFF;
+	font-size: 24px;
 }

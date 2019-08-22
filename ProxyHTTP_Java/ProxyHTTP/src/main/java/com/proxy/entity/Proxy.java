@@ -1,5 +1,5 @@
 package com.proxy.entity;
 
 public interface Proxy {
-	void connection();
+	void establishConnection();
 }

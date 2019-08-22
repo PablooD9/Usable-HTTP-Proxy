@@ -18,7 +18,7 @@ public class HttpRequestImpl implements IHttpRequest {
 	private int port = -1;
 //	private Header[] headers;
 	private List<Header> headers;
-	private String[] body;
+	private String body;
 	private boolean isSSL;
 	
 	private byte[] headersByte;
@@ -66,11 +66,11 @@ public class HttpRequestImpl implements IHttpRequest {
 		return host;
 	}
 
-	public String[] getBody() {
+	public String getBody() {
 		return body;
 	}
 
-	void setBody(String[] body) {
+	public void setBody(String body) {
 		this.body = body;
 	}
 	
@@ -238,14 +238,15 @@ public class HttpRequestImpl implements IHttpRequest {
 		String[] headersSplitted = headerLines.split("\r\n");
 		
 		try {
-		loadFirstReqLine(headersSplitted[0]);
+			loadFirstReqLine(headersSplitted[0]);
 		} catch(IllegalStateException ise) {
 			// TODO
-			System.err.println("Ojito! Petición vacía.");
+			System.err.println("EMPTY REQUEST");
+			return ;
 //			ise.printStackTrace();
 		}
 		
-		int counter=0;
+		int counter=1;
 		while(headersSplitted.length > counter 
 				&& headersSplitted[counter] != null 
 				&& !headersSplitted[counter].equals("") )
@@ -268,13 +269,18 @@ public class HttpRequestImpl implements IHttpRequest {
 								.orElse(null)
 								.getValues();
 		
+		if (host.contains(":"))
+		{
+			port = Integer.parseInt(host.split(":")[1]);
+			host = host.split(":")[0];
+		}
+		
 		System.out.print("Method: " + method + ", \t");
 		System.out.print("Requested Resource: " + requestedResource + ", \t");
 		System.out.print("HttpVersion: " + httpVersion + ", \t");
 		System.out.print("Host: " + host + ", \t");
 		System.out.println("Port: " + port + ".");
 		
-		// Ahora iría el Body........
 	}
 	
 	
@@ -283,11 +289,17 @@ public class HttpRequestImpl implements IHttpRequest {
 	 * @param firstLine
 	 */
 	private void loadFirstReqLine(String firstLine) {
-//		System.out.println(firstLine);
+		System.err.println("esto: " + firstLine + "en Thread::>>>> " + Thread.currentThread().getName());
 		String[] splittedFirstLine = firstLine.trim().split("[ ]+");
 		
-		if (!(splittedFirstLine.length==3))
-			throw new IllegalStateException("Bad request format.");
+		if (!(splittedFirstLine.length==3)) {
+			if (splittedFirstLine.length==2)
+				System.err.println("LONGITUD 2: " + splittedFirstLine[0] + "" + splittedFirstLine[1]);
+			else if (splittedFirstLine.length==1)
+				System.err.println("LONGITUD 1: " + splittedFirstLine[0]);
+
+			throw new IllegalStateException();
+		}
 		
 		String method = splittedFirstLine[0];
 		this.method = method;
@@ -335,6 +347,14 @@ public class HttpRequestImpl implements IHttpRequest {
 													 .orElse(null);
 		
 		return headerFound;
+	}
+
+	@Override
+	public void setHeader(String headerName, String newValue) {
+		Header header;
+		if (( header=getHeader(headerName)) != null) {
+			header.setValues(newValue);
+		}
 	}
 
 }

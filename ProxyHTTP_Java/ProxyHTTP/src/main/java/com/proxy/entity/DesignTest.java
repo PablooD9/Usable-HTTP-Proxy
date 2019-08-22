@@ -8,7 +8,7 @@ public class DesignTest {
 	
 	public void start() {
 		Proxy connHandler = new ProxyImpl();
-		connHandler.connection();
+//		connHandler.establishConnection();
 	}
 
 }

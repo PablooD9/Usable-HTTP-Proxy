@@ -3,12 +3,11 @@ package com.proxy.entity;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
 
 public abstract class SecureConnectionHandler extends Thread implements ConnectionHandler {
-	
-	public abstract SSLContext createSSLContext(String host);
 	
 	public void setSSLConnection(boolean ssl)
 	{
@@ -27,4 +26,8 @@ public abstract class SecureConnectionHandler extends Thread implements Connecti
 		// TODO
 		throw new IllegalStateException("What happened here? SOCKET");
 	}
+	
+	public abstract SSLContext createSSLContext(String host);
+	public abstract void setConnectionHandler(ConnectionHandler connHandler);
+		
 }

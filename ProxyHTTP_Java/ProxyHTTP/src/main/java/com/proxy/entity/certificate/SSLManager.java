@@ -1,6 +1,5 @@
 package com.proxy.entity.certificate;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,9 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -18,17 +15,15 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -36,7 +31,6 @@ import java.util.Random;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
@@ -54,7 +48,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import com.proxy.entity.SingleX509KeyManager;
-import com.proxy.entity.util.Base64;
 
 /**
  * @author Pablo
@@ -94,36 +87,18 @@ public class SSLManager {
 	private final String CAKeyStore = "ProxyCA.p12";
 	private final String ksPassword = "PassWorD!";
 	private final String ksType = "PKCS12";
-	private final String CAAlias = "ProxyCA";
+//	private final String ksType = "JKS";
+	
+	private final String CAAlias = "proxyca";
 	
 	public SSLManager() {
 		setDates();
+		setSystemProperties();
+		
 		Security.addProvider(new BouncyCastleProvider()); 
 		
-		try {
-			generateCACertificate();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OperatorCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnrecoverableEntryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		generateCACertificate(false);
+		generateEndEntityCert("localhost");
 	}
 	
 	
@@ -140,45 +115,51 @@ public class SSLManager {
 	    endDate = c.getTime();
 	}
 	
-
-	public void generateCAandEndUserCertificates(String hostname) throws CertificateException, OperatorCreationException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, UnrecoverableEntryException {
-		generateCACertificate();
-		generateEndEntityCert(hostname);
-	}
-	
 	// With Bouncy Castle
-	public void generateCACertificate() throws NoSuchAlgorithmException, NoSuchProviderException, CertificateException, OperatorCreationException, IOException, KeyStoreException, UnrecoverableEntryException
+	public void generateCACertificate(boolean fileExistsButNotImportedIntoKS)
 	{
 		File caFile = new File("ProxyCACert.pem");
-		if (!caFile.exists())
+		if (!caFile.exists() || fileExistsButNotImportedIntoKS)
 		{
-			System.err.println("===> Creating CA Certificate! <===");
-			// Create self signed Root CA certificate  
-		    KeyPair CAkp = generateKeyPair();  
-		    
-		    X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(  
-		         new X500Name("C=Oviedo, ST=Asturias, L=Spain, O=Proxy TFG, OU=Proxy TFG, CN=ProxyTFGCA"), // issuer authority  
-		         BigInteger.valueOf(new Random().nextInt()), //serial number of certificate  
-		         startDate, // start of validity  
-		         endDate, //end of certificate validity  
-		         new X500Name("C=Oviedo, ST=Asturias, L=Spain, O=Proxy TFG, OU=Proxy TFG, CN=ProxyTFGCA"), // subject name of certificate  
-		         CAkp.getPublic()); // public key of certificate  
-		    
-		    // key usage restrictions  
-		    builder.addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign));  
-		    builder.addExtension(Extension.basicConstraints, false, new BasicConstraints(true));  
-		    X509Certificate CACert = new JcaX509CertificateConverter().getCertificate(builder  
-		    		.build(new JcaContentSignerBuilder("SHA256withRSA").setProvider("BC")
-		    		.build(CAkp.getPrivate()))); // private key of signing authority , here it is self signed
-		    
-		    CACertificate = CACert;
-		    certsChain = new X509Certificate[1]; // this array will store the CACertificate
-		    certsChain[0] = CACertificate;
-		    
-		    saveCACertToFile();
-		    System.err.println("<=== CA Certificate created! ===>");
-		    
-		    saveCertToKeyStore( CAAlias, CAkp.getPrivate(), certsChain);
+			try {
+				System.err.println("===> Creating CA Certificate! <===");
+				// Create self signed Root CA certificate  
+			    KeyPair CAkp = generateKeyPair();  
+			    
+			    X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(  
+			         new X500Name("C=Oviedo, ST=Asturias, L=Spain, O=Proxy TFG, OU=Proxy TFG, CN=ProxyTFGCA"), // issuer authority  
+			         BigInteger.valueOf(new Random().nextInt()), //serial number of certificate  
+			         startDate, // start of validity  
+			         endDate, //end of certificate validity  
+			         new X500Name("C=Oviedo, ST=Asturias, L=Spain, O=Proxy TFG, OU=Proxy TFG, CN=ProxyTFGCA"), // subject name of certificate  
+			         CAkp.getPublic()); // public key of certificate  
+			    
+			    // key usage restrictions  
+			    builder.addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign));  
+			    builder.addExtension(Extension.basicConstraints, false, new BasicConstraints(true));  
+			    X509Certificate CACert = new JcaX509CertificateConverter().getCertificate(builder  
+			    		.build(new JcaContentSignerBuilder("SHA256withRSA").setProvider("BC")
+			    		.build(CAkp.getPrivate()))); // private key of signing authority , here it is self signed
+			    
+			    CACertificate = CACert;
+			    certsChain = new X509Certificate[1]; // this array will store the CACertificate
+			    certsChain[0] = CACertificate;
+			    caPrivateKey = CAkp.getPrivate();
+			    
+			    saveCACertToFile();
+			    System.err.println("<=== CA Certificate created! ===>");
+			    
+			    saveCertToKeyStore( CAAlias, CAkp.getPrivate(), certsChain);
+			} catch (CertificateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (OperatorCreationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}
 		else
@@ -191,20 +172,28 @@ public class SSLManager {
 		
 		InputStream in = null; 
 		try {
-			in = new FileInputStream(CAKeyStoreFile);
+//			in = new FileInputStream(CAKeyStoreFile);
+			in = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
 			
 			KeyStore keyStore = KeyStore.getInstance( ksType );
-			keyStore.load(in, ksPassword.toCharArray());
-			caPrivateKey = (PrivateKey) keyStore.getKey(CAAlias, ksPassword.toCharArray());
+//			keyStore.load(in, ksPassword.toCharArray());
+			keyStore.load(in, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
+			
+			if (!keyStore.containsAlias(CAAlias))
+			{
+				generateCACertificate(true);
+				return ;
+			}
+			
+//			caPrivateKey = (PrivateKey) keyStore.getKey(CAAlias, ksPassword.toCharArray());
+			caPrivateKey = (PrivateKey) keyStore.getKey(CAAlias, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
+			
 			Certificate[] chain = keyStore.getCertificateChain(CAAlias);
 				
 			certsChain = new X509Certificate[chain.length];
 			System.arraycopy(chain, 0, certsChain, 0, chain.length);
 			
 			CACertificate = certsChain[0];
-			
-//			System.setProperty("javax.net.ssl.keyStorePassword", ksPassword);
-//			System.setProperty("javax.net.ssl.keyStore", "ProxyCA.p12");
 		    
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -279,8 +268,39 @@ public class SSLManager {
 	}
 	
 	private boolean certAlreadyGeneratedFor(String hostname) {
-		File file = new File(hostname + ".p12");
-		return (file.exists()) ? true : false;
+//		File file = new File(hostname + ".p12");
+//		return (file.exists()) ? true : false;
+		
+		File keystoreFile = new File(System.getProperty("javax.net.ssl.keyStore"));
+		FileInputStream is=null;
+		try {
+			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+		
+			KeyStore keystore = KeyStore.getInstance( ksType );
+			keystore.load(is, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
+			
+			if (keystore.containsAlias( hostname ))
+			{
+				return true;
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return false;
 	}
 	
 	private static KeyPair generateKeyPair() {  
@@ -321,6 +341,7 @@ public class SSLManager {
 	}
 	
 	private void saveCertToKeyStore(String hostnameAsAlias, PrivateKey certPrivKey, X509Certificate[] certsChain) {
+		/*
 		OutputStream os;	
 		KeyStore ks;
 			try {
@@ -346,12 +367,33 @@ public class SSLManager {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		*/
 		
-	}
-	
-	private void initializeKSfromKS(KeyStore ks, OutputStream out) {
+		
+		File keystoreFile = new File(System.getProperty("javax.net.ssl.keyStore"));
+		FileInputStream is=null;
 		try {
-			ks.store(out, ksPassword.toCharArray());
+			// Load the Java Default KeyStore content into an auxiliar "keystore"
+			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+			KeyStore keystore = KeyStore.getInstance( ksType );
+			keystore.load(is, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
+			
+			if (keystore.containsAlias(hostnameAsAlias))
+			{
+				System.out.println("Alias is in the KS! ");
+				keystore.deleteEntry(hostnameAsAlias);
+			}
+//			else
+//			{
+			// Add the certificate to the auxiliar keystore
+			keystore.setKeyEntry(hostnameAsAlias, certPrivKey, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray(), certsChain);
+			
+			// Save the new keystore content from the auxiliar to the "real" Java Default KeyStore
+			FileOutputStream out = new FileOutputStream(keystoreFile);
+			keystore.store(out, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
+			out.close();
+//			}
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -368,26 +410,14 @@ public class SSLManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			if (out != null)
-				try {
-					out.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			try {
+				is.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-	}
-	
-	
-	private void addEntryToKS(String hostnameAsAlias, PrivateKey certPrivKey, X509Certificate[] certsChain, KeyStore ks)
-			throws KeyStoreException {
-		ks.setKeyEntry(hostnameAsAlias, certPrivKey, ksPassword.toCharArray(), certsChain);
-	}
-	
-	private void addEntryToKS(String hostnameAsAlias, X509Certificate cert, KeyStore ks)
-			throws KeyStoreException {
-		KeyStore.Entry entry = new KeyStore.TrustedCertificateEntry(cert);
-		ks.setEntry(hostnameAsAlias, entry, null);
+		
 	}
 
 	public SSLContext generateContext(String host) 
@@ -396,13 +426,16 @@ public class SSLManager {
 		try {
 			kmf = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
 			
-			KeyStore ks = getKeyStore(host);
-			kmf.init(ks, ksPassword.toCharArray());
+//			KeyStore ks = getKeyStore(host);
+			KeyStore ks = getKeyStore();
+//			kmf.init(ks, ksPassword.toCharArray());
+			kmf.init(ks, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
 			
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance( "X509" );
 			tmf.init(ks);
 			
-			PrivateKey pk = (PrivateKey) ks.getKey(host, ksPassword.toCharArray());
+//			PrivateKey pk = (PrivateKey) ks.getKey(host, ksPassword.toCharArray());
+			PrivateKey pk = (PrivateKey) ks.getKey(host, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
 			Certificate[] chain = ks.getCertificateChain(host);
 			X509Certificate[] certChain = new X509Certificate[chain.length];
 			System.arraycopy(chain, 0, certChain, 0, chain.length);
@@ -410,10 +443,9 @@ public class SSLManager {
 			X509KeyManager km = new SingleX509KeyManager(host,
 					pk, certChain);
 
-			SSLContext sslContext = SSLContext.getInstance("TLS");
-//			sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-			sslContext.init(new KeyManager[] { km }, new TrustManager[] { new DefaultTrustManager() }, null);
-//			sslContext.init(kmf.getKeyManagers(), new TrustManager[] { new DefaultTrustManager() }, new SecureRandom()); // accept all certificates (yuyu)
+			SSLContext sslContext = SSLContext.getInstance("SSLv3");
+			sslContext.init(new KeyManager[] { km }, tmf.getTrustManagers(), new SecureRandom());
+//			sslContext.init(new KeyManager[] { km }, new TrustManager[] { new DefaultTrustManager() }, null);
 			
 			return sslContext;
 		} catch (NoSuchAlgorithmException e) {
@@ -468,17 +500,64 @@ public class SSLManager {
 		return ks;
 	}
 	
-	private String getCACert() throws CertificateEncodingException {
+	private KeyStore getKeyStore() {
+		File file = new File(System.getProperty("javax.net.ssl.keyStore"));
+		InputStream in = null;
+		KeyStore ks = null;
 		try {
-			return "-----BEGIN CERTIFICATE-----\n"
-					+ Base64.encodeBytes(certsChain[0].getEncoded(),
-							Base64.DO_BREAK_LINES)
-					+ "\n-----END CERTIFICATE-----\n";
-		} catch (IOException e) {
+			in = new FileInputStream(file);
+			ks = KeyStore.getInstance( ksType );
+			ks.load(in, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		return ks;
 	}
+	
+	private String getCACert() throws CertificateEncodingException {
+		Base64.Encoder encoder = Base64.getEncoder();
+		return "-----BEGIN CERTIFICATE-----\n"
+				+ encoder.encodeToString(certsChain[0].getEncoded())
+//					+ Base64.encodeBytes(certsChain[0].getEncoded(),
+//							Base64.DO_BREAK_LINES)
+				+ "\n-----END CERTIFICATE-----\n";
+	}
+	
+	
+	private void setSystemProperties() {
+		System.setProperty("jdk.httpclient.allowRestrictedHeaders", "host,connection,content-length,expect");
+		
+		// TODO CAMBIAR!!!! Crear nuestra propia keystore, ya que cacerts puede corromperse.
+		System.setProperty("javax.net.ssl.keyStore", System.getenv("JAVA_HOME") + "/lib/security/cacerts");
+		System.setProperty("javax.net.ssl.keyStorePassword", "changeit");
+
+		System.setProperty( "sun.security.ssl.allowUnsafeRenegotiation", "true" );
+		
+//		System.setProperty("javax.net.debug", "all");
+		
+	}
+	
 
 }
 

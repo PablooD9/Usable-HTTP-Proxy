@@ -1,13 +1,10 @@
-/*
+
 package com.proxy.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-import com.proxy.entity.Host;
-
-@Repository
-public interface HostRepository extends MongoRepository<Host, Integer> {
+@NoRepositoryBean
+public interface HostRepository<T, ID> extends MongoRepository<T, ID> {
 	
 }
-*/

@@ -12,20 +12,18 @@ import com.proxy.entity.certificate.SSLManager;
 
 public class SSLConnectionHandler extends SecureConnectionHandler {
 
-	private String[] protocols = { "TLSv1", "TLSv1.2", "TLSv1.3" };
-	
 	private SSLManager sslManager;
 	private ConnectionHandler connHandler;
+	private String[] enabledProtocols = { "TLSv1", "TLSv1.1", "TLSv1.2" };
 	
-	public SSLConnectionHandler() {
-		this.sslManager = new SSLManager();
+	public SSLConnectionHandler(SSLManager sslManager) {
+		this.sslManager = sslManager;
 	}
 	
 	@Override
 	public void setConnectionHandler(ConnectionHandler connHandler) {
 		this.connHandler = connHandler;
 	}
-	
 	
 	@Override
 	public void handleConnection(Socket socket, InetSocketAddress hostTarget, boolean sslConn) {
@@ -58,6 +56,7 @@ public class SSLConnectionHandler extends SecureConnectionHandler {
 			sslSocket = (SSLSocket) sf.createSocket(socket, socket
 					.getInetAddress().getHostName(), socket.getPort(), true); // true -> autoclose SSLSocket
 			sslSocket.setUseClientMode(false);
+			sslSocket.setEnabledProtocols( enabledProtocols );
 			sslSocket.startHandshake();
 			return sslSocket;
 		} catch (IOException e) {
