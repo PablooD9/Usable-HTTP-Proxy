@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<th:block th:include="fragments/header"></th:block>
+	<link href="css/login.css" rel="stylesheet"/>
+	
+	<title>Iniciar sesión</title>
+</head>
+<body>
+
+	<div class="login-page">
+	  <div class="form">
+	  
+	    <p>Iniciar sesión</p>
+	    <form class="login-form"  method="post" th:action="@{/login}">
+	      <input type="text" name="username" placeholder="Correo electrónico"/>
+	      <input type="password" name="password" placeholder="Contraseña"/>
+	      
+	      <button>Iniciar sesión</button>
+	      <p class="message">¿No registrado aún? <a href="/signup">Crear una cuenta</a></p>
+	    </form>
+	    
+	  </div>
+	</div>
+
+  	<!-- Copyright Section -->
+  	<section class="copyright py-4 text-center text-white">
+    	<div class="container">
+      		<small>Copyright &copy; 2019 - TFG</small>
+    	</div>
+  	</section>
+  	
+	<th:block th:include="fragments/footerScripts"></th:block>
+	<script src="js/login.js"></script>
+
+</body>
+
+</html>

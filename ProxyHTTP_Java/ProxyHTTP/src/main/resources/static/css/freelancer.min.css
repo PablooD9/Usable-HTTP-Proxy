@@ -4016,7 +4016,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 
 .custom-select {
 	display: inline-block;
-	width: 100%;
+	width: 50%;
 	height: calc(1.5em + .75rem + .25rem);
 	padding: .375rem 1.75rem .375rem .75rem;
 	font-size: 1rem;
@@ -4067,7 +4067,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	padding-top: .25rem;
 	padding-bottom: .25rem;
 	padding-left: .5rem;
-	font-size: .875rem
+	font-size: 1rem
 }
 
 .custom-select-lg {
@@ -10114,7 +10114,8 @@ a.text-warning:focus, a.text-warning:hover {
 }
 
 .text-danger {
-	color: #dc3545 !important
+	color: #dc3545 !important;
+	font-size: .85rem;
 }
 
 a.text-danger:focus, a.text-danger:hover {
@@ -10699,7 +10700,7 @@ hr {
   border-bottom-right-radius: 1.5rem;
   border-top-left-radius: .5rem;
   border-bottom-left-radius: .5rem;
-  height: 8rem;
+  height: 7.4rem;
   width: 0; /* Unfolded menu */
   position: fixed;
   z-index: 1;
@@ -10713,9 +10714,9 @@ hr {
 }
 
 .sidenav a {
-  padding-left: 1.2rem;
+  padding-left: 1rem;
   text-decoration: none;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: #FFF;
   display: block;
   transition: 0.3s;
@@ -10739,7 +10740,7 @@ hr {
   .sidenav {
     margin-top: 2.1rem;
 	margin-left: .6rem;
-	height: 6.7rem;
+	height: 8.5rem;
 	width: 0; /* Unfolded menu */
 	/*width: 11.5rem !important;*/
 	padding-top: 38px;
@@ -10763,11 +10764,36 @@ hr {
 
 #configNav {
 	float: left;
-	-webkit-box-shadow: .75rem .4rem .6rem rgba(0, 0, 0, .15) !important; /* width heigth "strength" color*/
+	-webkit-box-shadow: .75rem .4rem .6rem rgba(0, 0, 0, .15) !important; /* width height "strength" color*/
     box-shadow: .75rem .4rem .6rem rgba(0, 0, 0, .15) !important
 }
 
 nav span {
 	color: #FFF;
 	font-size: 24px;
+	cursor: pointer
+}
+
+.configOption {
+	padding-top: 1.2rem;
+	display: flex;
+	justify-content: center;
+	margin-left: .4rem;
+	margin-right: .4rem;
+	height: 3.6rem;
+}
+
+.configOption select {
+	padding-right: 6rem;
+}
+
+@media screen and (max-width: 450px) {
+	.custom-select-sm {
+		font-size: .9rem;
+	}
+	
+	.configOption select {
+		padding-right: 1.9rem;
+		height: 2.5rem;
+	}
 }

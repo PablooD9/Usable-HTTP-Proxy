@@ -21,15 +21,15 @@
       </div>
     </div>
 </nav>
- -->
+-->
  
 <nav class="navbar navbar-default fixed-top shadow-lg" id="configNav">
   <div class="container">
     <div id="mySidenav" class="sidenav shadow-lg">
 		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-		<a class="js-scroll-trigger" href="#portfolio">> Config. básica</a> 
-		<a class="js-scroll-trigger" href="#about">> Config. avanzada</a>
+		<a class="js-scroll-trigger" href="#portfolio" th:text="#{Nav.basicConfig}">> Config. básica</a> 
+		<a class="js-scroll-trigger" href="#about" th:text="#{Nav.advancedConfig}">> Config. avanzada</a>
 	</div>
   </div>
-  <span style="cursor: pointer" onclick="openNav()">&#9776;</span>
+  <span onclick="openNav()">&#9776;</span>
 </nav>

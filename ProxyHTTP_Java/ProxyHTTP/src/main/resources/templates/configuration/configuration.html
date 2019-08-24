@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head th:replace="fragments/header"/>
+<head>
+	<th:block th:include="fragments/header"></th:block>
+	<title th:text="#{Config.title}">Configurar el Proxy</title>
+</head>
 
 <body id="page-top">
 
@@ -16,7 +19,7 @@
       <img class="masthead-avatar mb-5" src="/img/icon_proxy.png" alt="">
 
       <!-- Masthead Heading -->
-      <h1 class="masthead-heading text-uppercase mb-0">Página de Configuración del Proxy</h1>
+      <h1 class="masthead-heading text-uppercase mb-0" th:text="#{Config.h1Title}">Página de Configuración del Proxy</h1>
 
       <!-- Icon Divider -->
       <div class="divider-custom divider-light">
@@ -27,9 +30,12 @@
         <div class="divider-custom-line"></div>
       </div>
       
-      <button class="buttonUpdate" onclick="hideUpdateButton();">Actualizar lista de hosts</button>
+      <div class="col-sm-12">
+      	<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal0"></i>
+      	<button class="buttonUpdate" onclick="hideUpdateButton();" th:text="#{Config.updateButtonState1}">Actualizar lista de sitios web</button>
+      </div>
       
-      <button class="buttonLoading" disabled>
+      <button class="buttonLoading" th:text="#{Config.updateButtonState2}" disabled>
   		 <i class="fa fa-spinner fa-spin"></i>Recargando lista...
 	  </button>
 
@@ -41,7 +47,7 @@
     <div class="container">
 
       <!-- Portfolio Section Heading -->
-      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Configuración básica</h2>
+      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0" th:text="#{Config.basicConfig}">Configuración básica</h2>
 
       <!-- Icon Divider -->
       <div class="divider-custom">
@@ -57,61 +63,94 @@
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal1"></i>
-				<span class="feature">Quiero hacerme pasar por...</span>
-				<label class="switch">
-	  				<input type="checkbox">
-	  				<span class="slider round"></span>
-	  			</label>
+				<span class="feature" th:text="#{Config.option1}">Quiero hacerme pasar por...</span>
+				<div class="configOption">
+					<div class="row">
+						<select class="custom-select custom-select-sm">
+							<option selected th:text="#{Config.option1_OS}">Sistema operativo</option>
+							<option value="1">Windows</option>
+						  	<option value="2">Android</option>
+						</select>
+						<select class="custom-select custom-select-sm">
+						  	<option selected th:text="#{Config.option1_Nav}">Navegador</option>
+						  	<option value="1">Google Chrome</option>
+						  	<option value="2">Mozilla Firefox</option>
+						  	<option value="3">Opera</option>
+						  	<option value="4">Safari</option>
+						  	<option value="5">Internet Explorer</option>
+						</select>	 
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal2"></i>
-				<span class="feature">Quiero que no se sepa desde dónde navego</span>
-				<label class="switch">
-	  				<input type="checkbox">
-	  				<span class="slider round"></span>
-	  			</label>
+				<span class="feature" th:text="#{Config.option2}">Quiero que no se sepa desde dónde navego</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<input type="checkbox">
+			  				<span class="slider round"></span>
+			  			</label>
+		  			</div>
+	  			</div>
 			</div>
 		</div>
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal3"></i>
-				<span class="feature">No quiero navegar por sitios potencialmente peligrosos</span>
-				<label class="switch">
-	  				<input type="checkbox">
-	  				<span class="slider round"></span>
-	  			</label>
+				<span class="feature" th:text="#{Config.option3}">No quiero navegar por sitios potencialmente peligrosos</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<input type="checkbox">
+			  				<span class="slider round"></span>
+			  			</label>
+			  		</div>
+			  	</div>
 			</div>
 		</div>
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal4"></i>
-				<span class="feature">No quiero que me rastreen sitios de publicidad</span>
-				<label class="switch">
-	  				<input type="checkbox">
-	  				<span class="slider round"></span>
-	  			</label>
+				<span class="feature" th:text="#{Config.option4}">No quiero que me rastreen sitios de publicidad</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<input type="checkbox">
+			  				<span class="slider round"></span>
+			  			</label>
+			  		</div>
+			  	</div>
 	  		</div>
 		</div>
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal5"></i>
-				<span class="feature">No quiero visitar sitios con contenido pornográfico</span>
-				<label class="switch">
-	  				<input type="checkbox">
-	  				<span class="slider round"></span>
-	  			</label>
+				<span class="feature" th:text="#{Config.option5}">No quiero visitar sitios con contenido pornográfico</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<input type="checkbox">
+			  				<span class="slider round"></span>
+			  			</label>
+			  		</div>
+			  	</div>
 			</div>
 		</div>
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal6"></i>
 				<span class="feature">Cualquier cosa...</span>
-				<label class="switch">
-	  				<input type="checkbox">
-	  				<span class="slider round"></span>
-	  			</label>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<input type="checkbox">
+			  				<span class="slider round"></span>
+			  			</label>
+			  		</div>
+			  	</div>
 			</div>
 		</div>
 	</div>
@@ -126,7 +165,7 @@
     <div class="container">
 
       <!-- Portfolio Section Heading -->
-      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Configuración avanzada</h2>
+      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0" th:text="#{Config.advancedConfig}">Configuración avanzada</h2>
 
       <!-- Icon Divider -->
       <div class="divider-custom">
@@ -204,33 +243,9 @@
 	
     </div>
   </section>
-
-  <!-- Footer -->
-  <footer class="footer text-center">
-    <div class="container">
-      <div class="row">
-
-        <!-- Footer Contact -->
-        <div class="col-lg-4 mb-5 mb-lg-0">
-          <h4 class="text-uppercase mb-4">Contacto</h4>
-          <p class="lead mb-0">
-          <a href="https://www.linkedin.com/in/pablo-d%C3%ADaz-ranca%C3%B1o-049197166/">Mi Linkedin</a> <br>
-          <a href="https://github.com/PablooD9">Mi GitHub</a>
-          </p>
-        </div>
-
-        <!-- Footer About Text -->
-        <div class="col-lg-4">
-          <h4 class="text-uppercase mb-4">Acerca del Proxy</h4>
-          <p class="lead mb-0">Este Proxy ha sido implementado y desarrollado por
-            Pablo Díaz, estudiante de 4º curso del grado de Ingeniería Informática del Software, Oviedo.</p>
-        </div>
-
-      </div>
-    </div>
-  </footer>
-
-  <!-- Copyright Section -->
+  
+  <th:block th:include="fragments/footer"></th:block>
+    <!-- Copyright Section -->
   <section class="copyright py-4 text-center text-white">
     <div class="container">
       <small>Copyright &copy; 2019 - TFG</small>
@@ -246,7 +261,7 @@
   
   <th:block th:include="fragments/modalWindows"></th:block>
   
-  <th:block th:include="fragments/footer"></th:block>
+  <th:block th:include="fragments/footerScripts"></th:block>
 
 </body>
 

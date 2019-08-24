@@ -7,7 +7,7 @@
   color: #003871; /* White text */
   padding: 1.8rem 5rem; /* Some padding */
   font-size: 1.7rem; /* Set a font size */
-  margin-top: 2.2rem;
+  margin-top: 1.4rem;
   display: none; /* Hidden */
   cursor: not-allowed
 }
@@ -23,8 +23,8 @@
   border-style: solid;
   border-color: #000;
   color: #003871; /* White text */
-  padding: 1.4rem 5.3rem; /* Some padding */
+  padding: 1.4rem 5rem; /* Some padding */
   font-size: 1.7rem; /* Set a font size */
-  margin-top: 2.2rem;
+  margin-top: 1.4rem;
   cursor:pointer;
 }
