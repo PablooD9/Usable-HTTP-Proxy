@@ -10797,3 +10797,28 @@ nav span {
 		height: 2.5rem;
 	}
 }
+
+.language-icon {
+	width: 32px;
+	height: 33px;
+	margin-left: 24%;
+	margin-bottom: 6%;
+	display: block;
+}
+
+.icon-en {
+	background-image: url('/icon/united-kingdom-flag-button-square-icon-32.png');
+}
+
+.icon-es {
+	background-image: url('/icon/spain-flag-button-square-icon-32.png');
+}
+
+.language {
+	right: 38px;
+	top: 18px;
+}
+
+.language a {
+	font-size: 19px;
+}

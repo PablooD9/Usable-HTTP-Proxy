@@ -1,0 +1,9 @@
+<!-- Language -->
+<div class="language position-absolute">
+  <a th:if="${lang != null && lang.equalsIgnoreCase('es')}" id="language-switch" class="text-center text-white rounded" th:href="@{${#httpServletRequest.requestURI}(lang=en)}">
+    <i class="language-icon icon-en"></i>English
+  </a>
+  <a th:if="${lang != null && lang.equalsIgnoreCase('en')}" id="language-switch" class="text-center text-white rounded" th:href="@{${#httpServletRequest.requestURI}(lang=es)}">
+    <i class="language-icon icon-es"></i>Español
+  </a>
+</div>

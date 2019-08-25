@@ -4,35 +4,35 @@
 	<th:block th:include="fragments/header"></th:block>
 	<link href="css/login.css" rel="stylesheet"/>
 	
-	<title>Registrarse</title>
+	<title th:text="#{Register.title}">Registrarse</title>
 </head>
 <body>
 
+	<!-- Language Menu -->
+  	<div th:replace="fragments/languageMenu"/>
+
 	<div class="login-page">
 	  <div class="form">
-	  	<p>Crear una cuenta</p>
+	  	<p th:text="#{Login.createAccount}">Crear una cuenta</p>
 	    <form class="register-form" method="post" th:action="@{/signup}" th:object="${user}">
 	    
-	      <input type="text" name="email" placeholder="Correo electrónico"/>
+	      <input type="text" name="email" th:placeholder="#{Login.email}"/>
 	      <span class="text-danger" th:if="${#fields.hasErrors('email')}"
 						th:errors="*{email}"></span>
 	    
-	      <input type="password" name="password" placeholder="Contraseña"/>
+	      <input type="password" name="password" th:placeholder="#{Login.password}"/>
 	      <span class="text-danger" th:if="${#fields.hasErrors('password')}"
 						th:errors="*{password}"></span>
 						
-	      <button>Crear cuenta</button>
-	      <p class="message">¿Ya registrado? <a href="/login">Inicia sesión</a></p>
+	      <button id="register-button" th:text="#{Register.createAccount}">Crear cuenta</button>
+	      <p class="message" th:text="#{Register.alreadyRegistered}">¿Ya registrado?</p>
+	      <a href="/login" th:text="#{Register.logIn}">Inicia sesión</a>
 	    </form>
 	  </div>
 	</div>
 
   	<!-- Copyright Section -->
-  	<section class="copyright py-4 text-center text-white">
-    	<div class="container">
-      		<small>Copyright &copy; 2019 - TFG</small>
-    	</div>
-  	</section>
+  	<section th:replace="fragments/copyright"/>
   	
 	<th:block th:include="fragments/footerScripts"></th:block>
 	<script src="js/login.js"></script>

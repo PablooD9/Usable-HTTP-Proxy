@@ -4,31 +4,31 @@
 	<th:block th:include="fragments/header"></th:block>
 	<link href="css/login.css" rel="stylesheet"/>
 	
-	<title>Iniciar sesión</title>
+	<title th:text="#{Login.title}">Iniciar sesión</title>
 </head>
 <body>
+
+	<!-- Language Menu -->
+  	<div th:replace="fragments/languageMenu"/>
 
 	<div class="login-page">
 	  <div class="form">
 	  
-	    <p>Iniciar sesión</p>
+	    <p th:text="#{Login.title}">Iniciar sesión</p>
 	    <form class="login-form"  method="post" th:action="@{/login}">
-	      <input type="text" name="username" placeholder="Correo electrónico"/>
-	      <input type="password" name="password" placeholder="Contraseña"/>
+	      <input type="text" name="username" th:placeholder="#{Login.email}"/>
+	      <input type="password" name="password" th:placeholder="#{Login.password}"/>
 	      
-	      <button>Iniciar sesión</button>
-	      <p class="message">¿No registrado aún? <a href="/signup">Crear una cuenta</a></p>
+	      <button id="login-button" th:text="#{Login.loginButton}">Iniciar sesión</button>
+	      <p class="message" th:text="#{Login.notRegistered}">¿No registrado aún?</p>
+	      <a href="/signup" th:text="#{Login.createAccount}">Crear una cuenta</a>
 	    </form>
 	    
 	  </div>
 	</div>
 
   	<!-- Copyright Section -->
-  	<section class="copyright py-4 text-center text-white">
-    	<div class="container">
-      		<small>Copyright &copy; 2019 - TFG</small>
-    	</div>
-  	</section>
+  	<section th:replace="fragments/copyright"/>
   	
 	<th:block th:include="fragments/footerScripts"></th:block>
 	<script src="js/login.js"></script>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.proxy.model.user.User;
 import com.proxy.services.HostService;
+import com.proxy.services.LanguageService;
 import com.proxy.services.SecurityService;
 import com.proxy.services.UserService;
 import com.proxy.validator.SignUpValidator;
@@ -28,10 +29,13 @@ public class ConfigurationController {
 	private SecurityService secService;
 	@Autowired
 	private SignUpValidator userValidator;
+	@Autowired
+	private LanguageService langService;
 	
 	@RequestMapping(value={"", "/", "/configuration"})
-	public String getConfiguration(Model model) {
-		// model.addAttribute("hostsList", hostService.getHostsList());
+	public String getConfiguration(@RequestParam(required = false, name = "lang") String language, Model model) {
+		model.addAttribute("lang", langService.getActualLocaleLang( language ));
+		
 		return "configuration/configuration";
 	}
 	
@@ -42,15 +46,18 @@ public class ConfigurationController {
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login(Model model) {
+	public String login(@RequestParam(required = false, name = "lang") String language, Model model) {
 		model.addAttribute("user", new User());
-
+		model.addAttribute("lang", langService.getActualLocaleLang( language ));
+		
 		return "login/login";
 	}
 	
 	@RequestMapping(value = "/signup", method = RequestMethod.GET)
-	public String signup(Model model) {
+	public String signup(@RequestParam(required = false, name = "lang") String language, Model model) {
 		model.addAttribute("user", new User());
+		model.addAttribute("lang", langService.getActualLocaleLang( language ));
+		
 		return "login/register";
 	}
 	
@@ -59,13 +66,12 @@ public class ConfigurationController {
 		userValidator.validate(user, result);
 		if(result.hasErrors()) {
 			model.addAttribute("user", user);
+			model.addAttribute("lang", langService.getActualLocaleLang( null ));
 			return "login/register";
 		}
 		userService.saveUser(user);
-		
 		secService.autoLogin(user.getEmail(), user.getPassword());
 		
-//		model.addAttribute("usuarioActivo", userService.getUsuarioActivo());
 		return "redirect:/login";
 	}
 	
