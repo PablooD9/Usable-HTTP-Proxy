@@ -1,14 +1,12 @@
 package com.proxy.services;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,9 +50,30 @@ public class UserService implements UserDetailsService {
 	    return userRepository.findByEmail(email);
 	}
 	
+	public User findUserByCreds(String email, String pass) {
+		return userRepository.findByCreds(email, pass);
+	}
+	
 	public void saveUser(User user) {
 	    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 	    userRepository.save(user);
 	}
+	
+	public String getEmailOfLoggedInUser() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String username;
+		if (auth.getPrincipal() instanceof UserDetails) {
+			username = ((UserDetails) auth.getPrincipal()).getUsername();
+		} else {
+			username = auth.getPrincipal().toString();
+		}
+		
+		return username;
+	}
 
+	public User getUserLoggedIn() {
+		String email = getEmailOfLoggedInUser();
+		System.out.println(email);
+		return findUserByEmail(email);
+	}
 }

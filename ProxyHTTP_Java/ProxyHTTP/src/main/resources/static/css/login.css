@@ -9,9 +9,20 @@
   background: #FFFFFF;
   max-width: 360px;
   margin: 0 auto 100px;
+  margin-bottom: 30px;
   padding: 39px;
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.row {
+	margin-left: 3.4rem;
+}
+.row p {
+	margin-left: .3rem;
+}
+.row i {
+  margin-top: .2rem;
+  font-size: 16px;
 }
 .form input {
   font-family: "Roboto", sans-serif;
@@ -68,11 +79,20 @@
 .form p {
 	text-align: center;
 }
+.modal-body > .container { /* Modal help */
+  	max-width: 1050px;
+  	margin-right: -40px;
+	margin-left: -40px
+}
 .container {
   position: relative;
   z-index: 1;
   max-width: 300px;
   margin: 0 auto;
+}
+.fa-save {
+  margin-top: .2rem;
+  font-size: 65px !important;
 }
 .container:before, .container:after {
   content: "";
@@ -115,5 +135,21 @@ body {
 @media screen and (max-width: 450px) {
 	.form {
 		margin: 18% auto 100px;
+    	margin-bottom: 30px;
 	}
+}
+
+.skip-login-page {
+  margin-left: 3rem;
+  margin-right: 3rem;
+  margin-bottom: 2rem;
+}
+
+.skip-login-page p {
+  display: inline-block;
+	font-size: 1rem;
+}
+
+.skip-login-page a {
+  color: #FFF;
 }

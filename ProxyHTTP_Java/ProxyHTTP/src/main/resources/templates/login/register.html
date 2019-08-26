@@ -13,8 +13,15 @@
 
 	<div class="login-page">
 	  <div class="form">
+	  	<div class="row">
+	  	<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal0"></i>
 	  	<p th:text="#{Login.createAccount}">Crear una cuenta</p>
+	  	</div>
 	    <form class="register-form" method="post" th:action="@{/signup}" th:object="${user}">
+	    
+	      <input type="text" name="name" th:placeholder="#{Register.name}"/>
+	      <span class="text-danger" th:if="${#fields.hasErrors('name')}"
+						th:errors="*{name}"></span>
 	    
 	      <input type="text" name="email" th:placeholder="#{Login.email}"/>
 	      <span class="text-danger" th:if="${#fields.hasErrors('email')}"
@@ -30,10 +37,21 @@
 	    </form>
 	  </div>
 	</div>
+	
+	<div class="skip-login-page">
+		<p th:text="#{Login.skip}">Si quieres continuar sin iniciar sesión, </p>
+		<a href="/" th:text="#{Login.skipLink}">haz clic aquí.</a>
+	</div>
 
   	<!-- Copyright Section -->
   	<section th:replace="fragments/copyright"/>
   	
+  	<!-- Help fragment -->
+  	<div th:replace="fragments/helpFragment :: help_fragment(num='0', 
+  														   title='Register.helpTitle', 
+  														   content='Register.helpContent',
+  														   icon='fas fa-save fa-5x')"></div>
+  														   
 	<th:block th:include="fragments/footerScripts"></th:block>
 	<script src="js/login.js"></script>
 

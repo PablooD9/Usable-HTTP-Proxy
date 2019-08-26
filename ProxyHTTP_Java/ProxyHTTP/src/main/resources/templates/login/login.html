@@ -18,6 +18,8 @@
 	    <form class="login-form"  method="post" th:action="@{/login}">
 	      <input type="text" name="username" th:placeholder="#{Login.email}"/>
 	      <input type="password" name="password" th:placeholder="#{Login.password}"/>
+	      <span class="text-danger" th:if="${error == 'true'}"
+						th:text="#{Error.login}"></span>
 	      
 	      <button id="login-button" th:text="#{Login.loginButton}">Iniciar sesión</button>
 	      <p class="message" th:text="#{Login.notRegistered}">¿No registrado aún?</p>
@@ -25,6 +27,11 @@
 	    </form>
 	    
 	  </div>
+	</div>
+	
+	<div class="skip-login-page">
+		<p th:text="#{Login.skip}">Si quieres continuar sin iniciar sesión, </p>
+		<a href="/" th:text="#{Login.skipLink}">haz clic aquí.</a>
 	</div>
 
   	<!-- Copyright Section -->

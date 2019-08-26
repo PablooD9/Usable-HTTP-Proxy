@@ -14,6 +14,14 @@
   <!-- Language Menu -->
   <div th:replace="fragments/languageMenu"/>
 
+  <div th:if="${userLoggedIn != null}" class="welcome-message position-absolute">
+	  	<p th:text="#{Config.welcome} + ', ' + ${userLoggedIn.name}">Bienvenid@, usuari@</p>
+	  	<a href="/logout" th:text="#{Config.exit}">Desconectarme</a>
+	  	<div class="divider-custom divider-light">
+        	<div class="divider-custom-line"></div>
+        </div>
+  </div>
+
   <!-- Masthead -->
   <header class="masthead bg-primary text-white text-center">
     <div class="container d-flex align-items-center flex-column">

@@ -26,9 +26,13 @@ public class SignUpValidator implements Validator {
 		boolean existEmailErrors = false;
 		
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "Error.emptyEmail");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "Error.emptyName");
 		if (errors.hasErrors())
 			existEmailErrors = true;
 		
+		if(user.getName().length() > 15) {
+			errors.rejectValue("name", "Error.nameLength");
+		}
 		if(!user.getEmail().contains( "@" ) && !existEmailErrors) {
 			errors.rejectValue("email", "Error.invalidEmail");
 			existEmailErrors = true;

@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,13 +27,17 @@ public class ConfigurationController {
 	@Autowired
 	private SecurityService secService;
 	@Autowired
-	private SignUpValidator userValidator;
+	private SignUpValidator signupValidator;
 	@Autowired
 	private LanguageService langService;
 	
 	@RequestMapping(value={"", "/", "/configuration"})
 	public String getConfiguration(@RequestParam(required = false, name = "lang") String language, Model model) {
 		model.addAttribute("lang", langService.getActualLocaleLang( language ));
+		
+		User userLoggedIn = userService.getUserLoggedIn();
+		
+		model.addAttribute("userLoggedIn", userLoggedIn);
 		
 		return "configuration/configuration";
 	}
@@ -46,11 +49,22 @@ public class ConfigurationController {
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login(@RequestParam(required = false, name = "lang") String language, Model model) {
+	public String login(@RequestParam(required = false, name = "lang") String language, 
+						@RequestParam(required = false, name = "error") String error,
+						Model model) {
 		model.addAttribute("user", new User());
 		model.addAttribute("lang", langService.getActualLocaleLang( language ));
+		if (error != null)
+			model.addAttribute("error", error);
+		else
+			model.addAttribute("error", "false");
 		
 		return "login/login";
+	}
+	
+	@RequestMapping(value = "/login/error", method = RequestMethod.GET)
+	public String loginError() {
+		return "redirect:/login?error=true";
 	}
 	
 	@RequestMapping(value = "/signup", method = RequestMethod.GET)
@@ -63,14 +77,13 @@ public class ConfigurationController {
 	
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
 	public String signup(@ModelAttribute @Validated User user, BindingResult result, Model model) {
-		userValidator.validate(user, result);
+		signupValidator.validate(user, result);
 		if(result.hasErrors()) {
 			model.addAttribute("user", user);
 			model.addAttribute("lang", langService.getActualLocaleLang( null ));
 			return "login/register";
 		}
 		userService.saveUser(user);
-		secService.autoLogin(user.getEmail(), user.getPassword());
 		
 		return "redirect:/login";
 	}

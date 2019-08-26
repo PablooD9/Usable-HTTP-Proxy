@@ -1,7 +1,7 @@
 function openNav() {
 	// Let's check if it's already open
 	if (document.getElementById("mySidenav").style.width == "14.5rem" 
-		|| document.getElementById("mySidenav").style.width == "10rem")
+		|| document.getElementById("mySidenav").style.width == "8rem")
 	{
 		this.closeNav();
 	}
@@ -11,7 +11,7 @@ function openNav() {
 			document.getElementById("mySidenav").style.width = "14.5rem";
 		}
 		else
-			document.getElementById("mySidenav").style.width = "10rem";
+			document.getElementById("mySidenav").style.width = "8rem";
 	}
 }
 

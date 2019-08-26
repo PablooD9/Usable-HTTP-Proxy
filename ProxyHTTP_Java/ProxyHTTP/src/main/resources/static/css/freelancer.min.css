@@ -10747,13 +10747,13 @@ hr {
   }
   .sidenav a {
     padding-left: .7rem;
-  	font-size: 15.5px;
+  	font-size: 14.5px;
   }
   .navbar {
 	position: fixed;
 	padding: .5rem .5rem;
 	margin-left: .6rem;
-	width: 10rem;
+	width: 8rem;
 	background-color: #111;
 	text-align: center;
   }
@@ -10821,4 +10821,56 @@ nav span {
 
 .language a {
 	font-size: 19px;
+}
+
+@media screen and (max-width: 450px) {
+	.language {
+		right: 11px;
+		top: 12px;
+	}
+}
+
+.welcome-message {
+	color: #FFF;
+	font-size: 21px;
+	padding-left: .3rem;
+	padding-right: .3rem;
+	padding-top: .3rem;
+	border-bottom-right-radius: 1.6rem;
+	border-bottom-left-radius: 1.6rem;
+	left: 45%;
+	margin-top: .5rem;
+	background-color: #000;
+	max-width: 14rem;
+}
+	
+@media screen and (max-width: 450px) {
+	.welcome-message {
+		margin-top: 0rem;
+		left: 40.2%;
+		padding-left: .4rem;
+		padding-right: .4rem;
+		padding-top: .6rem;
+		max-width: 9rem;
+	}
+	
+	.welcome-message a {
+    	font-size: 14px !important;;		
+  }
+	
+	.welcome-message p {
+		  font-size: 16.3px;
+	}
+}
+	
+.welcome-message p, .welcome-message a {
+  margin-bottom: .3rem;		
+}
+
+.welcome-message a {
+  font-size: 17px;		
+}
+
+.welcome-message .divider-light {
+	margin-top: .4rem;
 }
