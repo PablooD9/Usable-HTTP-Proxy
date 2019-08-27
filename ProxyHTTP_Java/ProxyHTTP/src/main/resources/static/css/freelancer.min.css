@@ -10874,3 +10874,20 @@ nav span {
 .welcome-message .divider-light {
 	margin-top: .4rem;
 }
+
+#savePrefState1{
+	font-size: 1.2rem;
+	color: #fff;
+	background-color: #7088fc;
+	border-color: #7088fc;
+}
+
+#savePrefState2{
+	font-size: 1.2rem;
+	display: none; /* Hidden */
+	cursor: not-allowed;
+}
+
+#preferences{
+	
+}

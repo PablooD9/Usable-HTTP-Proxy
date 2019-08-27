@@ -1,4 +1,4 @@
-package com.proxy.model.user;
+package com.proxy.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

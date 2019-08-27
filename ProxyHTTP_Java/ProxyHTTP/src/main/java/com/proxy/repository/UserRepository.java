@@ -3,7 +3,7 @@ package com.proxy.repository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import com.proxy.model.user.User;
+import com.proxy.model.User;
 
 public interface UserRepository extends MongoRepository<User, String>{
 	

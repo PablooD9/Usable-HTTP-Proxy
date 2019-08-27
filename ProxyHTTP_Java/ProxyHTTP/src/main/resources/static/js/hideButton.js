@@ -3,9 +3,10 @@ function hideUpdateButton(){
 	document.getElementsByClassName("buttonLoading")[0].style.display="block";
 	
 	var currentURL = window.location.href;
-	var urlUpdateMaliciousHosts = 'updateMaliciousHosts';
-	
-	var URL = currentURL + urlUpdateMaliciousHosts;
+	if (currentURL.includes("https"))
+		var URL = "https://localhost:8090/updateMaliciousHosts";
+	else
+		var URL = "http://localhost:8090/updateMaliciousHosts";
 	
 	window.location.href=URL;
 }

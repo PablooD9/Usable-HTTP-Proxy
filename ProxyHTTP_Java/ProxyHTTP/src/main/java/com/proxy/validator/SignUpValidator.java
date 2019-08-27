@@ -6,7 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import com.proxy.model.user.User;
+import com.proxy.model.User;
 import com.proxy.services.UserService;
 
 @Component

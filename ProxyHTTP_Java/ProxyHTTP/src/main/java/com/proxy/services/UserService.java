@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.proxy.model.user.User;
+import com.proxy.model.User;
 import com.proxy.repository.UserRepository;
 
 @Service
@@ -73,7 +73,6 @@ public class UserService implements UserDetailsService {
 
 	public User getUserLoggedIn() {
 		String email = getEmailOfLoggedInUser();
-		System.out.println(email);
 		return findUserByEmail(email);
 	}
 }
