@@ -38,6 +38,8 @@ public class ConfigurationController {
 		
 		model.addAttribute("userLoggedIn", userLoggedIn);
 		model.addAttribute("userConfig", userConfig);
+		model.addAttribute("OSOptions", confService.getOSOptions());
+		model.addAttribute("BrowserOptions", confService.getBrowserOptions());
 		
 		return "configuration/configuration";
 	}

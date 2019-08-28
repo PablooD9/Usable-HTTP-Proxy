@@ -81,42 +81,33 @@
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal1"></i>
 				<span class="feature" th:text="#{Config.option1}">Quiero hacerme pasar por...</span>
 				<div class="configOption">
-					<div class="row">
-						<div th:switch="${userConfig}">
-							<div th:case="null">
-								<select id="op1_os" class="isOption custom-select custom-select-sm">
-									<option selected th:text="#{Config.option1_OS}">Sistema operativo</option>
-									<option>Windows</option>
-								  	<option>Android</option>
-								</select>
-								<select id="op1_browser" class="isOption custom-select custom-select-sm">
-								  	<option selected th:text="#{Config.option1_Nav}">Navegador</option>
-								  	<option>Google Chrome</option>
-								  	<option>Mozilla Firefox</option>
-								  	<option>Opera</option>
-								  	<option>Safari</option>
-								  	<option>Internet Explorer</option>
-								</select>	 
-							</div>
-							<div th:case="*">
-							<!-- Esto de debajo se deberá leer de fichero. Una vez leido el fichero, hacer
-								un th:each="..." y, para cada una de las opciones, hacer un th:if="userConfig.op1_os == opcion" 
-								y un th:unless="userConfig.op1_os == opcion"... -->
-								<select id="op1_os" class="isOption custom-select custom-select-sm">
-									<option selected th:text="#{Config.option1_OS}">Sistema operativo</option>
-									<option>Windows</option>
-								  	<option>Android</option>
-								</select>
-								<select id="op1_browser" class="isOption custom-select custom-select-sm">
-								  	<option selected th:text="#{Config.option1_Nav}">Navegador</option>
-								  	<option>Google Chrome</option>
-								  	<option>Mozilla Firefox</option>
-								  	<option>Opera</option>
-								  	<option>Safari</option>
-								  	<option>Internet Explorer</option>
-								</select>	
-							</div>
-						</div>	
+					<div class="row option1">
+						<select id="op1_os" class="isOption custom-select custom-select-sm">
+							<th:block th:each="osOption : ${OSOptions}">
+								<div th:switch="${userConfig}">
+									<div th:case="null">
+										<option th:text="${osOption.optName}">Sistema operativo</option>
+									</div>
+									<div th:case="*">
+										<option th:if="${userConfig.op1_os == osOption.optName}" th:text="${osOption.optName}" selected>Sistema operativo</option>
+										<option th:unless="${userConfig.op1_os == osOption.optName}" th:text="${osOption.optName}">Sistema operativo</option>
+									</div>
+								</div>
+							</th:block>
+						</select>
+						<select id="op1_browser" class="isOption custom-select custom-select-sm">
+							<th:block th:each="browserOption : ${BrowserOptions}">
+								<div th:switch="${userConfig}">
+									<div th:case="null">
+										<option th:text="${browserOption.optName}">Navegador</option>
+									</div>
+									<div th:case="*">
+										<option th:if="${userConfig.op1_browser == browserOption.optName}" th:text="${browserOption.optName}" selected>Navegador</option>
+										<option th:unless="${userConfig.op1_browser == browserOption.optName}" th:text="${browserOption.optName}">Navegador</option>
+									</div>
+								</div>
+							</th:block>
+						</select>	 
 					</div>
 				</div>
 			</div>
