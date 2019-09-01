@@ -17,13 +17,12 @@ public class ConnectionImpl implements Connection
 	
 	@Override
 	public void run() {
-		SSLManager sslManager = new SSLManager();
-		
 		Socket socket;
 		try {
-			while ((socket = serverSocket.accept()) != null) {
+			while ( true ) {
+				socket = serverSocket.accept();
 				configureSocket(socket);
-				ConnectionHandler handler = new ConnectionHandlerImpl( socket, new SSLConnectionHandler(sslManager) );
+				ConnectionHandler handler = new ConnectionHandlerImpl( socket, new SSLConnectionHandler() );
 				
 				Thread thread = new Thread(handler);
 				thread.start();

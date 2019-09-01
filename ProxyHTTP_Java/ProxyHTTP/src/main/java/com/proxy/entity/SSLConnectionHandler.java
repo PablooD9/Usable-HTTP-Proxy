@@ -16,8 +16,8 @@ public class SSLConnectionHandler extends SecureConnectionHandler {
 	private ConnectionHandler connHandler;
 	private String[] enabledProtocols = { "TLSv1", "TLSv1.1", "TLSv1.2" };
 	
-	public SSLConnectionHandler(SSLManager sslManager) {
-		this.sslManager = sslManager;
+	public SSLConnectionHandler() {
+		this.sslManager = new SSLManager();
 	}
 	
 	@Override

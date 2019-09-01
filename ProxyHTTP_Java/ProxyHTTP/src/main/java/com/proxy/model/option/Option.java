@@ -1,20 +1,20 @@
 package com.proxy.model.option;
 
-public class Option {
-
-	private String optName;
+public interface Option {
 	
-	public Option(String optName) {
-		setOptName(optName);
-	}
-
-	public String getOptName() {
-		return optName;
-	}
-
-	public void setOptName(String optName) {
-		this.optName = optName;
-	}
+	public String getOptName();
+	public void setOptName(String optName);
+	public boolean parse();
 	
+	public static Option parseOptionLine(String line, String optionType) {
+		if (optionType.equalsIgnoreCase( "Default" )){
+			return new OptionImpl( line );
+		}
+		else if (optionType.equalsIgnoreCase( "User-Agent" )) {
+			return new OptionUserAgent( line );
+		}
+		
+		throw new IllegalStateException("Option type not implemented yet!");
+	}
 	
 }

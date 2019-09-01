@@ -22,6 +22,12 @@
         	<div class="divider-custom-line"></div>
         </div>
   </div>
+  <div th:unless="${userLoggedIn != null}" id="signinMessage" class="welcome-message position-absolute">
+  		<a href="/login" th:text="#{Config.signin}">Iniciar sesión</a>
+  		<div class="divider-custom divider-light">
+        	<div class="divider-custom-line"></div>
+        </div>
+  </div>
 
   <!-- Masthead -->
   <header class="masthead bg-primary text-white text-center">
@@ -252,16 +258,14 @@
 	</div>
 	-->
 	
-		<div th:if="${userLoggedIn != null}">
-			<div id="preferences" class="col-sm-12">
-				<button type="button" id="savePrefState1" class="btn btn-success" onclick="save()" th:text="#{Config.savePref_1}">
-					Guardar preferencias
-				</button>
-			</div>
-			<button type="button" id="savePrefState2" class="btn btn-success" th:text="#{Config.savePref_2}" disabled>
-			  	Guardado con éxito
+		<div id="preferences" class="col-sm-12">
+			<button type="button" id="savePrefState1" class="btn btn-success" onclick="save()" th:text="#{Config.savePref_1}">
+				Guardar preferencias
 			</button>
 		</div>
+		<button type="button" id="savePrefState2" class="btn btn-success" th:text="#{Config.savePref_2}" disabled>
+		  	Guardado con éxito
+		</button>
     </div>
   </section>
   

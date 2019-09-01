@@ -45,7 +45,6 @@ public class UserService implements UserDetailsService {
 	    return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
 	}
 	
-	
 	public User findUserByEmail(String email) {
 	    return userRepository.findByEmail(email);
 	}
@@ -74,5 +73,9 @@ public class UserService implements UserDetailsService {
 	public User getUserLoggedIn() {
 		String email = getEmailOfLoggedInUser();
 		return findUserByEmail(email);
+	}
+	
+	public boolean userIsLoggedIn() {
+		return (getUserLoggedIn() != null) ? true : false;
 	}
 }

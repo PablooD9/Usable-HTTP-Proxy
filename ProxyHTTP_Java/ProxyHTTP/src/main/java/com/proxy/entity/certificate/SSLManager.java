@@ -96,11 +96,13 @@ public class SSLManager {
 		setSystemProperties();
 		
 		Security.addProvider(new BouncyCastleProvider()); 
-		
+		generateCACertificate(false);
+	}
+	
+	public void createCertificates() {
 		generateCACertificate(false);
 		generateEndEntityCert("localhost");
 	}
-	
 	
 	private void setDates() {
 		// ====== Validity Date =====

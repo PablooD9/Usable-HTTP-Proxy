@@ -28,13 +28,20 @@ public class ConfigurationController {
 	@Autowired
 	private ConfigurationService confService;
 	
+	@RequestMapping(value={"/test"})
+	public String test(Model model) {
+		confService.getUserAgent();
+		
+		return "ok";
+	}
+	
 	@RequestMapping(value={"", "/", "/configuration"})
 	public String getConfiguration(@RequestParam(required = false, name = "lang") String language, Model model) {
 		model.addAttribute("lang", langService.getActualLocaleLang( language ));
 		
 		User userLoggedIn = userService.getUserLoggedIn();
 		Configuration userConfig = confService.getConfigOfUser();
-		System.out.println(userConfig);
+//		System.out.println(userConfig);
 		
 		model.addAttribute("userLoggedIn", userLoggedIn);
 		model.addAttribute("userConfig", userConfig);
@@ -59,13 +66,8 @@ public class ConfigurationController {
 						 @RequestParam("_op4") String op4,
 						 @RequestParam("_op5") String op5) 
 	{	
-		
-		System.out.println( op1_os + "\n" + op1_browser + "\n" + op2 + "\n" + op3 + "\n" + op4 + "\n" + op5);
-		
-		if (userService.getUserLoggedIn() != null) {
-			Configuration configuration = confService.buildConfigurationObject(op1_os, op1_browser, op2, op3, op4, op5);
-			confService.saveConfiguration(configuration);
-		}
+		Configuration configuration = confService.buildConfigurationObject(op1_os, op1_browser, op2, op3, op4, op5);
+		confService.saveConfiguration(configuration);
 		
 	    return "OK!";
 	}

@@ -241,7 +241,7 @@ public class HttpRequestImpl implements IHttpRequest {
 			loadFirstReqLine(headersSplitted[0]);
 		} catch(IllegalStateException ise) {
 			// TODO
-			System.err.println("EMPTY REQUEST");
+//			System.err.println("EMPTY REQUEST");
 			return ;
 //			ise.printStackTrace();
 		}
@@ -275,12 +275,7 @@ public class HttpRequestImpl implements IHttpRequest {
 			host = host.split(":")[0];
 		}
 		
-		System.out.print("Method: " + method + ", \t");
-		System.out.print("Requested Resource: " + requestedResource + ", \t");
-		System.out.print("HttpVersion: " + httpVersion + ", \t");
-		System.out.print("Host: " + host + ", \t");
-		System.out.println("Port: " + port + ".");
-		
+//		headers.forEach(header -> System.out.println(header.getKey() + ": " + header.getValues()));
 	}
 	
 	
@@ -289,14 +284,13 @@ public class HttpRequestImpl implements IHttpRequest {
 	 * @param firstLine
 	 */
 	private void loadFirstReqLine(String firstLine) {
-		System.err.println("esto: " + firstLine + "en Thread::>>>> " + Thread.currentThread().getName());
 		String[] splittedFirstLine = firstLine.trim().split("[ ]+");
 		
 		if (!(splittedFirstLine.length==3)) {
-			if (splittedFirstLine.length==2)
-				System.err.println("LONGITUD 2: " + splittedFirstLine[0] + "" + splittedFirstLine[1]);
-			else if (splittedFirstLine.length==1)
-				System.err.println("LONGITUD 1: " + splittedFirstLine[0]);
+//			if (splittedFirstLine.length==2)
+//				System.err.println("LONGITUD 2: " + splittedFirstLine[0] + "" + splittedFirstLine[1]);
+//			else if (splittedFirstLine.length==1)
+//				System.err.println("LONGITUD 1: " + splittedFirstLine[0]);
 
 			throw new IllegalStateException();
 		}
@@ -324,7 +318,12 @@ public class HttpRequestImpl implements IHttpRequest {
 			try {
 				uri = new URI(resource);
 				String resourcePath = uri.getPath();
-				requestedResource = resourcePath;
+				String query = uri.getQuery();
+				if (query != null) {
+					requestedResource = resourcePath + "?" + query;
+				}
+				else
+					requestedResource = resourcePath;
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

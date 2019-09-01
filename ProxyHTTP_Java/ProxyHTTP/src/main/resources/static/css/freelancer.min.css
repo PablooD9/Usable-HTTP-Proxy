@@ -10736,7 +10736,7 @@ hr {
   margin-left: 1rem;
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 480px) {
   .sidenav {
     margin-top: 2.1rem;
 	margin-left: .6rem;
@@ -10787,7 +10787,7 @@ nav span {
 	padding-right: 6rem;
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 480px) {
 	.custom-select-sm {
 		font-size: .9rem;
 	}
@@ -10823,7 +10823,7 @@ nav span {
 	font-size: 19px;
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 480px) {
 	.language {
 		right: 11px;
 		top: 12px;
@@ -10844,7 +10844,7 @@ nav span {
 	max-width: 14rem;
 }
 	
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 480px) {
 	.welcome-message {
 		margin-top: 0rem;
 		left: 40.2%;
@@ -10892,6 +10892,20 @@ nav span {
 	width: 650px;
 }
 
-#preferences{
+#signinMessage {
+	margin-left: .2rem;
+}
 	
+#signinMessage a {
+	font-size: 22px !important;
+}
+	
+@media screen and (max-width: 480px) {
+	#signinMessage {
+	 margin-left: .7rem;
+	 max-width: 7.5rem;
+  }
+	#signinMessage a {
+	 font-size: 16px !important;;
+  }
 }
