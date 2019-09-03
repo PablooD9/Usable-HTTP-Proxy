@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.Executors;
 
 import com.proxy.entity.certificate.SSLManager;
 
@@ -19,17 +20,27 @@ public class ConnectionImpl implements Connection
 	public void run() {
 		Socket socket;
 		try {
+			var executorsPool = Executors.newFixedThreadPool(40);
 			while ( true ) {
 				socket = serverSocket.accept();
 				configureSocket(socket);
 				ConnectionHandler handler = new ConnectionHandlerImpl( socket, new SSLConnectionHandler() );
 				
-				Thread thread = new Thread(handler);
-				thread.start();
+				executorsPool.execute( handler );
+				
+//				Thread thread = new Thread(handler);
+//				thread.start();
 			}
 		} catch (IOException ioe) {
 			// TODO 
 			ioe.printStackTrace();
+		} finally {
+			try {
+				serverSocket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

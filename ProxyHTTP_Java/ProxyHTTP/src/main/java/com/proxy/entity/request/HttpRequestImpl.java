@@ -336,7 +336,12 @@ public class HttpRequestImpl implements IHttpRequest {
 	private void loadHeader(String headerLine) {
 		String key = getKeyOfHeader(headerLine);
 		String values = getValuesOfHeader(headerLine);
-		headers.add(new Header(key, values));
+		if (values == null) {
+			System.err.println("NULL FOUND FOR HEADER " + key);
+			headers.add(new Header(key, "null"));
+		}
+		else
+			headers.add(new Header(key, values));
 	}
 
 	@Override

@@ -541,14 +541,12 @@ public class SSLManager {
 		Base64.Encoder encoder = Base64.getEncoder();
 		return "-----BEGIN CERTIFICATE-----\n"
 				+ encoder.encodeToString(certsChain[0].getEncoded())
-//					+ Base64.encodeBytes(certsChain[0].getEncoded(),
-//							Base64.DO_BREAK_LINES)
 				+ "\n-----END CERTIFICATE-----\n";
 	}
 	
 	
 	private void setSystemProperties() {
-		System.setProperty("jdk.httpclient.allowRestrictedHeaders", "host,connection,content-length,expect");
+//		System.setProperty("jdk.httpclient.allowRestrictedHeaders", "host,connection,content-length,expect,upgrade");
 		
 		// TODO CAMBIAR!!!! Crear nuestra propia keystore, ya que cacerts puede corromperse.
 		System.setProperty("javax.net.ssl.keyStore", System.getenv("JAVA_HOME") + "/lib/security/cacerts");

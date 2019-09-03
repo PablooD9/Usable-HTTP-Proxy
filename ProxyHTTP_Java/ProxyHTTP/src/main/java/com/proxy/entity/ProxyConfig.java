@@ -6,7 +6,7 @@ public class ProxyConfig {
 	private final int maxNumOfClientReqWaiting = 20;
 	private final String host = "localhost";
 	
-	private final int socketTimeOut = 120000;
+	private final int socketTimeOut = 10000;
 	 
     private ProxyConfig(){}
  

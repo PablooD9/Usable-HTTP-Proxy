@@ -1,10 +1,8 @@
 package com.proxy.entity;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -12,11 +10,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.List;
@@ -27,10 +25,8 @@ import java.util.concurrent.CompletionException;
 import javax.net.ssl.SSLContext;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
+import com.proxy.entity.request.Header;
 import com.proxy.entity.request.HttpRequestImpl;
 import com.proxy.entity.request.IHttpRequest;
 
@@ -61,7 +57,9 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 	public void handleConnection(Socket socket, InetSocketAddress hostTarget, boolean sslConnection) {
 		
     	System.out.println( "=========================== Starting new request. THREAD: " + Thread.currentThread().getName() + " =============================");
+    	
     	InputStream inStream;
+    	boolean error = false;
 		try {
 			inStream = socket.getInputStream();
 			
@@ -69,43 +67,36 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			request = readRequest(inStream, sslConnection);
 			
 			if (request.getHeaders().isEmpty()){
-				closeSocket( socket );
-				return ;
+				error = true;
 			}
 			
-			if (request.getMethod().equalsIgnoreCase("CONNECT")) { // SSL Connection? Probably.
-				connectMethod( socket, request );
-				return ;
+			if (!error) {
+				if (request.getMethod().equalsIgnoreCase("CONNECT")) { // SSL Connection? Probably.
+					System.err.println(request.getHost());
+					connectMethod( socket, request );
+				}
+				else {
+					if (hostTarget == null)
+						hostTarget = new InetSocketAddress(request.getHost(), request.getPort());
+
+					obtainResponse(socket, request, null);
+				}
+				
+				/*
+					IProxyFunctionality functionality = new ProxyFunctionalityImpl();
+					functionality = new ModifyUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)", functionality);
+					functionality = new CheckMaliciousHost(functionality);
+					functionality.modifyRequest( request );
+				*/
+				
 			}
 			
-//			System.out.print("Method: " + request.getMethod()+ ", \t");
-//			System.out.print("Requested Resource: " + request.getRequestedResource() + ", \t");
-//			System.out.print("HttpVersion: " + request.getHttpVersion() + ", \t");
-//			System.out.print("Host: " + request.getHost() + ", \t");
-//			System.out.println("Port: " + request.getPort() + ".");
-			
-			/*
-				IProxyFunctionality functionality = new ProxyFunctionalityImpl();
-				functionality = new ModifyUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)", functionality);
-				functionality = new CheckMaliciousHost(functionality);
-				functionality.modifyRequest( request );
-			*/
-			
-			if (hostTarget == null)
-				hostTarget = new InetSocketAddress(request.getHost(), request.getPort());
-
-			obtainResponse(socket, request, null);
-
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		} finally {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			closeSocket(socket);
 		}
+		
 	}
 	
 	private void closeSocket(Socket socket) {
@@ -125,6 +116,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 	                .connectTimeout(Duration.ofSeconds(30))
 	                .priority(1)
 	                .version(HttpClient.Version.HTTP_2)
+	                .followRedirects(Redirect.NORMAL)
 	                .sslContext( sslContext )
 					.build();
 		}
@@ -133,6 +125,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		            .connectTimeout(Duration.ofSeconds(30))
 		            .priority(1)
 		            .version(HttpClient.Version.HTTP_2)
+		            .followRedirects(Redirect.NORMAL)
 		            .build();
 		
 		String protocolAndHost = ((req.isSSL()) ? "https://" : "http://") + req.getHost();
@@ -145,30 +138,39 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			System.out.println("Aqui:" + uri);
 		}
 		
-		HttpRequest request=null;
+		HttpRequest.Builder preRequest=null;
 		if (req.getMethod().equalsIgnoreCase("GET")) {
-			request = HttpRequest.newBuilder()  // GET request!
+			preRequest = HttpRequest.newBuilder()  // GET request!
 		        .uri(URI.create( uri ))
-		        .GET()
-		        .build();
+		        .GET();
 		}
 		else if (req.getMethod().equalsIgnoreCase("POST")) {
-			request = HttpRequest.newBuilder()  // POST request!
+			preRequest = HttpRequest.newBuilder()  // POST request!
 	        .uri(URI.create( uri ))
-	        .POST(BodyPublishers.ofString(req.getBody()))
-	        .build();
+	        .POST(BodyPublishers.ofString(req.getBody()));
 		}
 		
-//		www.aneca.es/Programas-de-evaluacion/SELLOS-INTERNACIONALES/SELLO-INTERNACIONAL-DE-CALIDAD-en-el-ambito-de-la-Informatica-sello-EURO-INF/Listado-titulos-acreditados-con-el-sello-EURO-INF
-
-		System.err.println("Request to: " + request.uri().getHost() + request.uri().getPath());
+		for (Header header : req.getHeaders()) {
+			if (!header.getKey().equalsIgnoreCase("Host") &&
+				!header.getKey().equalsIgnoreCase("Connection") &&
+				!header.getKey().equalsIgnoreCase("Content-Length") &&
+				!header.getKey().equalsIgnoreCase("Upgrade") ) 
+			{
+				preRequest.setHeader(header.getKey(), header.getValues());
+			}
+		}
+		preRequest.header("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36");
+		HttpRequest request = preRequest.build();
 		
-		HttpResponse<InputStream> response;
+		System.err.println("Request to: " + uri);
+		
+		HttpResponse<byte[]> response;
 		try {
-			response = client.sendAsync(request, BodyHandlers.ofInputStream())
-				.join();	
+			response = client.sendAsync(request, BodyHandlers.ofByteArray())
+							 .join();	
 		} catch (CompletionException ce) {
 			System.err.println("Address " + uri + " is unreachable!");
+//			ce.printStackTrace();
 			return ;
 		}
 		
@@ -185,7 +187,8 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 //			headers.forEach((clave, valor) -> System.out.println( clave + "{ " + valor + "}" ));
 	            
 			String protocol = response.version().toString().replace("_", ".").replaceFirst("\\.", "/");
-//			System.out.println(protocol);
+			protocol = protocol.replace("HTTP/2", "HTTP/1.1");
+			System.out.println("proto: " + protocol);
 			
 			int code = response.statusCode();
 //			System.err.println("Status code: "+ code + ", for METHOD::: " + req.getMethod());
@@ -193,6 +196,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			String reasonPhrase = HttpStatus.getStatusText( code );
 			
 			var crlf = "\r\n";
+			
 			var responseString = protocol + " " + code + " " + reasonPhrase + crlf;
 			
 			for (String key : headers.keySet()) {
@@ -207,39 +211,18 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 
 //			responseString += response.body();
 			
-//			if (req.getHost().contains("aneca.es")) {
-//				System.err.println("Entró!");
-//				System.err.println(responseString);
-//				BufferedReader br = new BufferedReader(new InputStreamReader(response.body()));
-//				String s;
-//				try {
-//					while ((s=br.readLine()) != null)
-//						System.out.println( s );
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-			
 			writeResponse(socket, response.body(), responseString);
 		}
 	}
 	
-	private void writeResponse(Socket socket, InputStream streamResponse, String responseHeaders) {
+	private void writeResponse(Socket socket, byte[] streamResponse, String responseHeaders) {
 		OutputStream outputStream = null;
-		PrintWriter out = null;
 		try {
 			outputStream = socket.getOutputStream(); 
-			out = new PrintWriter( outputStream );
-			out.print(responseHeaders);
-			out.flush();
 			
-			byte[] b = new byte[4096];
-			int len;
-			while((len = streamResponse.read(b, 0, 4096)) > 0)
-			{
-				outputStream.write(b, 0, len);
-			}
+			outputStream.write(responseHeaders.getBytes());
+			outputStream.write(streamResponse);
+			outputStream.flush();
 			
 			System.out.println("El hilo " + Thread.currentThread().getName()+ " ha acabado de escribir.");
 		} catch (IOException e) {
@@ -247,16 +230,15 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			System.out.println("NANIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
 			e.printStackTrace();
 		} finally {
-//			try {
-//            	if (!socket.isOutputShutdown()) {
-//            		socket.shutdownOutput();
-//            	}
-//				outputStream.close();
-//				out.close();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			try {
+            	if (!socket.isOutputShutdown()) {
+            		socket.shutdownOutput();
+            	}
+				outputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}
 	}
@@ -327,13 +309,11 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		
 		request.parse( headers );
 		
-		if (request.getMethod() != null && (request.getMethod().equalsIgnoreCase("post") 
-				|| request.getMethod().equalsIgnoreCase("put") 
-				|| request.getMethod().equalsIgnoreCase("patch"))) // We need to get the request body
+		if (request.getMethod() != null && request.getHeader("Content-Length") != null) // We need to get the request body
 		{
 			int contentLength = Integer.parseInt( request.getHeader("Content-Length").getValues() );
 			
-//			System.out.println("Método: " + request.getMethod() + ", content-length: " + contentLength);
+			System.out.println("Method: " + request.getMethod() + ", content-length: " + contentLength);
 			
 			StringBuilder body = new StringBuilder();
 	        int c = 0;
