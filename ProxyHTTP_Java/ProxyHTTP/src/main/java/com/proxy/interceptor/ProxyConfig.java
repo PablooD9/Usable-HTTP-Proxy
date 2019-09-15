@@ -1,4 +1,4 @@
-package com.proxy.entity;
+package com.proxy.interceptor;
 
 public class ProxyConfig {
 	private static ProxyConfig instance = new ProxyConfig();

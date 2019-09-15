@@ -1,4 +1,4 @@
-package com.proxy.entity;
+package com.proxy.interceptor;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -8,7 +8,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import com.proxy.entity.certificate.SSLManager;
+import com.proxy.interceptor.certificate.SSLManager;
 
 public class SSLConnectionHandler extends SecureConnectionHandler {
 

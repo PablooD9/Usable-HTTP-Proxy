@@ -19,7 +19,7 @@
  *
  */
 
-package com.proxy.entity.util;
+package com.proxy.interceptor.util;
 
 /**
  * This class implements a circular buffer that allows writing and reading to

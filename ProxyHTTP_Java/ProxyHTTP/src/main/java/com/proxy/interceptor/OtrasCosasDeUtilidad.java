@@ -1,4 +1,4 @@
-package com.proxy.entity;
+package com.proxy.interceptor;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -23,8 +23,8 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
-import com.proxy.entity.request.Header;
-import com.proxy.entity.request.IHttpRequest;
+import com.proxy.interceptor.request.Header;
+import com.proxy.interceptor.request.IHttpRequest;
 
 
 public class OtrasCosasDeUtilidad {

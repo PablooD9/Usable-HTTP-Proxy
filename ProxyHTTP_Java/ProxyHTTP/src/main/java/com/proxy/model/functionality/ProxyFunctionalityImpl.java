@@ -1,6 +1,6 @@
 package com.proxy.model.functionality;
 
-import com.proxy.entity.request.IHttpRequest;
+import com.proxy.interceptor.request.IHttpRequest;
 
 public class ProxyFunctionalityImpl implements IProxyFunctionality {
 

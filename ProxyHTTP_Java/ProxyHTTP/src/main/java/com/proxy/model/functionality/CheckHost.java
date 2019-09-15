@@ -2,7 +2,7 @@ package com.proxy.model.functionality;
 
 import java.util.List;
 
-import com.proxy.entity.request.IHttpRequest;
+import com.proxy.interceptor.request.IHttpRequest;
 import com.proxy.model.hosttype.Host;
 import com.proxy.services.HostService;
 

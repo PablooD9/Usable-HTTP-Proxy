@@ -1,4 +1,4 @@
-package com.proxy.entity;
+package com.proxy.interceptor;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.Executors;
 
-import com.proxy.entity.certificate.SSLManager;
+import com.proxy.interceptor.certificate.SSLManager;
 
 public class ConnectionImpl implements Connection
 {

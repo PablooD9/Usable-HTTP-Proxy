@@ -3,9 +3,9 @@ package com.proxy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.proxy.entity.Proxy;
-import com.proxy.entity.ProxyImpl;
-import com.proxy.entity.certificate.SSLManager;
+import com.proxy.interceptor.Proxy;
+import com.proxy.interceptor.ProxyImpl;
+import com.proxy.interceptor.certificate.SSLManager;
 
 @SpringBootApplication
 public class HttpProxyApplication {

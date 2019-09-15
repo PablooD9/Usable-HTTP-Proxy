@@ -1,4 +1,4 @@
-package com.proxy.entity;
+package com.proxy.interceptor;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;

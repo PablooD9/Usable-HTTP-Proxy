@@ -1,4 +1,4 @@
-package com.proxy.entity;
+package com.proxy.interceptor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,9 +26,9 @@ import javax.net.ssl.SSLContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 
-import com.proxy.entity.request.Header;
-import com.proxy.entity.request.HttpRequestImpl;
-import com.proxy.entity.request.IHttpRequest;
+import com.proxy.interceptor.request.Header;
+import com.proxy.interceptor.request.HttpRequestImpl;
+import com.proxy.interceptor.request.IHttpRequest;
 
 public class ConnectionHandlerImpl implements ConnectionHandler {
 
@@ -159,7 +159,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 				preRequest.setHeader(header.getKey(), header.getValues());
 			}
 		}
-		preRequest.header("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36");
+		preRequest.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36");
 		HttpRequest request = preRequest.build();
 		
 		System.err.println("Request to: " + uri);

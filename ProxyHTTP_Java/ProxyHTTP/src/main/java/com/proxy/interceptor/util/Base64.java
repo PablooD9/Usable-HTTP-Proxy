@@ -19,7 +19,7 @@
  *
  */
 
-package com.proxy.entity.util;
+package com.proxy.interceptor.util;
 
 import java.io.IOException;
 
