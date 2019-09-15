@@ -19,7 +19,7 @@
  *
  */
 
-package com.proxy.entity.io;
+package com.proxy.interceptor.io;
 
 import java.io.FilterInputStream;
 import java.io.IOException;

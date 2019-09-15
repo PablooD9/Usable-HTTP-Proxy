@@ -19,7 +19,7 @@
  *
  */
 
-package com.proxy.entity;
+package com.proxy.interceptor;
 
 import java.net.Socket;
 import java.security.Principal;

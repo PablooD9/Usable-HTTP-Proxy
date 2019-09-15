@@ -19,13 +19,13 @@
  *
  */
 
-package com.proxy.entity.io;
+package com.proxy.interceptor.io;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.proxy.entity.util.CircularByteBuffer;
+import com.proxy.interceptor.util.CircularByteBuffer;
 
 /**
  * This class processes streams encoded according to RFC2616 "chunked"

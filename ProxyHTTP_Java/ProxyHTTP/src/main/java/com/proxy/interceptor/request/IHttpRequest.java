@@ -1,4 +1,4 @@
-package com.proxy.entity.request;
+package com.proxy.interceptor.request;
 
 import java.util.List;
 

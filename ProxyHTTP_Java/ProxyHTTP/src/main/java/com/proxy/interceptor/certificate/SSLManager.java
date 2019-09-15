@@ -1,4 +1,4 @@
-package com.proxy.entity.certificate;
+package com.proxy.interceptor.certificate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +47,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
-import com.proxy.entity.SingleX509KeyManager;
+import com.proxy.interceptor.SingleX509KeyManager;
 
 /**
  * @author Pablo

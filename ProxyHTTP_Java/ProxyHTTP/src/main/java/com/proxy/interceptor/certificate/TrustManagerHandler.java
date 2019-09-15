@@ -1,4 +1,4 @@
-package com.proxy.entity.certificate;
+package com.proxy.interceptor.certificate;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
