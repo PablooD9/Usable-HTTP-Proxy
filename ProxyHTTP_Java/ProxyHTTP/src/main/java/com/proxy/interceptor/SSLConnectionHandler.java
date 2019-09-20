@@ -12,13 +12,8 @@ import com.proxy.interceptor.certificate.SSLManager;
 
 public class SSLConnectionHandler extends SecureConnectionHandler {
 
-	private SSLManager sslManager;
 	private ConnectionHandler connHandler;
-	private String[] enabledProtocols = { "TLSv1", "TLSv1.1", "TLSv1.2" };
-	
-	public SSLConnectionHandler() {
-		this.sslManager = new SSLManager();
-	}
+	private String[] enabledProtocols = { "TLSv1.2", "TLSv1.1", "TLSv1" };
 	
 	@Override
 	public void setConnectionHandler(ConnectionHandler connHandler) {
@@ -27,7 +22,7 @@ public class SSLConnectionHandler extends SecureConnectionHandler {
 	
 	@Override
 	public void handleConnection(Socket socket, InetSocketAddress hostTarget, boolean sslConn) {
-		sslManager.generateEndEntityCert(hostTarget.getHostName());
+		SSLManager.getInstance().generateEndEntityCert(hostTarget.getHostName());
 		
 		SSLSocket sslSocket = createSSLSocketConnection(socket, hostTarget.getHostName());
 		
@@ -68,7 +63,7 @@ public class SSLConnectionHandler extends SecureConnectionHandler {
 
 	@Override
 	public SSLContext createSSLContext(String host) {
-		return sslManager.generateContext(host);
+		return SSLManager.getInstance().generateContext(host);
 	}
 
 }

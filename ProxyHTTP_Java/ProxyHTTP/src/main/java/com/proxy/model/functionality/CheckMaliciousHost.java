@@ -1,6 +1,6 @@
 package com.proxy.model.functionality;
 
-import com.proxy.model.hosttype.HostType;
+import com.proxy.model.UserConfiguration;
 
 public class CheckMaliciousHost extends CheckHost {
 
@@ -9,8 +9,8 @@ public class CheckMaliciousHost extends CheckHost {
 	}
 
 	@Override
-	void loadHostsList() {
-		setHostsList( getHostService().getHostsFromType( HostType.Malicious_Hosts ) );
+	boolean isAnOptionActive() {
+		return UserConfiguration.getInstance().getConfiguration().getOp3().equalsIgnoreCase("true");
 	}
 
 }

@@ -1,16 +1,16 @@
 package com.proxy.model.functionality;
 
-import com.proxy.model.hosttype.HostType;
+import com.proxy.model.UserConfiguration;
 
 public class CheckSpamHost extends CheckHost {
 
 	public CheckSpamHost(IProxyFunctionality functionality) {
 		super(functionality);
 	}
-
+	
 	@Override
-	void loadHostsList() {
-		setHostsList( getHostService().getHostsFromType( HostType.Spam_Hosts ) );
+	boolean isAnOptionActive() {
+		return UserConfiguration.getInstance().getConfiguration().getOp4().equalsIgnoreCase("true");
 	}
 
 }

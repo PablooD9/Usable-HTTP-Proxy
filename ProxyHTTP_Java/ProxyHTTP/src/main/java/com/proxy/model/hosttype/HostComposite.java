@@ -10,6 +10,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.proxy.model.UserConfiguration;
 
 public class HostComposite extends AbstractHostComposite {
 
@@ -26,6 +27,8 @@ public class HostComposite extends AbstractHostComposite {
 	public void updateHostsList() {
 		MongoClient client = createConnectionToMongoClient();
 		MongoDatabase dbConnection = connectToDatabase(client);
+		UserConfiguration.getInstance().setMaliciousHostsToScan(new ArrayList<>());
+		// ...
 		
 		Thread[] threads = new Thread[ hostTypes.size() ];
 		
@@ -35,6 +38,7 @@ public class HostComposite extends AbstractHostComposite {
 				MongoCollection<Document> collection = getHostsCollection(dbConnection, hType.name());
 				deleteAllHostsFromCollection(collection);
 				List<Host> hostList = loadHostList( hType );
+				UserConfiguration.getInstance().getMaliciousHostsToScan().addAll(hostList);
 				List<Document> hostDocuments = hostsListToDocument( hostList );
 				if (hostDocuments != null)
 					collection.insertMany( hostDocuments );

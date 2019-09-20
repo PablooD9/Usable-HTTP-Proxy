@@ -241,22 +241,58 @@
         <div class="divider-custom-line"></div>
       </div>
 
+		<!-- Opciones avanzadas -->
+		<div class="row" id="advancedFeatures">
+			<div class="col-sm-12">
+				<div class="shadow p-3 mb-5 bg-white rounded">
+					<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal6"></i>
+					<span class="feature">Quiero que las respuestas de los sitios web contengan las siguientes cabeceras:</span>
+					<div class="configOption">
+						<div class="row">
+							
+							<select class="selectpicker" multiple>
+								<th:block th:each="secHeader : ${securityHeaders}">
+									<div th:switch="${userConfig}">
+										<div th:case="null">
+											<option th:text="${secHeader.optName}">Cabecera</option>
+										</div>
+										<div th:case="*">
+											<option th:if="${userConfig.op1_os == secHeader.optName}" th:text="${secHeader.optName}" selected>Cabecera</option>
+											<option th:unless="${userConfig.op1_os == secHeader.optName}" th:text="${secHeader.optName}">Cabecera</option>
+										</div>
+								</th:block>
+							</select>
 
-	<!-- Opciones avanzadas -->
-	<!--
-	<div class="row" id="advancedFeatures">
-		<div class="col-sm-12">
-			<div class="shadow p-3 mb-5 bg-white rounded">
-				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal7"></i>
-				<span class="feature">Quiero hacerme pasar por...</span>
-				<label class="switch">
-	  				<input type="checkbox">
-	  				<span class="slider round"></span>
-	  			</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12">
+				<div class="shadow p-3 mb-5 bg-white rounded">
+					<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal7"></i>
+					<span class="feature">Quiero bloquear los sitios con una mala reputación (cabecera "Referer")</span>
+					<div class="configOption">
+						<div class="row">
+							<label class="switch">
+				  				<div th:switch="${userConfig}">
+									<div th:case="null">
+										<input id="op3" class="isOption" type="checkbox">
+										<span class="slider round"></span>
+									</div>
+									<div th:case="*">
+										<div th:switch="${userConfig.op3}">
+					  						<input th:case="'true'" id="op3" class="isOption" type="checkbox" checked>
+					  						<input th:case="*" id="op3" class="isOption" type="checkbox">
+					  						<span class="slider round"></span>
+					  					</div>
+					  				</div>
+				  				</div>
+				  			</label>
+				  		</div>
+				  	</div>
+				</div>
 			</div>
 		</div>
-	</div>
-	-->
 	
 		<div id="preferences" class="col-sm-12">
 			<button type="button" id="savePrefState1" class="btn btn-success" onclick="save()" th:text="#{Config.savePref_1}">
@@ -266,6 +302,7 @@
 		<button type="button" id="savePrefState2" class="btn btn-success" th:text="#{Config.savePref_2}" disabled>
 		  	Guardado con éxito
 		</button>
+		
     </div>
   </section>
   
@@ -286,6 +323,9 @@
   <!-- Save preferences button -->
   <script src="js/savePreferences.js"></script>
 
+  <!-- Checkbox style for advanced config -->
+  <script src="js/checkboxAdvancedConfig.js"></script>
+  
 </body>
 
 </html>

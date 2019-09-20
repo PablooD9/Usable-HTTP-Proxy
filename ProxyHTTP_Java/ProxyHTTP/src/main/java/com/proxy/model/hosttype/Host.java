@@ -97,4 +97,13 @@ public abstract class Host implements Cloneable{
 	}
 	
 	public abstract String getURLOfHostList();
+	
+    @Override
+    public boolean equals(Object anObject) {
+        if (!(anObject instanceof Host)) {
+            return false;
+        }
+        Host otherMember = (Host)anObject;
+        return otherMember._id.equals(this._id);
+    }
 }

@@ -4,17 +4,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.List;
@@ -29,6 +28,15 @@ import org.apache.commons.httpclient.HttpStatus;
 import com.proxy.interceptor.request.Header;
 import com.proxy.interceptor.request.HttpRequestImpl;
 import com.proxy.interceptor.request.IHttpRequest;
+import com.proxy.interceptor.response.HttpResponseImpl;
+import com.proxy.interceptor.response.IHttpResponse;
+import com.proxy.model.functionality.CheckMaliciousHost;
+import com.proxy.model.functionality.CheckPornographyHost;
+import com.proxy.model.functionality.CheckSecurityHeaders;
+import com.proxy.model.functionality.CheckTrackerHost;
+import com.proxy.model.functionality.IProxyFunctionality;
+import com.proxy.model.functionality.ModifyUserAgent;
+import com.proxy.model.functionality.ProxyFunctionalityImpl;
 
 public class ConnectionHandlerImpl implements ConnectionHandler {
 
@@ -72,22 +80,16 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			
 			if (!error) {
 				if (request.getMethod().equalsIgnoreCase("CONNECT")) { // SSL Connection? Probably.
-					System.err.println(request.getHost());
 					connectMethod( socket, request );
 				}
 				else {
 					if (hostTarget == null)
 						hostTarget = new InetSocketAddress(request.getHost(), request.getPort());
 
-					obtainResponse(socket, request, null);
+					boolean maliciousRequest = configureRequest(request);
+					
+					sendResponse(socket, request, null, maliciousRequest);
 				}
-				
-				/*
-					IProxyFunctionality functionality = new ProxyFunctionalityImpl();
-					functionality = new ModifyUserAgent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)", functionality);
-					functionality = new CheckMaliciousHost(functionality);
-					functionality.modifyRequest( request );
-				*/
 				
 			}
 			
@@ -107,7 +109,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		} catch (IOException ignore) {}
 	}
 	
-	private void obtainResponse(Socket socket, IHttpRequest req, String uri) {
+	private void sendResponse(Socket socket, IHttpRequest req, String uri, boolean maliciousRequest) {
 
 		HttpClient client = null;
 		if (req.isSSL()) {
@@ -138,6 +140,9 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			System.out.println("Aqui:" + uri);
 		}
 		
+//		if (maliciousRequest)
+//			uri = "https://localhost:8091";
+		
 		HttpRequest.Builder preRequest=null;
 		if (req.getMethod().equalsIgnoreCase("GET")) {
 			preRequest = HttpRequest.newBuilder()  // GET request!
@@ -147,7 +152,17 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		else if (req.getMethod().equalsIgnoreCase("POST")) {
 			preRequest = HttpRequest.newBuilder()  // POST request!
 	        .uri(URI.create( uri ))
-	        .POST(BodyPublishers.ofString(req.getBody()));
+	        .POST(BodyPublishers.ofByteArray(req.getBody()));
+		}
+		else {
+			if (req.getBody() != null)
+				preRequest = HttpRequest.newBuilder()
+				.uri(URI.create( uri ))
+				.method(req.getMethod(), BodyPublishers.ofByteArray( req.getBody() ));
+			else
+				preRequest = HttpRequest.newBuilder()
+				.uri(URI.create( uri ))
+				.method(req.getMethod(), BodyPublishers.noBody());
 		}
 		
 		for (Header header : req.getHeaders()) {
@@ -159,7 +174,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 				preRequest.setHeader(header.getKey(), header.getValues());
 			}
 		}
-		preRequest.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36");
+//		preRequest.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36");
 		HttpRequest request = preRequest.build();
 		
 		System.err.println("Request to: " + uri);
@@ -180,54 +195,70 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		
 		if ( !locationHeader.isEmpty() ) {
 			System.out.println("Moved permanently to " + locationHeader.get());
-			obtainResponse( socket, req, locationHeader.get() );
+			sendResponse( socket, req, locationHeader.get(), maliciousRequest );
 		}
 		else {
-			Map<String, List<String>> headers = httpHeaders.map();
-//			headers.forEach((clave, valor) -> System.out.println( clave + "{ " + valor + "}" ));
-	            
-			String protocol = response.version().toString().replace("_", ".").replaceFirst("\\.", "/");
-			protocol = protocol.replace("HTTP/2", "HTTP/1.1");
-			System.out.println("proto: " + protocol);
+			IHttpResponse httpResponse = buildResponse( response );
+			httpResponse.setHost( req.getHost() );
 			
-			int code = response.statusCode();
-//			System.err.println("Status code: "+ code + ", for METHOD::: " + req.getMethod());
+			configureResponse( httpResponse );
 			
-			String reasonPhrase = HttpStatus.getStatusText( code );
-			
-			var crlf = "\r\n";
-			
-			var responseString = protocol + " " + code + " " + reasonPhrase + crlf;
-			
-			for (String key : headers.keySet()) {
-				responseString += key + ":";
-				for (String valor : headers.get(key)) {
-					responseString += " " + valor;
-				}
-				responseString += crlf;
-			}
-			
-			responseString += crlf; // espacio cabeceras y cuerpo
-
-//			responseString += response.body();
-			
-			writeResponse(socket, response.body(), responseString);
+			writeResponse(socket, response.body(), httpResponse, maliciousRequest);
 		}
 	}
 	
-	private void writeResponse(Socket socket, byte[] streamResponse, String responseHeaders) {
+	private IHttpResponse buildResponse(HttpResponse<byte[]> response) {
+		IHttpResponse httpResponse = new HttpResponseImpl();
+		var crlf = "\r\n";
+		
+		String protocol = response.version().toString().replace("_", ".").replaceFirst("\\.", "/");
+		
+		protocol = protocol.replace("HTTP/2", "HTTP/1.1");
+		int code = response.statusCode();
+		String reasonPhrase = HttpStatus.getStatusText( code );
+		var responseString = protocol + " " + code + " " + reasonPhrase;
+		httpResponse.setStatusLine( responseString );
+		
+		responseString += crlf;
+		
+		HttpHeaders httpHeaders = response.headers();
+		Map<String, List<String>> headers = httpHeaders.map();
+		
+		var values = "";
+		for (String key : headers.keySet()) {
+			values = "";
+			for (String value : headers.get(key)) {
+				values += " " + value;
+			}
+			Header header = new Header(key, values);
+			httpResponse.addHeader( header );
+		}
+		
+		return httpResponse;
+	}
+	
+	private void writeResponse(Socket socket, byte[] streamResponse, IHttpResponse response, boolean maliciousRequest) {
 		OutputStream outputStream = null;
 		try {
 			outputStream = socket.getOutputStream(); 
 			
-			outputStream.write(responseHeaders.getBytes());
-			outputStream.write(streamResponse);
+			String firstLine = response.getStatusLine() + "\r\n";
+			outputStream.write(firstLine.getBytes());
+			for (Header header : response.getHeaders()) {
+				String h = header.getKey() + ":" + header.getValues() + "\r\n";
+				outputStream.write( h.getBytes() );
+			}
+			outputStream.write("\r\n".getBytes());
+			if (maliciousRequest)
+				outputStream.write("".getBytes());
+			else
+				outputStream.write(streamResponse);
 			outputStream.flush();
 			
-			System.out.println("El hilo " + Thread.currentThread().getName()+ " ha acabado de escribir.");
+			System.out.println("Thread " + Thread.currentThread().getName()+ " has finished.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("NANIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
+			System.out.println("Writing error...");
 			e.printStackTrace();
 		} finally {
 			try {
@@ -242,42 +273,6 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			
 		}
 	}
-	
-	private static void forwardData(Socket inputSocket, Socket outputSocket) {
-        try {
-            InputStream inputStream = inputSocket.getInputStream();
-            try {
-                OutputStream outputStream = outputSocket.getOutputStream();
-                try {
-                    byte[] buffer = new byte[4096];
-                    int read;
-                    do {
-                        read = inputStream.read(buffer);
-                        if (read > 0) {
-                            outputStream.write(buffer, 0, read);
-                            if (inputStream.available() < 1) {
-                                outputStream.flush();
-                            }
-                        }
-                    } while (read >= 0);
-                } finally {
-                    if (!outputSocket.isOutputShutdown()) {
-                        outputSocket.shutdownOutput();
-                    }
-                }
-            } finally {
-                if (!inputSocket.isInputShutdown()) {
-                    inputSocket.shutdownInput();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();  // TODO: implement catch
-        }
-    }
-	
-	
-	
-	
 	
 	
 	/** Metodo que va leyendo caracter a caracter el contenido de la petici�n enviada al servidor, y lo va metiendo
@@ -330,7 +325,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 	        }
 	        
 //	        System.out.println( body.toString() );
-	        request.setBody( body.toString() );
+	        request.setBody( body.toString().getBytes() );
 		}
 		
 		return request;
@@ -389,4 +384,25 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		}
 	}
 	
+	private boolean configureRequest(IHttpOperation request) {
+		IProxyFunctionality functionality = new ProxyFunctionalityImpl();
+		functionality = new ModifyUserAgent(functionality);
+		functionality = new CheckMaliciousHost(functionality);
+		functionality = new CheckTrackerHost(functionality);
+		functionality = new CheckPornographyHost(functionality);
+		
+		boolean maliciousRequest = false;
+		IHttpOperation operation = functionality.modify( request );
+		if (operation == null)
+			maliciousRequest = true;
+		
+		return maliciousRequest;
+	}
+	
+	private void configureResponse(IHttpOperation response) {
+		IProxyFunctionality functionality = new ProxyFunctionalityImpl();
+		functionality = new CheckSecurityHeaders(functionality);
+		
+		response = functionality.modify( response );
+	}
 }

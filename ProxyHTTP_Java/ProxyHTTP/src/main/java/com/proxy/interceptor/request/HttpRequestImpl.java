@@ -16,14 +16,11 @@ public class HttpRequestImpl implements IHttpRequest {
 	private String httpVersion;
 	private String host;
 	private int port = -1;
-//	private Header[] headers;
 	private List<Header> headers;
-	private String body;
+	private byte[] body;
 	private boolean isSSL;
 	
 	private byte[] headersByte;
-	
-//	private final static String ASCII = "ASCII";
 	
 	public List<Header> getHeaders() {
 		// TODO Auto-generated method stub
@@ -65,12 +62,16 @@ public class HttpRequestImpl implements IHttpRequest {
 	public String getHost() {
 		return host;
 	}
+	
+	public void setHost(String host) {
+		this.host = host;
+	}
 
-	public String getBody() {
+	public byte[] getBody() {
 		return body;
 	}
 
-	public void setBody(String body) {
+	public void setBody(byte[] body) {
 		this.body = body;
 	}
 	
@@ -87,108 +88,6 @@ public class HttpRequestImpl implements IHttpRequest {
 		headers = new ArrayList<>();
 	}
 	
-//	public Header[] getHeaders() {
-//		return headers;
-//	}
-	
-	/*
-	public void loadHeaders(byte[] headersByte) {
-		this.headersByte = headersByte;
-		String[] headerLines = getHeaderLines(headersByte);
-		Header[] headers = getHeaders( headerLines );
-		
-		if (port == -1)
-		{
-			if (isSSL())
-				port = 443;
-			else
-				port = 80;
-		}
-			
-		if (headers == null)
-			return;
-		
-		this.headers = headers;
-		for (int i=0; i< this.headers.length; i++) {
-			if (headers[i].getKey().equalsIgnoreCase("host")) 
-			{
-				headers[i].setValues( headers[i].getValues().split(":")[0] );
-				host = headers[i].getValues();
-				break;
-			}
-		}
-		
-		System.out.print("Method: " + method + ", ");
-		System.out.print("Requested Resource: " + requestedResource + ", ");
-		System.out.print("HttpVersion: " + httpVersion + ", ");
-		System.out.print("Host: " + host + ", ");
-		System.out.println("Port: " + port + ".");
-		
-	}
-	*/
-	
-	/*
-	public Header getHeader(String name) {
-		if (headers != null) {
-			for (int i=0; i< headers.length; i++) {
-				if (headers[i].getKey().equalsIgnoreCase(name))
-					return headers[i];
-			}
-			return null;
-		}
-		
-		throw new IllegalStateException("Impossible to get the list of headers.");
-	}
-	*/
-	
-	/*
-	private String[] getHeaderLines(byte[] headersByte) {
-		List<String> headerLines = new ArrayList<>();
-		byte[] separators = new byte[] {'\r', '\n'};
-		
-		int sep, start = 0;
-		boolean isFirstLine = true;
-		while ((sep = indexOf(separators, start, headersByte)) > -1) {
-			String line = null;
-			try {
-				line = new String(headersByte, start, sep-start, ASCII);
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (isFirstLine) {
-				loadFirstReqLine(line);
-				isFirstLine=false;
-			}
-			else if (line != null)
-				headerLines.add(line);
-			start = sep + separators.length;
-		}
-		
-		return headerLines.toArray(new String[headerLines.size()]);
-	}
-	*/
-	
-	/*
-	private Header[] getHeaders(String[] headerLines) {
-		if (headerLines.length <= 0)
-			return null;
-		
-		List<Header> headers = new ArrayList<>();
-		for(int i=0; i< headerLines.length; i++) {
-			if (headerLines[i].length()>0) {
-				String key = getKeyOfHeader(headerLines[i]);
-				String values = getValuesOfHeader(headerLines[i]);
-				
-				headers.add(new Header(key, values));
-			}
-		}
-		
-		return headers.toArray(new Header[headers.size()]);
-	}
-	*/
-	
-	
 	private String getKeyOfHeader(String headerLine) {
 		String separator = " *: *";
 		String key = headerLine.split(separator, 2)[0];
@@ -202,36 +101,6 @@ public class HttpRequestImpl implements IHttpRequest {
 		
 		return values;
 	}
-	
-	
-	/**
-	 * Finds the first occurrence of separator, starting at start
-	 * 
-	 * @param separator
-	 * @param start
-	 * @return
-	 */
-	/*private int indexOf(byte[] separator, int start, byte[] headersByte) {
-		if (headersByte == null)
-			throw new NullPointerException("array is null");
-		if (headersByte.length - start < separator.length)
-			return -1;
-		int sep = start;
-		int i = 0;
-		while (sep <= headersByte.length - separator.length
-				&& i < separator.length) {
-			if (headersByte[sep + i] == separator[i]) {
-				i++;
-			} else {
-				i = 0;
-				sep++;
-			}
-		}
-		if (i == separator.length)
-			return sep;
-		return -1;
-	}
-	*/
 	
 	@Override
 	public void parse(String headerLines) {
@@ -275,7 +144,6 @@ public class HttpRequestImpl implements IHttpRequest {
 			host = host.split(":")[0];
 		}
 		
-//		headers.forEach(header -> System.out.println(header.getKey() + ": " + header.getValues()));
 	}
 	
 	
@@ -287,11 +155,6 @@ public class HttpRequestImpl implements IHttpRequest {
 		String[] splittedFirstLine = firstLine.trim().split("[ ]+");
 		
 		if (!(splittedFirstLine.length==3)) {
-//			if (splittedFirstLine.length==2)
-//				System.err.println("LONGITUD 2: " + splittedFirstLine[0] + "" + splittedFirstLine[1]);
-//			else if (splittedFirstLine.length==1)
-//				System.err.println("LONGITUD 1: " + splittedFirstLine[0]);
-
 			throw new IllegalStateException();
 		}
 		

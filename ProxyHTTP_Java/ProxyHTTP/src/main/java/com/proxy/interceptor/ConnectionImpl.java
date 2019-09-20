@@ -20,16 +20,16 @@ public class ConnectionImpl implements Connection
 	public void run() {
 		Socket socket;
 		try {
-			var executorsPool = Executors.newFixedThreadPool(40);
+//			var executorsPool = Executors.newFixedThreadPool(40);
 			while ( true ) {
 				socket = serverSocket.accept();
 				configureSocket(socket);
 				ConnectionHandler handler = new ConnectionHandlerImpl( socket, new SSLConnectionHandler() );
 				
-				executorsPool.execute( handler );
+//				executorsPool.execute( handler );
 				
-//				Thread thread = new Thread(handler);
-//				thread.start();
+				Thread thread = new Thread(handler);
+				thread.start();
 			}
 		} catch (IOException ioe) {
 			// TODO 

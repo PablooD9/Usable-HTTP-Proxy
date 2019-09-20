@@ -19,6 +19,7 @@ import com.proxy.model.UserConfiguration;
 import com.proxy.model.option.DefaultOption;
 import com.proxy.model.option.DefaultOptionBrowser;
 import com.proxy.model.option.DefaultOptionOS;
+import com.proxy.model.option.DefaultOptionSecurityHeader;
 import com.proxy.model.option.DefaultOptionUserAgent;
 import com.proxy.model.option.Option;
 import com.proxy.model.option.OptionUserAgent;
@@ -38,6 +39,9 @@ public class ConfigurationService {
 	private final static String BROWSER_FILE_PATH = "src/main/resources/static/otherFiles/Browsers.txt";
 	private List<Option> browserOptions;
 	
+	private final static String SECURITY_HEADERS_FILE_PATH = "src/main/resources/static/otherFiles/SecurityHeaders.txt";
+	private List<Option> securityHeaders;
+	
 	private final static String USER_AGENT_FILE_PATH = "src/main/resources/static/otherFiles/UAConfiguration.txt";
 	private List<Option> UAOptions;
 	
@@ -48,12 +52,13 @@ public class ConfigurationService {
 	public List<Option> getOSOptions(){ return OSOptions; }
 	public List<Option> getBrowserOptions(){ return browserOptions; }
 	public List<Option> getUAOptions(){ return UAOptions; }
-	
+	public List<Option> getSecurityHeaders(){ return securityHeaders; }
 	
 	@PostConstruct
 	private void loadOptionsInfo() {
 		OSOptions = readOptionsFile(OS_FILE_PATH, OPTION_TYPES[0]);
 		browserOptions = readOptionsFile(BROWSER_FILE_PATH, OPTION_TYPES[0]);
+		securityHeaders = readOptionsFile(SECURITY_HEADERS_FILE_PATH, OPTION_TYPES[0]);
 		UAOptions = readOptionsFile(USER_AGENT_FILE_PATH, OPTION_TYPES[1]);
 		
 		if (optionsAreNull())
@@ -81,7 +86,6 @@ public class ConfigurationService {
 				String line = "";
 				while ((line = reader.readLine()) != null) {
 					Option option = Option.parseOptionLine(line, optionType);
-					option.parse();
 					if (option.parse() == true) {
 						optionsList.add( option );
 					}
@@ -115,17 +119,21 @@ public class ConfigurationService {
 	}
 	
 	public void saveConfiguration(Configuration configuration) {
+		UserConfiguration.getInstance().setConfiguration( configuration );
+		String ua = getUserAgent(configuration);
+		configuration.setOp1( ua );
 		if (userService.userIsLoggedIn())
 			confRepository.save( configuration );
-		UserConfiguration.getInstance().setConfiguration( configuration );
 		configurationIsActive = true;
 	}
 	
 	public Configuration getConfigOfUser() {
 		Optional<Configuration> optionalConf = confRepository.findById( userService.getEmailOfLoggedInUser() );
-		if (!optionalConf.isEmpty())
+		if (!optionalConf.isEmpty()) {
+			UserConfiguration.getInstance().setConfiguration(optionalConf.get());
 			return optionalConf.get();
-		else if (configurationIsActive)
+		}
+		else if (configurationIsActive) // Anonymous user
 			return UserConfiguration.getInstance().getConfiguration();
 			
 		return null;
@@ -138,15 +146,24 @@ public class ConfigurationService {
 		DefaultOption defBrowserOption = new DefaultOptionBrowser(BROWSER_FILE_PATH);
 		browserOptions = defBrowserOption.getOptions();
 		
+		DefaultOption defSecurityHeaders = new DefaultOptionSecurityHeader(SECURITY_HEADERS_FILE_PATH);
+		securityHeaders = defSecurityHeaders.getOptions();
+		
 		DefaultOption defUAOption = new DefaultOptionUserAgent(USER_AGENT_FILE_PATH);
 		UAOptions = defUAOption.getOptions();
 	}
 	
-	public String getUserAgent() {
+	public String getUserAgent(Configuration configuration) {
 		
-		String OS = UserConfiguration.getInstance().getConfiguration().getOp1_os();
-		String browser = UserConfiguration.getInstance().getConfiguration().getOp1_browser();
-		
+		String OS, browser;
+		if (configuration != null) {
+			OS = configuration.getOp1_os();
+			browser = configuration.getOp1_browser();
+		}
+		else{
+			OS = UserConfiguration.getInstance().getConfiguration().getOp1_os();
+			browser = UserConfiguration.getInstance().getConfiguration().getOp1_browser();
+		}
 		System.err.println("Buscando " + OS + ", " + browser);
 		
 		for (Option option : UAOptions) {
@@ -154,7 +171,6 @@ public class ConfigurationService {
 			{
 				String ua = ((OptionUserAgent) option).getUserAgentIfValid(OS, browser);
 				if (ua != null) {
-					System.err.println("AQUIIIIUFUH:: " + ua);
 					return ua;
 				}
 			}

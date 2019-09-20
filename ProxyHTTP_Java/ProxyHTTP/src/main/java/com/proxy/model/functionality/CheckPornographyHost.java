@@ -1,6 +1,6 @@
 package com.proxy.model.functionality;
 
-import com.proxy.model.hosttype.HostType;
+import com.proxy.model.UserConfiguration;
 
 public class CheckPornographyHost extends CheckHost {
 
@@ -9,8 +9,8 @@ public class CheckPornographyHost extends CheckHost {
 	}
 
 	@Override
-	void loadHostsList() {
-		setHostsList( getHostService().getHostsFromType( HostType.Pornography_Hosts ) );
+	boolean isAnOptionActive() {
+		return UserConfiguration.getInstance().getConfiguration().getOp5().equalsIgnoreCase("true");
 	}
 
 }

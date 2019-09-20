@@ -1,20 +1,25 @@
 package com.proxy.model.functionality;
 
-import com.proxy.interceptor.request.IHttpRequest;
+import com.proxy.interceptor.IHttpOperation;
+import com.proxy.model.UserConfiguration;
 
 public class ModifyUserAgent extends ProxyDecorator {
-
-	private String userAgent;
 	
-	public ModifyUserAgent(String userAgent, IProxyFunctionality functionality)
+	public ModifyUserAgent(IProxyFunctionality functionality)
 	{
 		super( functionality );
-		this.userAgent = userAgent;
 	}
 	
 	@Override
-	public String modifyRequest(IHttpRequest request) {
-		request.setHeader("User-Agent", userAgent);
-		return getFunctionality().modifyRequest( request );
+	public IHttpOperation modify(IHttpOperation operation) {
+
+		if (UserConfiguration.getInstance().getConfiguration() != null)
+		{
+			String userAgent = UserConfiguration.getInstance().getConfiguration().getOp1();
+			if (userAgent != null) {
+				operation.setHeader("User-Agent", userAgent);
+			}
+		}
+		return getFunctionality().modify( operation );
 	}
 }

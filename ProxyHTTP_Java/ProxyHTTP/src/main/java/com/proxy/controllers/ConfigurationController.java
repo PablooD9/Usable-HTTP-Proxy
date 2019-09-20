@@ -28,13 +28,6 @@ public class ConfigurationController {
 	@Autowired
 	private ConfigurationService confService;
 	
-	@RequestMapping(value={"/test"})
-	public String test(Model model) {
-		confService.getUserAgent();
-		
-		return "ok";
-	}
-	
 	@RequestMapping(value={"", "/", "/configuration"})
 	public String getConfiguration(@RequestParam(required = false, name = "lang") String language, Model model) {
 		model.addAttribute("lang", langService.getActualLocaleLang( language ));
@@ -47,6 +40,7 @@ public class ConfigurationController {
 		model.addAttribute("userConfig", userConfig);
 		model.addAttribute("OSOptions", confService.getOSOptions());
 		model.addAttribute("BrowserOptions", confService.getBrowserOptions());
+		model.addAttribute("securityHeaders", confService.getSecurityHeaders());
 		
 		return "configuration/configuration";
 	}

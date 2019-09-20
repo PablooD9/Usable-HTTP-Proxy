@@ -1,0 +1,6 @@
+# Security headers to be included in advanced configuration
+Content-Security-Policy
+Strict-Transport-Security
+X-Content-Type-Options
+X-Frame-Options
+X-Xss-Protection

@@ -1,12 +1,12 @@
 package com.proxy.model.functionality;
 
-import com.proxy.interceptor.request.IHttpRequest;
+import com.proxy.interceptor.IHttpOperation;
 
 public class ProxyFunctionalityImpl implements IProxyFunctionality {
 
 	@Override
-	public String modifyRequest(IHttpRequest request) {
-		return "";
+	public IHttpOperation modify(IHttpOperation operation) {
+		return operation;
 	}
 
 }

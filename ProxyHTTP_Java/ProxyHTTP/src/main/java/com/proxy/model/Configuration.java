@@ -10,6 +10,7 @@ public class Configuration {
 	
 	private String op1_os;
 	private String op1_browser;
+	private String op1;
 	private String op2;
 	private String op3;
 	private String op4;
@@ -49,6 +50,14 @@ public class Configuration {
 
 	public void setOp1_browser(String op1_browser) {
 		this.op1_browser = op1_browser;
+	}
+	
+	public String getOp1() {
+		return op1;
+	}
+
+	public void setOp1(String op1) {
+		this.op1 = op1;
 	}
 
 	public String getOp2() {
