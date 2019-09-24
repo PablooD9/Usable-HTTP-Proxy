@@ -22,8 +22,6 @@ public class OptionUserAgent extends AbstractOption {
 		String uaBrowser = getBrowser().trim();
 		String uaHeader = getUAHeader().trim();
 		
-		System.err.println("OS:: " + uaOS + ", " + "Browser:: " + uaBrowser);
-		
 		if (!uaOS.equalsIgnoreCase( OS.trim() ) 
 			|| !uaBrowser.equalsIgnoreCase( browser.trim() ))
 			return null;

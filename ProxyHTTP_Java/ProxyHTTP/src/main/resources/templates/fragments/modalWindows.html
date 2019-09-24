@@ -27,31 +27,75 @@
 														   title='Config.modal4Title', 
 														   content='Config.modal4Content',
 														   icon='fas fa-ban fa-5x')"></div>
-														   
+<!-- 														   
 <div th:replace="fragments/helpFragment :: help_fragment(num='6',
 														   title='Cualquier cosa...', 
 														   content='Cualquier cosa...')"></div>	
+-->
 														   													   
 <div th:replace="fragments/helpFragment :: help_fragment(num='7',
 														   title='TESTTITLE2', 
 														   content='TESTCONTENT2')"></div>	
 														   													   														   
 <div th:replace="fragments/helpFragment :: help_fragment(num='8',
-														   title='TESTTITLE2', 
-														   content='TESTCONTENT2')"></div>	
+														   title='SecurityException.modal8Title', 
+														   content='SecurityException.modal8Content',
+														   icon='fas fa-ban fa-5x')"></div>	
 														   													   														   
 <div th:replace="fragments/helpFragment :: help_fragment(num='9',
 														   title='TESTTITLE2', 
 														   content='TESTCONTENT2')"></div>	
-														   													   														   
-<div th:replace="fragments/helpFragment :: help_fragment(num='10',
-														   title='TESTTITLE2', 
-														   content='TESTCONTENT2')"></div>	
-														   													   														   
-<div th:replace="fragments/helpFragment :: help_fragment(num='11',
-														   title='TESTTITLE2', 
-														   content='TESTCONTENT2')"></div>	
-														   													   														   
-<div th:replace="fragments/helpFragment :: help_fragment(num='12',
-														   title='TESTTITLE2', 
-														   content='TESTCONTENT2')"></div>		
+														   
+
+<!-- Portfolio Modal -->
+  <div th:fragment="help_fragment" class="portfolio-modal modal fade" th:id="portfolioModal6" tabindex="-1" role="dialog" aria-labelledby="portfolioModal1Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">
+            <i class="fas fa-times"></i>
+          </span>
+        </button>
+        <div class="modal-body text-center">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <!-- Portfolio Modal - Title -->
+                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Excepciones de seguridad</h2>
+                <!-- Icon Divider -->
+                <div class="divider-custom">
+                  <div class="divider-custom-line"></div>
+                  <div class="divider-custom-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="divider-custom-line"></div>
+                </div>
+                <!-- Portfolio Modal - Image -->
+                <i class="fas fa-ban fa-5x"></i>
+                
+                <!-- Portfolio Modal - Text -->
+                <p class="mb-5">Aquí puedes eliminar los sitios web a los que puedes acceder pese a no cumplir tus preferencias de seguridad.</p>
+                
+                <div class="deleteException row">
+                	<th:block th:each="hostException : ${hostExceptions}">
+                		<div class="col-sm-12">
+	                		<span th:text="${hostException}"></span>
+	                		<button th:data1="${hostException}" th:onclick="javascript:deleteException(this)" class="secExceptionInfo btn btn-primary">Eliminar excepción</button>
+	                		<button th:data1="${hostException}" th:class="'secExceptionConfirmed host-reference-' + ${hostException} + ' btn btn-primary'" disabled>Excepción eliminada</button>
+                		</div>
+                	</th:block>
+                </div>
+                <div class="closeModal">
+	                <button class="btn btn-primary" href="#" data-dismiss="modal">
+	                  <i class="fas fa-times fa-fw"></i>
+	                  <span th:text="#{Modal.close}">Cerrar</span>
+	                </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  
+														   													   														  	

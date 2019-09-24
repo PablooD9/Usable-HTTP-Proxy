@@ -17,28 +17,33 @@ public class HostParser {
 	}
 	
 	private void loadWhiteList() {
-		whiteHostList.add("127.0.0.1");
-		whiteHostList.add("::1");
-		whiteHostList.add("255.255.255.255");
-		whiteHostList.add("fe80::1%lo0");
-		whiteHostList.add("ff00::0");
-		whiteHostList.add("ff02::1");
-		whiteHostList.add("ff02::2");
-		whiteHostList.add("ff02::3");
+		whiteHostList.add("localhost");
+		whiteHostList.add("localhost.localdomain");
+		whiteHostList.add("local");
+		whiteHostList.add("broadcasthost");
+		whiteHostList.add("ip6-localhost");
+		whiteHostList.add("ip6-loopback");
+		whiteHostList.add("ip6-localnet");
+		whiteHostList.add("ip6-mcastprefix");
+		whiteHostList.add("ip6-allnodes");
+		whiteHostList.add("ip6-allrouters");
+		whiteHostList.add("ip6-allhosts");
+		whiteHostList.add("0.0.0.0");
 	}
 	
 	public String parse(String line) {
 		if (isValid( line )) {
-			String host = line.split(" ")[1];
+			String host = line.split("[ ]+")[1]; // Split in 1 or more white spaces.
 			return host;
 		}
 		return null;
 	}
 	
 	private boolean isValid(String line) {
-		if (!line.startsWith("#") 
+		if (!line.startsWith("#")
+				&& !line.equals("")
 				&& line.length() > 0
-				&& !whiteHostList.contains(new String(line.split(" ")[0])))
+				&& !whiteHostList.contains(new String(line.split("[ ]+")[1])))
 			return true;
 		return false;
 	}

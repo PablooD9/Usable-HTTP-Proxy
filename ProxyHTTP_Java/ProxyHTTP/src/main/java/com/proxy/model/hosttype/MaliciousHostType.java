@@ -7,7 +7,7 @@ package com.proxy.model.hosttype;
 public class MaliciousHostType extends Host { 
 	
 	private final static String URL_malicious_hosts =
-			"https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts";
+			"https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
 	
 	public MaliciousHostType() {}
 	

@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.proxy.model.Configuration;
+import com.proxy.model.SecurityException;
 import com.proxy.model.UserConfiguration;
 import com.proxy.model.option.DefaultOption;
 import com.proxy.model.option.DefaultOptionBrowser;
@@ -24,6 +27,7 @@ import com.proxy.model.option.DefaultOptionUserAgent;
 import com.proxy.model.option.Option;
 import com.proxy.model.option.OptionUserAgent;
 import com.proxy.repository.ConfigurationRepository;
+import com.proxy.repository.SecurityExceptionRepository;
 
 @Service
 public class ConfigurationService {
@@ -32,6 +36,8 @@ public class ConfigurationService {
 	private UserService userService;
 	@Autowired
 	private ConfigurationRepository confRepository;
+	@Autowired
+	private SecurityExceptionRepository secExceptionRepository;
 	
 	private final static String OS_FILE_PATH = "src/main/resources/static/otherFiles/OS.txt";
 	private List<Option> OSOptions;
@@ -112,10 +118,92 @@ public class ConfigurationService {
 	}
 	
 	public Configuration buildConfigurationObject(String op1_os, String op1_browser, String op2,
-												  String op3, String op4, String op5) {
+												  String op3, String op4, String op5, String op6) {
 		String userEmail = userService.getEmailOfLoggedInUser();
-		Configuration configuration = new Configuration(userEmail, op1_os, op1_browser, op2, op3, op4, op5);
+		Configuration configuration = new Configuration(userEmail, op1_os, op1_browser, op2, op3, op4, op5, op6);
 		return configuration;
+	}
+	
+	public boolean saveSecurityException(String host) {
+		String email = userService.getEmailOfLoggedInUser();
+		SecurityException secException = secExceptionRepository.findByEmail( email );
+		List<String> secExceptionList = UserConfiguration.getInstance().getConfiguration().getHostExceptions();
+		if (secException == null) {
+			secException = new SecurityException(email, host);
+			if (exceptionIsInExceptionsList(secExceptionList, host))
+				return false;
+			secExceptionList.add(host);
+			if (userService.userIsLoggedIn())
+				secExceptionRepository.save( secException );
+		}
+		else {
+			if (secException.getHostsException().toLowerCase().contains(host)) // If host is already added to the exceptions, we don't add it again
+				return false;
+			secExceptionList.add(host);
+			updateDatabaseHostsExceptionOfUser( secExceptionList, secException );
+		}
+		
+		return true; // We have added the host exception
+	}
+	
+	public void deleteSecurityException(String host) {
+		List<String> secExceptionList = UserConfiguration.getInstance().getConfiguration().getHostExceptions();
+		if (exceptionIsInExceptionsList(secExceptionList, host)) { // If host is in user configuration list, we delete it 
+			secExceptionList = deleteSecurityExceptionFromList(secExceptionList, host);
+			UserConfiguration.getInstance().getConfiguration().setHostExceptions(secExceptionList);
+			
+			if (userService.userIsLoggedIn()) { // If user is logged in, we must delete this security exception from DB
+				SecurityException secException = secExceptionRepository.findByEmail( userService.getEmailOfLoggedInUser() );
+				if (secException != null) {
+					updateDatabaseHostsExceptionOfUser(secExceptionList, secException);
+				}
+			}
+		}
+	}
+	
+	private boolean exceptionIsInExceptionsList(List<String> secExceptionList, String host) {
+		if (secExceptionList == null)
+			return true;
+		for (String hostException : secExceptionList) {
+			if (hostException.toLowerCase().equalsIgnoreCase(host))
+				return true; // If host is already added to the exceptions, we don't add it again
+		}
+		
+		return false;
+	}
+	
+	private List<String> deleteSecurityExceptionFromList(List<String> secExceptionList, String host) {
+		List<String> secExceptionLinkedList = new LinkedList<>();
+		secExceptionLinkedList.addAll(secExceptionList);
+		
+		int counter=0;
+		for (String hostException : secExceptionList) {
+			if (hostException.toLowerCase().equalsIgnoreCase(host)) {
+				secExceptionLinkedList.remove(counter);
+			}
+			counter++;
+		}
+		
+		secExceptionList = new ArrayList<>();
+		secExceptionList.addAll( secExceptionLinkedList );
+		
+		return secExceptionList;
+	}
+	
+	private void updateDatabaseHostsExceptionOfUser( List<String> seList, SecurityException se) {
+		String hostsException = "";
+		int counter=0;
+		for (String sException : seList) {
+			if (counter++ == seList.size()-1)
+				hostsException += sException;
+			else
+				hostsException += sException + ",";
+		}
+		se.setHostsException(hostsException);
+		if (seList.isEmpty())
+			secExceptionRepository.delete( se );
+		else
+			secExceptionRepository.save( se );
 	}
 	
 	public void saveConfiguration(Configuration configuration) {
@@ -129,8 +217,13 @@ public class ConfigurationService {
 	
 	public Configuration getConfigOfUser() {
 		Optional<Configuration> optionalConf = confRepository.findById( userService.getEmailOfLoggedInUser() );
+		SecurityException secException = secExceptionRepository.findByEmail( userService.getEmailOfLoggedInUser() );
+		List<String> secExceptionList = new ArrayList<>();
+		if (secException != null)
+			secExceptionList = getExceptionsList( secException );
 		if (!optionalConf.isEmpty()) {
 			UserConfiguration.getInstance().setConfiguration(optionalConf.get());
+			UserConfiguration.getInstance().getConfiguration().setHostExceptions(secExceptionList);
 			return optionalConf.get();
 		}
 		else if (configurationIsActive) // Anonymous user
@@ -153,7 +246,7 @@ public class ConfigurationService {
 		UAOptions = defUAOption.getOptions();
 	}
 	
-	public String getUserAgent(Configuration configuration) {
+	private String getUserAgent(Configuration configuration) {
 		
 		String OS, browser;
 		if (configuration != null) {
@@ -164,7 +257,6 @@ public class ConfigurationService {
 			OS = UserConfiguration.getInstance().getConfiguration().getOp1_os();
 			browser = UserConfiguration.getInstance().getConfiguration().getOp1_browser();
 		}
-		System.err.println("Buscando " + OS + ", " + browser);
 		
 		for (Option option : UAOptions) {
 			if (option instanceof OptionUserAgent)
@@ -177,5 +269,25 @@ public class ConfigurationService {
 		}
 		
 		return null;
+	}
+	
+	public List<String> getExceptionsList(SecurityException se){
+		if (se == null) {
+			if (UserConfiguration.getInstance().getConfiguration() == null)
+				return new ArrayList<>();
+			
+			return UserConfiguration.getInstance().getConfiguration().getHostExceptions();
+		}
+		String[] exceptions;
+		if (se.getHostsException().contains(","))
+			exceptions = se.getHostsException().split(",");
+		else
+			exceptions = new String[] { se.getHostsException() };
+		
+		List<String> list = new ArrayList<>();
+		for (int i=0; i< exceptions.length; i++)
+			list.add(exceptions[i]);
+		
+		return list;
 	}
 }

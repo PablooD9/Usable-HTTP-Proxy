@@ -247,18 +247,18 @@
 				<div class="shadow p-3 mb-5 bg-white rounded">
 					<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal6"></i>
 					<span class="feature">Quiero que las respuestas de los sitios web contengan las siguientes cabeceras:</span>
-					<div class="configOption">
+					<div class="isOption configOption">
 						<div class="row">
 							
-							<select class="selectpicker" multiple>
+							<select id="op6" class="selectpicker" multiple>
 								<th:block th:each="secHeader : ${securityHeaders}">
 									<div th:switch="${userConfig}">
 										<div th:case="null">
 											<option th:text="${secHeader.optName}">Cabecera</option>
 										</div>
 										<div th:case="*">
-											<option th:if="${userConfig.op1_os == secHeader.optName}" th:text="${secHeader.optName}" selected>Cabecera</option>
-											<option th:unless="${userConfig.op1_os == secHeader.optName}" th:text="${secHeader.optName}">Cabecera</option>
+											<option th:if="${userConfig.op6.contains(secHeader.optName)}" th:text="${secHeader.optName}" selected>Cabecera</option>
+											<option th:unless="${userConfig.op6.contains(secHeader.optName)}" th:text="${secHeader.optName}">Cabecera</option>
 										</div>
 								</th:block>
 							</select>
@@ -294,14 +294,17 @@
 			</div>
 		</div>
 	
-		<div id="preferences" class="col-sm-12">
-			<button type="button" id="savePrefState1" class="btn btn-success" onclick="save()" th:text="#{Config.savePref_1}">
-				Guardar preferencias
-			</button>
-		</div>
+	<div class="preferenceButton row">
+		<button type="button" id="savePrefState1" class="btn btn-success" onclick="save()" th:text="#{Config.savePref_1}">
+			Guardar preferencias
+		</button>
 		<button type="button" id="savePrefState2" class="btn btn-success" th:text="#{Config.savePref_2}" disabled>
 		  	Guardado con éxito
 		</button>
+		<button type="button" id="manageExceptions" class="btn btn-success" data-toggle="modal" data-target="#portfolioModal6" th:text="#{Config.manageExceptionsButton}">
+			Configurar excepciones de seguridad
+		</button>
+	</div>
 		
     </div>
   </section>
@@ -322,6 +325,8 @@
   <th:block th:include="fragments/footerScripts"></th:block>
   <!-- Save preferences button -->
   <script src="js/savePreferences.js"></script>
+  <!-- Delete security exception -->
+  <script src="js/deleteException.js"></script>
 
   <!-- Checkbox style for advanced config -->
   <script src="js/checkboxAdvancedConfig.js"></script>

@@ -34,13 +34,13 @@ public class ConfigurationController {
 		
 		User userLoggedIn = userService.getUserLoggedIn();
 		Configuration userConfig = confService.getConfigOfUser();
-//		System.out.println(userConfig);
 		
 		model.addAttribute("userLoggedIn", userLoggedIn);
 		model.addAttribute("userConfig", userConfig);
 		model.addAttribute("OSOptions", confService.getOSOptions());
 		model.addAttribute("BrowserOptions", confService.getBrowserOptions());
 		model.addAttribute("securityHeaders", confService.getSecurityHeaders());
+		model.addAttribute("hostExceptions", confService.getExceptionsList( null ));
 		
 		return "configuration/configuration";
 	}
@@ -58,12 +58,32 @@ public class ConfigurationController {
 						 @RequestParam("_op2") String op2,
 						 @RequestParam("_op3") String op3,
 						 @RequestParam("_op4") String op4,
-						 @RequestParam("_op5") String op5) 
+						 @RequestParam("_op5") String op5,
+						 @RequestParam("_op6") String op6) 
 	{	
-		Configuration configuration = confService.buildConfigurationObject(op1_os, op1_browser, op2, op3, op4, op5);
+		Configuration configuration = confService.buildConfigurationObject(op1_os, op1_browser, op2, op3, op4, op5, op6);
 		confService.saveConfiguration(configuration);
 		
-	    return "OK!";
+	    return "";
+	}
+	
+	@RequestMapping("/addSecurityException")
+	public String addSecurityException(@RequestParam("host") String host, Model model) {
+		boolean exceptionAdded = confService.saveSecurityException(host);
+		
+		model.addAttribute("lang", langService.getActualLocaleLang( null ));
+		model.addAttribute("host", host);
+		model.addAttribute("securityExceptionExists", exceptionAdded);
+		
+		return "configuration/addSecurityException";
+	}
+	
+	@RequestMapping(value = "/deleteSecurityException", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String deleteSecurityException(@RequestParam("host") String host) {
+		confService.deleteSecurityException(host);
+		
+		return "";
 	}
 	
 }

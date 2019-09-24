@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.proxy.interceptor.request.Header;
+import com.proxy.interceptor.request.IHttpRequest;
 
 public class HttpResponseImpl implements IHttpResponse {
 
@@ -11,6 +12,7 @@ public class HttpResponseImpl implements IHttpResponse {
 	private String statusLine;
 	private byte[] body;
 	private String host;
+	private IHttpRequest request;
 	
 	public HttpResponseImpl() {
 		headers = new ArrayList<>();
@@ -58,7 +60,16 @@ public class HttpResponseImpl implements IHttpResponse {
 		this.host = host;
 	}
 	
-	private Header getHeader(String headerName) {
+	public IHttpRequest getRequest() {
+		return request;
+	}
+
+	public void setRequest(IHttpRequest request) {
+		this.request = request;
+	}
+	
+
+	public Header getHeader(String headerName) {
 		Header headerFound = headers.parallelStream().filter(header -> header.getKey().equalsIgnoreCase(headerName))
 				 .findFirst()
 				 .orElse(null);

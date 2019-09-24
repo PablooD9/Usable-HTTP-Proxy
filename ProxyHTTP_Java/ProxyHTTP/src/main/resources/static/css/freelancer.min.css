@@ -10981,3 +10981,46 @@ nav span {
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
+
+.preferenceButton{
+	display:inline-block;
+}
+
+.preferenceButton > button {
+	margin-right: .7rem;
+	margin-top: .7rem;
+}
+
+#manageExceptions {
+	font-size: 1.2rem;
+	color: #fff;
+	background-color: #0080c0;
+	border-color: #0080c0;
+}
+
+.deleteException {
+	text-align: left;
+	margin-top: -1rem;
+}
+
+.deleteException > .col-sm-12 {
+	margin-bottom: 10px;
+	border-style: solid;
+	padding: 10px;
+}
+
+.deleteException > div > .secExceptionInfo {
+	background-color: #ff0000;
+	float: right;
+}
+
+.closeModal {
+	margin-top: 2rem;
+}
+
+.secExceptionConfirmed {
+	display: none;
+	float: right;
+	cursor: not-allowed;
+	border-color: #ff0000 !important;
+}

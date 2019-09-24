@@ -8,6 +8,7 @@ public interface IHttpOperation {
 	String getHost();
 	void setHost(String host);
 	
+	Header getHeader(String name);
 	List<Header> getHeaders();
 	void setHeader(String headerName, String newValue);
 	

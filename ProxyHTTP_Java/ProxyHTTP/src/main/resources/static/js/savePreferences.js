@@ -18,6 +18,8 @@ function save(){
 	var op5 = document.getElementById("op5");
 	var op5_value = String( op5.checked );
 	
+	var op6_value = this.getSecurityHeaders();
+	
 	this.changeStateButton();
 	
 	$.ajax({
@@ -28,7 +30,8 @@ function save(){
 	    	 	 _op2: op2_value,
 	    	 	 _op3: op3_value,
 	    	 	 _op4: op4_value,
-	    	 	 _op5: op5_value } // parameters
+	    	 	 _op5: op5_value,
+	    	 	 _op6: op6_value } // parameters
 	})
 }
 
@@ -37,7 +40,39 @@ function changeStateButton(){
 	document.getElementById("savePrefState2").style.display="inline-block";
 }
 
+function getSecurityHeaders(){
+	var op6 = document.getElementById("op6");
+    var opts = [], opt;
+    
+    // loop through options in select list
+    for (var i=0, len=op6.options.length; i<len; i++) {
+        opt = op6.options[i];
+        
+        // check if selected
+        if ( opt.selected ) {
+            // add to array of option elements to return from this function
+            opts.push(opt.value);
+        }
+    }
+    
+    var options = "";
+    for (var j=0, len=opts.length; j<len; j++){
+    	if (j==len-1)
+    		options += opts[j];
+    	else
+    		options += opts[j] + ",";
+    }
+    
+    // return selected option elements
+    return options;
+}
+
 $('.isOption').click(function(){
+	document.getElementById("savePrefState1").style.display="inline-block";
+	document.getElementById("savePrefState2").style.display="none";	
+});
+
+$('#op6').click(function(){
 	document.getElementById("savePrefState1").style.display="inline-block";
 	document.getElementById("savePrefState2").style.display="none";	
 });

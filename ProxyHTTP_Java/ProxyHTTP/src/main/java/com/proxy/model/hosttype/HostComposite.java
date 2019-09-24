@@ -28,7 +28,6 @@ public class HostComposite extends AbstractHostComposite {
 		MongoClient client = createConnectionToMongoClient();
 		MongoDatabase dbConnection = connectToDatabase(client);
 		UserConfiguration.getInstance().setMaliciousHostsToScan(new ArrayList<>());
-		// ...
 		
 		Thread[] threads = new Thread[ hostTypes.size() ];
 		
@@ -40,6 +39,8 @@ public class HostComposite extends AbstractHostComposite {
 				List<Host> hostList = loadHostList( hType );
 				UserConfiguration.getInstance().getMaliciousHostsToScan().addAll(hostList);
 				List<Document> hostDocuments = hostsListToDocument( hostList );
+				if (hostDocuments.size() == 0)
+					System.err.println("Vacia: " + hType);
 				if (hostDocuments != null)
 					collection.insertMany( hostDocuments );
 				
@@ -56,7 +57,7 @@ public class HostComposite extends AbstractHostComposite {
 		client.close();
 	}
 	
-	private List<Host> loadHostList(HostType hostType) {
+	public List<Host> loadHostList(HostType hostType) {
 		CreateHostFactory chf = new CreateHost();
 		Host host = chf.createHost(hostType);
 		

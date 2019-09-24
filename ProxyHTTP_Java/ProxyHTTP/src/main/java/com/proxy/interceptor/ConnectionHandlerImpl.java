@@ -25,6 +25,8 @@ import javax.net.ssl.SSLContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 
+import com.proxy.interceptor.error.HttpErrorPage;
+import com.proxy.interceptor.error.IHttpErrorPage;
 import com.proxy.interceptor.request.Header;
 import com.proxy.interceptor.request.HttpRequestImpl;
 import com.proxy.interceptor.request.IHttpRequest;
@@ -40,7 +42,9 @@ import com.proxy.model.functionality.ProxyFunctionalityImpl;
 
 public class ConnectionHandlerImpl implements ConnectionHandler {
 
-	private final byte[] HTTP_OK = "HTTP/1.1 200 OK\r\n\r\n".getBytes();
+	private final static byte[] HTTP_OK = "HTTP/1.1 200 OK\r\n\r\n".getBytes();
+	private final static byte[] HTTP_ERROR_PAGE = "".getBytes();
+	
 	private ConnectionHandler connHandler; // useful for SSL communications
 	
 	private Socket socket;
@@ -118,7 +122,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 	                .connectTimeout(Duration.ofSeconds(30))
 	                .priority(1)
 	                .version(HttpClient.Version.HTTP_2)
-	                .followRedirects(Redirect.NORMAL)
+	                .followRedirects(Redirect.ALWAYS)
 	                .sslContext( sslContext )
 					.build();
 		}
@@ -127,7 +131,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		            .connectTimeout(Duration.ofSeconds(30))
 		            .priority(1)
 		            .version(HttpClient.Version.HTTP_2)
-		            .followRedirects(Redirect.NORMAL)
+		            .followRedirects(Redirect.ALWAYS)
 		            .build();
 		
 		String protocolAndHost = ((req.isSSL()) ? "https://" : "http://") + req.getHost();
@@ -140,8 +144,8 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			System.out.println("Aqui:" + uri);
 		}
 		
-//		if (maliciousRequest)
-//			uri = "https://localhost:8091";
+		if (maliciousRequest)
+			uri = "https://localhost:8091";
 		
 		HttpRequest.Builder preRequest=null;
 		if (req.getMethod().equalsIgnoreCase("GET")) {
@@ -166,10 +170,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		}
 		
 		for (Header header : req.getHeaders()) {
-			if (!header.getKey().equalsIgnoreCase("Host") &&
-				!header.getKey().equalsIgnoreCase("Connection") &&
-				!header.getKey().equalsIgnoreCase("Content-Length") &&
-				!header.getKey().equalsIgnoreCase("Upgrade") ) 
+			if (!System.getProperty("restrictedHeaders").trim().toLowerCase().contains( header.getKey().trim().toLowerCase() )) 
 			{
 				preRequest.setHeader(header.getKey(), header.getValues());
 			}
@@ -198,16 +199,16 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			sendResponse( socket, req, locationHeader.get(), maliciousRequest );
 		}
 		else {
-			IHttpResponse httpResponse = buildResponse( response );
+			IHttpResponse httpResponse = buildResponse( req, response );
 			httpResponse.setHost( req.getHost() );
 			
-			configureResponse( httpResponse );
+			boolean maliciousResponse = configureResponse( httpResponse );
 			
-			writeResponse(socket, response.body(), httpResponse, maliciousRequest);
+			writeResponse(socket, response.body(), httpResponse, maliciousRequest, maliciousResponse);
 		}
 	}
 	
-	private IHttpResponse buildResponse(HttpResponse<byte[]> response) {
+	private IHttpResponse buildResponse(IHttpRequest request, HttpResponse<byte[]> response) {
 		IHttpResponse httpResponse = new HttpResponseImpl();
 		var crlf = "\r\n";
 		
@@ -234,25 +235,40 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			httpResponse.addHeader( header );
 		}
 		
+		httpResponse.setRequest( request );
+		
 		return httpResponse;
 	}
 	
-	private void writeResponse(Socket socket, byte[] streamResponse, IHttpResponse response, boolean maliciousRequest) {
+	private void writeResponse(Socket socket, byte[] streamResponse, IHttpResponse response, boolean maliciousRequest, boolean maliciousResponse) {
 		OutputStream outputStream = null;
 		try {
 			outputStream = socket.getOutputStream(); 
 			
-			String firstLine = response.getStatusLine() + "\r\n";
-			outputStream.write(firstLine.getBytes());
-			for (Header header : response.getHeaders()) {
-				String h = header.getKey() + ":" + header.getValues() + "\r\n";
-				outputStream.write( h.getBytes() );
-			}
-			outputStream.write("\r\n".getBytes());
 			if (maliciousRequest)
 				outputStream.write("".getBytes());
-			else
-				outputStream.write(streamResponse);
+			else {
+				if (maliciousResponse && isAResponseValidForErrorPage( response )) {
+					System.out.println("res: " + response.getRequest().getRequestedResource());
+					IHttpErrorPage errorPage = new HttpErrorPage("Description.", response.getHost());
+					
+					outputStream.write(errorPage.getStatusLine());
+					outputStream.write(errorPage.getHeaders());
+					outputStream.write(errorPage.getBody());
+				}
+				else {
+					String firstLine = response.getStatusLine() + "\r\n";
+					outputStream.write(firstLine.getBytes());
+					for (Header header : response.getHeaders()) {
+						String h = header.getKey() + ":" + header.getValues() + "\r\n";
+						outputStream.write( h.getBytes() );
+					}
+					outputStream.write("\r\n".getBytes());
+					
+					outputStream.write(streamResponse);
+				}
+			}
+			
 			outputStream.flush();
 			
 			System.out.println("Thread " + Thread.currentThread().getName()+ " has finished.");
@@ -272,6 +288,15 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			}
 			
 		}
+	}
+	
+	private boolean isAResponseValidForErrorPage(IHttpResponse response) {
+		if(response.getRequest().getHeader("Referer") == null) {
+			System.out.println("Hoidsfj");
+			return true;
+		}
+		
+		return false;
 	}
 	
 	
@@ -399,10 +424,15 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		return maliciousRequest;
 	}
 	
-	private void configureResponse(IHttpOperation response) {
+	private boolean configureResponse(IHttpOperation response) {
 		IProxyFunctionality functionality = new ProxyFunctionalityImpl();
 		functionality = new CheckSecurityHeaders(functionality);
 		
-		response = functionality.modify( response );
+		boolean maliciousResponse = false;
+		IHttpOperation operation = functionality.modify( response );
+		if (operation == null)
+			maliciousResponse = true;
+		
+		return maliciousResponse;
 	}
 }

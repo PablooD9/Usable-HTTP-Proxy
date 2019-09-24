@@ -25,6 +25,7 @@ public class HttpProxyApplication {
 
 	private static void setSystemProperties() {
 //		System.setProperty("jdk.httpclient.allowRestrictedHeaders", "host,connection,content-length,expect,upgrade");
+		System.setProperty("restrictedHeaders", "host,connection,content-length,upgrade"); // HttpClient does not support this headers
 		
 		// TODO CAMBIAR!!!! Crear nuestra propia keystore. CACERTS ES UNA TRUSTSTORE
 		System.setProperty("javax.net.ssl.keyStore", System.getenv("JAVA_HOME") + "/lib/security/cacerts");
