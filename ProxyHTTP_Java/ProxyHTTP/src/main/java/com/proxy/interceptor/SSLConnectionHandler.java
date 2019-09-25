@@ -10,10 +10,9 @@ import javax.net.ssl.SSLSocketFactory;
 
 import com.proxy.interceptor.certificate.SSLManager;
 
-public class SSLConnectionHandler extends SecureConnectionHandler {
+public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 
 	private ConnectionHandler connHandler;
-	private String[] enabledProtocols = { "TLSv1.2", "TLSv1.1", "TLSv1" };
 	
 	@Override
 	public void setConnectionHandler(ConnectionHandler connHandler) {
@@ -51,7 +50,7 @@ public class SSLConnectionHandler extends SecureConnectionHandler {
 			sslSocket = (SSLSocket) sf.createSocket(socket, socket
 					.getInetAddress().getHostName(), socket.getPort(), true); // true -> autoclose SSLSocket
 			sslSocket.setUseClientMode(false);
-			sslSocket.setEnabledProtocols( enabledProtocols );
+			sslSocket.setEnabledProtocols( getEnabledProtocols() );
 			sslSocket.startHandshake();
 			return sslSocket;
 		} catch (IOException e) {

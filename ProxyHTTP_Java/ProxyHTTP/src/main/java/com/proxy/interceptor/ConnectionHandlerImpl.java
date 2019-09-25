@@ -25,13 +25,13 @@ import javax.net.ssl.SSLContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 
-import com.proxy.interceptor.error.HttpErrorPage;
+import com.proxy.interceptor.error.HttpErrorPageImpl;
 import com.proxy.interceptor.error.IHttpErrorPage;
-import com.proxy.interceptor.request.Header;
-import com.proxy.interceptor.request.HttpRequestImpl;
-import com.proxy.interceptor.request.IHttpRequest;
-import com.proxy.interceptor.response.HttpResponseImpl;
-import com.proxy.interceptor.response.IHttpResponse;
+import com.proxy.interceptor.httpOperation.request.Header;
+import com.proxy.interceptor.httpOperation.request.HttpRequestImpl;
+import com.proxy.interceptor.httpOperation.request.IHttpRequest;
+import com.proxy.interceptor.httpOperation.response.HttpResponseImpl;
+import com.proxy.interceptor.httpOperation.response.IHttpResponse;
 import com.proxy.model.functionality.CheckMaliciousHost;
 import com.proxy.model.functionality.CheckPornographyHost;
 import com.proxy.model.functionality.CheckSecurityHeaders;
@@ -43,7 +43,6 @@ import com.proxy.model.functionality.ProxyFunctionalityImpl;
 public class ConnectionHandlerImpl implements ConnectionHandler {
 
 	private final static byte[] HTTP_OK = "HTTP/1.1 200 OK\r\n\r\n".getBytes();
-	private final static byte[] HTTP_ERROR_PAGE = "".getBytes();
 	
 	private ConnectionHandler connHandler; // useful for SSL communications
 	
@@ -117,7 +116,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 
 		HttpClient client = null;
 		if (req.isSSL()) {
-			SSLContext sslContext = ((SecureConnectionHandler)connHandler).createSSLContext( req.getHost() );
+			SSLContext sslContext = ((AbstractSecureConnectionHandler)connHandler).createSSLContext( req.getHost() );
 			client = HttpClient.newBuilder()
 	                .connectTimeout(Duration.ofSeconds(30))
 	                .priority(1)
@@ -250,7 +249,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			else {
 				if (maliciousResponse && isAResponseValidForErrorPage( response )) {
 					System.out.println("res: " + response.getRequest().getRequestedResource());
-					IHttpErrorPage errorPage = new HttpErrorPage("Description.", response.getHost());
+					IHttpErrorPage errorPage = new HttpErrorPageImpl("Description.", response.getHost());
 					
 					outputStream.write(errorPage.getStatusLine());
 					outputStream.write(errorPage.getHeaders());
@@ -291,8 +290,13 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 	}
 	
 	private boolean isAResponseValidForErrorPage(IHttpResponse response) {
-		if(response.getRequest().getHeader("Referer") == null) {
-			System.out.println("Hoidsfj");
+		if(response.getRequest().getHeader("Referer") == null
+			|| (response.getRequest().getHeader("Referer") != null && 
+				response.getHeader("Content-type") != null && 
+				response.getHeader("Content-type").getValues().contains("text/html"))) 
+		{
+			if (response.getHeader("Content-type").getValues().contains("text/html"))
+				System.err.println("hasgdudafgidfygdfshaaaaaaaaaaaa " + response.getHeader("Content-type").getValues());
 			return true;
 		}
 		
@@ -327,7 +331,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			
 		} while (line != null && !line.equals(""));
 		
-		request.parse( headers );
+		request.buildRequest( headers );
 		
 		if (request.getMethod() != null && request.getHeader("Content-Length") != null) // We need to get the request body
 		{

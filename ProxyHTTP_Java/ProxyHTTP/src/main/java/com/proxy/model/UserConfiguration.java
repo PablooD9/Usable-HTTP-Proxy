@@ -3,7 +3,6 @@ package com.proxy.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.proxy.interceptor.request.Header;
 import com.proxy.model.hosttype.Host;
 
 public class UserConfiguration 

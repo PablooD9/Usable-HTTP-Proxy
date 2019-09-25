@@ -34,7 +34,6 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -48,9 +47,6 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-
-import com.proxy.interceptor.ProxyConfig;
-import com.proxy.interceptor.SingleX509KeyManager;
 
 /**
  * @author Pablo
@@ -414,8 +410,7 @@ public class SSLManager {
 			X509Certificate[] certChain = new X509Certificate[chain.length];
 			System.arraycopy(chain, 0, certChain, 0, chain.length);
 			
-			X509KeyManager km = new SingleX509KeyManager(host,
-					pk, certChain);
+			SingleKeyManager km = new SingleKeyManager(host, pk, certChain);
 
 			SSLContext sslContext = SSLContext.getInstance("SSLv3");
 			sslContext.init(new KeyManager[] { km }, tmf.getTrustManagers(), new SecureRandom());
@@ -437,41 +432,6 @@ public class SSLManager {
 		}
 		
 		return null;
-	}
-	
-	private KeyStore getKeyStore(String hostname) {
-		File file = new File(hostname + ".p12");
-		InputStream in = null;
-		KeyStore ks = null;
-		try {
-			in = new FileInputStream(file);
-			ks = KeyStore.getInstance( ksType );
-			ks.load(in, "password".toCharArray());
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				in.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return ks;
 	}
 	
 	private KeyStore getKeyStore() {

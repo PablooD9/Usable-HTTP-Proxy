@@ -1,31 +1,5 @@
 package com.proxy.interceptor;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.URI;
-import java.net.URL;
-import java.time.Duration;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-
-import com.proxy.interceptor.request.Header;
-import com.proxy.interceptor.request.IHttpRequest;
-
 
 public class OtrasCosasDeUtilidad {
 	

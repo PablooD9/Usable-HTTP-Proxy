@@ -3,9 +3,6 @@ package com.proxy.interceptor;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-
 
 public class ProxyImpl implements Proxy {
 	
@@ -24,7 +21,7 @@ public class ProxyImpl implements Proxy {
 		System.out.println( "=========================== Listening on port " + serverSocket.getLocalPort() + " =============================");
 		
 		Connection connection = new ConnectionImpl(serverSocket);
-		connection.run();
+		connection.runServer();
 
 	}
 		

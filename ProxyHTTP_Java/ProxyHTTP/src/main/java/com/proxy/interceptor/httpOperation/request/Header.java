@@ -1,4 +1,4 @@
-package com.proxy.interceptor.request;
+package com.proxy.interceptor.httpOperation.request;
 
 public class Header {
 	private String key;

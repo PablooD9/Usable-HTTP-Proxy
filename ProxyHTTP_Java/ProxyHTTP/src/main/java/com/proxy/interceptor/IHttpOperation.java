@@ -2,7 +2,7 @@ package com.proxy.interceptor;
 
 import java.util.List;
 
-import com.proxy.interceptor.request.Header;
+import com.proxy.interceptor.httpOperation.request.Header;
 
 public interface IHttpOperation {
 	String getHost();

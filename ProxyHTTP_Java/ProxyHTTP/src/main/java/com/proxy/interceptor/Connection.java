@@ -1,5 +1,8 @@
 package com.proxy.interceptor;
 
-public interface Connection extends Runnable {
-	
+import java.net.Socket;
+
+public interface Connection {
+	public void runServer();
+	public void configureSocket(Socket socket);
 }

@@ -2,7 +2,7 @@ package com.proxy.interceptor.error;
 
 import java.io.UnsupportedEncodingException;
 
-public class HttpErrorPage implements IHttpErrorPage {
+public class HttpErrorPageImpl implements IHttpErrorPage {
 
 	private String host, message;
 	
@@ -21,7 +21,7 @@ public class HttpErrorPage implements IHttpErrorPage {
 	private final String ERROR_BODY2 = "</body></html>";
 	
 	
-	public HttpErrorPage(String message, String host) {
+	public HttpErrorPageImpl(String message, String host) {
 		this.message = message;
 		this.host = host;
 	}

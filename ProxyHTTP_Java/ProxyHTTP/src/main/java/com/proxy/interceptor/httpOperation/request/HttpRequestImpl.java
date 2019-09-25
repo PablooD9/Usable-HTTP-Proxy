@@ -1,35 +1,21 @@
-package com.proxy.interceptor.request;
+package com.proxy.interceptor.httpOperation.request;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.proxy.interceptor.AbstractHttpOperation;
 
 /**
  * @author Pablo
  *
  */
-public class HttpRequestImpl implements IHttpRequest {
+public class HttpRequestImpl extends AbstractHttpOperation implements IHttpRequest {
 
 	private String method;
 	private String requestedResource;
 	private String httpVersion;
-	private String host;
 	private int port = -1;
-	private List<Header> headers;
-	private byte[] body;
 	private boolean isSSL;
-	
-	private byte[] headersByte;
-	
-	public List<Header> getHeaders() {
-		// TODO Auto-generated method stub
-		return headers;
-	}
-	
-	public byte[] getHeadersByte() {
-		return headersByte;
-	}
 	
 	public int getPort() {
 		return port;
@@ -58,22 +44,6 @@ public class HttpRequestImpl implements IHttpRequest {
 	void setHttpVersion(String httpVersion) {
 		this.httpVersion = httpVersion;
 	}
-
-	public String getHost() {
-		return host;
-	}
-	
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public byte[] getBody() {
-		return body;
-	}
-
-	public void setBody(byte[] body) {
-		this.body = body;
-	}
 	
 	public void setSSL(boolean ssl) {
 		this.isSSL = ssl;
@@ -85,7 +55,7 @@ public class HttpRequestImpl implements IHttpRequest {
 	
 	
 	public HttpRequestImpl() {
-		headers = new ArrayList<>();
+		super();
 	}
 	
 	private String getKeyOfHeader(String headerLine) {
@@ -103,7 +73,7 @@ public class HttpRequestImpl implements IHttpRequest {
 	}
 	
 	@Override
-	public void parse(String headerLines) {
+	public void buildRequest(String headerLines) {
 		String[] headersSplitted = headerLines.split("\r\n");
 		
 		try {
@@ -130,18 +100,18 @@ public class HttpRequestImpl implements IHttpRequest {
 				port = 80;
 		}
 			
-		if (headers.isEmpty())
+		if (getHeaders().isEmpty())
 			return;
 		
-		host = headers.stream().filter(header -> header.getKey().equalsIgnoreCase("host"))
+		setHost( getHeaders().stream().filter(header -> header.getKey().equalsIgnoreCase("host"))
 								.findFirst()
 								.orElse(null)
-								.getValues();
+								.getValues() );
 		
-		if (host.contains(":"))
+		if (getHost().contains(":"))
 		{
-			port = Integer.parseInt(host.split(":")[1]);
-			host = host.split(":")[0];
+			port = Integer.parseInt(getHost().split(":")[1]);
+			setHost( getHost().split(":")[0] );
 		}
 		
 	}
@@ -201,27 +171,10 @@ public class HttpRequestImpl implements IHttpRequest {
 		String values = getValuesOfHeader(headerLine);
 		if (values == null) {
 			System.err.println("NULL FOUND FOR HEADER " + key);
-			headers.add(new Header(key, "null"));
+			getHeaders().add(new Header(key, "null"));
 		}
 		else
-			headers.add(new Header(key, values));
-	}
-
-	@Override
-	public Header getHeader(String name) {
-		Header headerFound = headers.parallelStream().filter(header -> header.getKey().equalsIgnoreCase(name))
-													 .findFirst()
-													 .orElse(null);
-		
-		return headerFound;
-	}
-
-	@Override
-	public void setHeader(String headerName, String newValue) {
-		Header header;
-		if (( header=getHeader(headerName)) != null) {
-			header.setValues(newValue);
-		}
+			getHeaders().add(new Header(key, values));
 	}
 
 }

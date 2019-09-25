@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.concurrent.Executors;
-
-import com.proxy.interceptor.certificate.SSLManager;
 
 public class ConnectionImpl implements Connection
 {
@@ -17,7 +14,7 @@ public class ConnectionImpl implements Connection
 	}
 	
 	@Override
-	public void run() {
+	public void runServer() {
 		Socket socket;
 		try {
 //			var executorsPool = Executors.newFixedThreadPool(40);
@@ -44,7 +41,7 @@ public class ConnectionImpl implements Connection
 		}
 	}
 	
-	private void configureSocket(Socket socket) {
+	public void configureSocket(Socket socket) {
 		try {
 			socket.setSoTimeout( ProxyConfig.getInstance().getSocketTimeOut() );
 		} catch (SocketException e) {

@@ -1,8 +1,8 @@
-package com.proxy.interceptor.response;
+package com.proxy.interceptor.httpOperation.response;
 
 import com.proxy.interceptor.IHttpOperation;
-import com.proxy.interceptor.request.Header;
-import com.proxy.interceptor.request.IHttpRequest;
+import com.proxy.interceptor.httpOperation.request.Header;
+import com.proxy.interceptor.httpOperation.request.IHttpRequest;
 
 public interface IHttpResponse extends IHttpOperation{
 	void addHeader(Header header);
