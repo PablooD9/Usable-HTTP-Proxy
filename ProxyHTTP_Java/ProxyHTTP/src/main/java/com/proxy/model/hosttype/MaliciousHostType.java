@@ -10,10 +10,6 @@ public class MaliciousHostType extends Host {
 			"https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
 	
 	public MaliciousHostType() {}
-	
-	public MaliciousHostType(Integer _id, String hostName) {
-		super(_id, hostName);
-	}
 
 	@Override
 	public String getURLOfHostList() {

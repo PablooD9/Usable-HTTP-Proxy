@@ -26,7 +26,7 @@ public class HttpResponseImpl extends AbstractHttpOperation implements IHttpResp
 	@Override
 	public void setStatusLine(String statusLine) {
 		this.statusLine = statusLine;
-		System.out.println( "Status line: " + statusLine);
+//		System.out.println( "Status line: " + statusLine);
 	}
 	
 	public IHttpRequest getRequest() {

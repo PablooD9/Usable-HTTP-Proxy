@@ -3,7 +3,7 @@ package com.proxy.model.hosttype;
 public class TrackerHostType extends Host {
 
 	private final static String URL_trackers_hosts =
-			"http://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&mimetype=plaintext&useip=0.0.0.0";
+			"https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&mimetype=plaintext&useip=0.0.0.0";
 	
 	public TrackerHostType() {}
 	

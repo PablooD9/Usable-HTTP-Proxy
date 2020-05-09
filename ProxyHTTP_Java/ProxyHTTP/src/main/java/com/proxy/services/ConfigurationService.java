@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -209,7 +208,7 @@ public class ConfigurationService {
 	public void saveConfiguration(Configuration configuration) {
 		UserConfiguration.getInstance().setConfiguration( configuration );
 		String ua = getUserAgent(configuration);
-		configuration.setOp1( ua );
+		configuration.setUserAgent( ua );
 		if (userService.userIsLoggedIn())
 			confRepository.save( configuration );
 		configurationIsActive = true;
@@ -250,12 +249,12 @@ public class ConfigurationService {
 		
 		String OS, browser;
 		if (configuration != null) {
-			OS = configuration.getOp1_os();
-			browser = configuration.getOp1_browser();
+			OS = configuration.getOS();
+			browser = configuration.getBrowser();
 		}
 		else{
-			OS = UserConfiguration.getInstance().getConfiguration().getOp1_os();
-			browser = UserConfiguration.getInstance().getConfiguration().getOp1_browser();
+			OS = UserConfiguration.getInstance().getConfiguration().getOS();
+			browser = UserConfiguration.getInstance().getConfiguration().getBrowser();
 		}
 		
 		for (Option option : UAOptions) {

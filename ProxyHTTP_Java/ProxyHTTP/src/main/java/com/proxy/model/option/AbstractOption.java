@@ -17,7 +17,7 @@ public abstract class AbstractOption implements Option {
 	}
 	
 	public boolean parse() {
-		if (optName.trim().startsWith("#") || optName.length() == 0) {
+		if (optName.trim().startsWith("#") || optName.trim().length() == 0) {
 			return false;
 		}
 		

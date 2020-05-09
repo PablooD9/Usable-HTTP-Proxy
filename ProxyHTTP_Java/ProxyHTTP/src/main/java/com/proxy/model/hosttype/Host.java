@@ -37,11 +37,9 @@ public abstract class Host implements Cloneable{
 	public void setHostList(List<Host> hostList) {
 		this.hostList = hostList;
 	}
-
 	
-	/** Obtiene la lista de hosts maliciosos desde la URL:
-	 * 		"https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts"
-	 * Los hosts obtenidos de la página anterior son parseados e insertados en una lista.
+	/** Obtiene la lista de hosts desde una URL
+	 * Los hosts obtenidos son parseados e insertados en una lista.
 	 */
 	public List<Host> loadHostsList(){
 		HostParser parser = new HostParser();
@@ -57,7 +55,8 @@ public abstract class Host implements Cloneable{
 			int counter = 1;
 			while ( (line = reader.readLine() ) != null) {
 				if ( (line = parser.parse(line)) != null) {
-					hostList.add( clone(counter, line) );
+					Host hostCloned = clone(counter, line);
+					hostList.add( hostCloned );
 					counter++;
 				}
 			}
@@ -76,7 +75,6 @@ public abstract class Host implements Cloneable{
 					e.printStackTrace();
 				}
 		}
-		
 		return hostList;
 	}
 	
@@ -96,8 +94,6 @@ public abstract class Host implements Cloneable{
 		return (Host) clone;
 	}
 	
-	public abstract String getURLOfHostList();
-	
     @Override
     public boolean equals(Object anObject) {
         if (!(anObject instanceof Host)) {
@@ -106,4 +102,6 @@ public abstract class Host implements Cloneable{
         Host otherMember = (Host)anObject;
         return otherMember._id.equals(this._id);
     }
+	
+	public abstract String getURLOfHostList();
 }

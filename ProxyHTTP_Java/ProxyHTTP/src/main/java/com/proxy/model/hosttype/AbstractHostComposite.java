@@ -11,6 +11,6 @@ public abstract class AbstractHostComposite extends Host {
 	}
 	
 	public abstract void addHost(HostType hostType);
-	public abstract void updateHostsList();
+	public abstract void updateMongoHostsList();
 	public abstract List<Host> obtainHostsList(HostType hType);
 }

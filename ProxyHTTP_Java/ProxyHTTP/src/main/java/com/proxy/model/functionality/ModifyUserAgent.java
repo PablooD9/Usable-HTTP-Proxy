@@ -15,7 +15,7 @@ public class ModifyUserAgent extends ProxyDecorator {
 
 		if (UserConfiguration.getInstance().getConfiguration() != null)
 		{
-			String userAgent = UserConfiguration.getInstance().getConfiguration().getOp1();
+			String userAgent = UserConfiguration.getInstance().getConfiguration().getUserAgent();
 			if (userAgent != null) {
 				operation.setHeader("User-Agent", userAgent);
 			}

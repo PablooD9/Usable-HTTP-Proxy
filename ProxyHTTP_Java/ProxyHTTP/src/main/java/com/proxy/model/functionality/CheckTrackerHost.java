@@ -10,7 +10,7 @@ public class CheckTrackerHost extends CheckHost {
 	
 	@Override
 	boolean isAnOptionActive() {
-		return UserConfiguration.getInstance().getConfiguration().getOp4().equalsIgnoreCase("true");
+		return UserConfiguration.getInstance().getConfiguration().getCheckIfTrackersHosts().equalsIgnoreCase("true");
 	}
 
 }

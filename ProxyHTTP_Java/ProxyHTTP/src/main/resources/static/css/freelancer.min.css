@@ -10879,8 +10879,8 @@ nav span {
 #savePrefState1{
 	font-size: 1.2rem;
 	color: #fff;
-	background-color: #7088fc;
-	border-color: #7088fc;
+	background-color: #2196F3;
+	border-color: #8ec9f9;
 }
 
 #savePrefState2{
@@ -10994,8 +10994,8 @@ nav span {
 #manageExceptions {
 	font-size: 1.2rem;
 	color: #fff;
-	background-color: #0080c0;
-	border-color: #0080c0;
+	background-color: #ca6500;
+	border-color: #ffc68c;
 }
 
 .deleteException {

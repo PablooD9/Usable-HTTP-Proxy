@@ -43,6 +43,8 @@ public class HostParser {
 		if (!line.startsWith("#")
 				&& !line.equals("")
 				&& line.length() > 0
+				&& !line.startsWith("<")
+				&& line.split("[ ]+").length == 2
 				&& !whiteHostList.contains(new String(line.split("[ ]+")[1])))
 			return true;
 		return false;

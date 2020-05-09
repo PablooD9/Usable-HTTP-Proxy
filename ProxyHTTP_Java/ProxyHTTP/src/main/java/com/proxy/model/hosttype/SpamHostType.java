@@ -13,7 +13,6 @@ public class SpamHostType extends Host {
 	
 	@Override
 	public String getURLOfHostList() {
-		// TODO Auto-generated method stub
 		return URL_spam_hosts;
 	}
 

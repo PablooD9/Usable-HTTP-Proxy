@@ -23,9 +23,11 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -36,9 +38,12 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -52,14 +57,15 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  * @author Pablo
  *
  *
- *	NOTES:
+ *	NOTES for Certificates:
  *	
 	 CN: CommonName
 	 OU: OrganizationalUnit
 	 O: Organization
 	 L: Locality
-	 S: State Or Province Name
+	 ST: State Or Province Name
 	 C: CountryName
+	 SAN: Subject Alternative Name
  *
  */
 public class SSLManager {
@@ -90,7 +96,6 @@ public class SSLManager {
         return instance;
     }
 	
-	
 	private void setDates() {
 		// ====== Validity Date =====
 		// Actual Date
@@ -108,7 +113,6 @@ public class SSLManager {
 		generateCACertificate(false);
 		generateEndEntityCert("localhost");
 	}
-	
 	
 	// We generate the CA Certificate with Bouncy Castle
 	public void generateCACertificate(boolean fileExistsButNotImportedIntoKS)
@@ -177,17 +181,18 @@ public class SSLManager {
 			if (!keyStore.containsAlias(CAAlias))
 			{
 				generateCACertificate(true);
-				return ;
+				// return;
 			}
-			
-			caPrivateKey = (PrivateKey) keyStore.getKey(CAAlias, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
-			
-			Certificate[] chain = keyStore.getCertificateChain(CAAlias);
+			else {
+				caPrivateKey = (PrivateKey) keyStore.getKey(CAAlias, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
 				
-			certsChain = new X509Certificate[chain.length];
-			System.arraycopy(chain, 0, certsChain, 0, chain.length);
-			
-			CACertificate = certsChain[0];
+				Certificate[] chain = keyStore.getCertificateChain(CAAlias);
+					
+				certsChain = new X509Certificate[chain.length];
+				System.arraycopy(chain, 0, certsChain, 0, chain.length);
+				
+				CACertificate = certsChain[0];
+			}
 		    
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -227,16 +232,24 @@ public class SSLManager {
 		         endDate,  
 		         new X500Name("C=Oviedo, ST=Asturias, L=Spain, O=Proxy TFG, OU=Proxy TFG, CN=" + hostname), // subject
 		         endEntityCertKeyPair.getPublic());  
+		    
 		    try {
 				builder.addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.digitalSignature));
-				
+		    	
+		    	// Add Subject Alternative Name (SAN).
+			    List<GeneralName> sanList = new ArrayList<GeneralName>();
+			    sanList.add(new GeneralName(GeneralName.dNSName, hostname));
+			    GeneralNames subjectAltNames = GeneralNames.getInstance(new DERSequence((GeneralName[]) sanList.toArray(new GeneralName[] {})));
+			    builder.addExtension(Extension.subjectAlternativeName, false, subjectAltNames);
+		    	
+			    // Add more attributes to the End User Certificate.
 				builder.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));  
 			    X509Certificate endUserCert;
 				endUserCert = new JcaX509CertificateConverter().getCertificate(
 							builder.build(
 									new JcaContentSignerBuilder("SHA256withRSA")
 									.setProvider("BC")
-							.build(caPrivateKey))); // private key of signing authority
+									.build(caPrivateKey))); // private key of signing authority
 				
 				X509Certificate[] certsChain = getCertChain( endUserCert );
 			    saveCertToKeyStore( hostname, endEntityCertKeyPair.getPrivate(), certsChain );

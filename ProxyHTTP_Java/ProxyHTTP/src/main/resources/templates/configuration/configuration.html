@@ -95,8 +95,8 @@
 										<option th:text="${osOption.optName}">Sistema operativo</option>
 									</div>
 									<div th:case="*">
-										<option th:if="${userConfig.op1_os == osOption.optName}" th:text="${osOption.optName}" selected>Sistema operativo</option>
-										<option th:unless="${userConfig.op1_os == osOption.optName}" th:text="${osOption.optName}">Sistema operativo</option>
+										<option th:if="${userConfig.OS == osOption.optName}" th:text="${osOption.optName}" selected>Sistema operativo</option>
+										<option th:unless="${userConfig.OS == osOption.optName}" th:text="${osOption.optName}">Sistema operativo</option>
 									</div>
 								</div>
 							</th:block>
@@ -108,8 +108,8 @@
 										<option th:text="${browserOption.optName}">Navegador</option>
 									</div>
 									<div th:case="*">
-										<option th:if="${userConfig.op1_browser == browserOption.optName}" th:text="${browserOption.optName}" selected>Navegador</option>
-										<option th:unless="${userConfig.op1_browser == browserOption.optName}" th:text="${browserOption.optName}">Navegador</option>
+										<option th:if="${userConfig.browser == browserOption.optName}" th:text="${browserOption.optName}" selected>Navegador</option>
+										<option th:unless="${userConfig.browser == browserOption.optName}" th:text="${browserOption.optName}">Navegador</option>
 									</div>
 								</div>
 							</th:block>
@@ -156,7 +156,7 @@
 									<span class="slider round"></span>
 								</div>
 								<div th:case="*">
-									<div th:switch="${userConfig.op3}">
+									<div th:switch="${userConfig.checkIfMaliciousHosts}">
 				  						<input th:case="'true'" id="op3" class="isOption" type="checkbox" checked>
 				  						<input th:case="*" id="op3" class="isOption" type="checkbox">
 				  						<span class="slider round"></span>
@@ -181,7 +181,7 @@
 									<span class="slider round"></span>
 								</div>
 								<div th:case="*">
-									<div th:switch="${userConfig.op4}">
+									<div th:switch="${userConfig.checkIfTrackersHosts}">
 				  						<input th:case="'true'" id="op4" class="isOption" type="checkbox" checked>
 				  						<input th:case="*" id="op4" class="isOption" type="checkbox">
 				  						<span class="slider round"></span>
@@ -206,7 +206,7 @@
 									<span class="slider round"></span>
 								</div>
 								<div th:case="*">
-									<div th:switch="${userConfig.op5}">
+									<div th:switch="${userConfig.checkIfPornographicHosts}">
 				  						<input th:case="'true'" id="op5" class="isOption" type="checkbox" checked>
 				  						<input th:case="*" id="op5" class="isOption" type="checkbox">
 				  						<span class="slider round"></span>
@@ -257,8 +257,8 @@
 											<option th:text="${secHeader.optName}">Cabecera</option>
 										</div>
 										<div th:case="*">
-											<option th:if="${userConfig.op6.contains(secHeader.optName)}" th:text="${secHeader.optName}" selected>Cabecera</option>
-											<option th:unless="${userConfig.op6.contains(secHeader.optName)}" th:text="${secHeader.optName}">Cabecera</option>
+											<option th:if="${userConfig.securityHeaders.contains(secHeader.optName)}" th:text="${secHeader.optName}" selected>Cabecera</option>
+											<option th:unless="${userConfig.securityHeaders.contains(secHeader.optName)}" th:text="${secHeader.optName}">Cabecera</option>
 										</div>
 								</th:block>
 							</select>
@@ -267,6 +267,7 @@
 					</div>
 				</div>
 			</div>
+			<!--
 			<div class="col-sm-12">
 				<div class="shadow p-3 mb-5 bg-white rounded">
 					<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal7"></i>
@@ -292,6 +293,7 @@
 				  	</div>
 				</div>
 			</div>
+			-->
 		</div>
 	
 	<div class="preferenceButton row">

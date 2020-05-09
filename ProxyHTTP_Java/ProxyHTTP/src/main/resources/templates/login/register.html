@@ -19,15 +19,15 @@
 	  	</div>
 	    <form class="register-form" method="post" th:action="@{/signup}" th:object="${user}">
 	    
-	      <input type="text" name="name" th:placeholder="#{Register.name}"/>
+	      <input type="text" name="name" th:placeholder="#{Register.name}" maxlength="15"/>
 	      <span class="text-danger" th:if="${#fields.hasErrors('name')}"
 						th:errors="*{name}"></span>
 	    
-	      <input type="text" name="email" th:placeholder="#{Login.email}"/>
+	      <input type="text" name="email" th:placeholder="#{Login.email}" maxlength="50"/>
 	      <span class="text-danger" th:if="${#fields.hasErrors('email')}"
 						th:errors="*{email}"></span>
 	    
-	      <input type="password" name="password" th:placeholder="#{Login.password}"/>
+	      <input type="password" name="password" th:placeholder="#{Login.password}" maxlength="24"/>
 	      <span class="text-danger" th:if="${#fields.hasErrors('password')}"
 						th:errors="*{password}"></span>
 						

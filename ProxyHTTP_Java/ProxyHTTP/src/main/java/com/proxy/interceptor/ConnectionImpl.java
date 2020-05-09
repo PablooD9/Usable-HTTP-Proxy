@@ -8,9 +8,11 @@ import java.net.SocketException;
 public class ConnectionImpl implements Connection
 {
 	private ServerSocket serverSocket;
+	private ProxyConfig proxyConfig;
 	
-	public ConnectionImpl(ServerSocket serverSocket) {
+	public ConnectionImpl(ServerSocket serverSocket, ProxyConfig proxyConfig) {
 		this.serverSocket = serverSocket;
+		this.proxyConfig = proxyConfig;
 	}
 	
 	@Override
@@ -43,7 +45,8 @@ public class ConnectionImpl implements Connection
 	
 	public void configureSocket(Socket socket) {
 		try {
-			socket.setSoTimeout( ProxyConfig.getInstance().getSocketTimeOut() );
+			socket.setSoTimeout( proxyConfig.getSocketTimeOut() );
+			
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -13,7 +13,7 @@ public class CheckSecurityHeaders extends CheckHost {
 
 	@Override
 	boolean isAnOptionActive() {
-		String headers = UserConfiguration.getInstance().getConfiguration().getOp6();
+		String headers = UserConfiguration.getInstance().getConfiguration().getSecurityHeaders();
 		return (headers != null && headers.length() > 1);
 	}
 	
@@ -22,7 +22,7 @@ public class CheckSecurityHeaders extends CheckHost {
 		if (UserConfiguration.getInstance().getConfiguration() != null && isAnOptionActive()) {
 			if (checkIfThereIsSecurityException( operation ))
 				return getFunctionality().modify( operation );
-			String preHeaders = UserConfiguration.getInstance().getConfiguration().getOp6();
+			String preHeaders = UserConfiguration.getInstance().getConfiguration().getSecurityHeaders();
 			String[] headers;
 			if (preHeaders.contains(","))
 				headers = preHeaders.split(",");

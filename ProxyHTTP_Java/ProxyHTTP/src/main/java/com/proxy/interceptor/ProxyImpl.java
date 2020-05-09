@@ -8,10 +8,14 @@ public class ProxyImpl implements Proxy {
 	
 	@Override
 	public void establishConnection() {
-		InetSocketAddress localConn = new InetSocketAddress(ProxyConfig.getInstance().getHost(), ProxyConfig.getInstance().getLocalPort());
+		int port = 8080;
+		int socketTimeOut = 60000;
+		ProxyConfig proxyConfig = new ProxyConfigImpl( port, socketTimeOut );
+		
+		InetSocketAddress localConn = new InetSocketAddress(proxyConfig.getLocalhost(), proxyConfig.getLocalPort());
 		ServerSocket serverSocket = null;
 		try {
-			serverSocket = new ServerSocket( localConn.getPort(), ProxyConfig.getInstance().getMaxNumOfClientsReqWaiting(), localConn.getAddress() );
+			serverSocket = new ServerSocket( localConn.getPort(), proxyConfig.getMaxNumOfClientsReqWaiting(), localConn.getAddress() );
 			serverSocket.setReuseAddress( true );
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -20,7 +24,7 @@ public class ProxyImpl implements Proxy {
 		
 		System.out.println( "=========================== Listening on port " + serverSocket.getLocalPort() + " =============================");
 		
-		Connection connection = new ConnectionImpl(serverSocket);
+		Connection connection = new ConnectionImpl(serverSocket, proxyConfig);
 		connection.runServer();
 
 	}

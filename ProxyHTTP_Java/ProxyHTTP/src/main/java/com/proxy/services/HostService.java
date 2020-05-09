@@ -42,7 +42,7 @@ public class HostService {
 		hostComposite.addHost( HostType.Spam_Hosts );
 		hostComposite.addHost( HostType.Pornography_Hosts );
 		
-		hostComposite.updateHostsList();
+//		hostComposite.updateMongoHostsList();
 		createHostFiles();
 	}
 	

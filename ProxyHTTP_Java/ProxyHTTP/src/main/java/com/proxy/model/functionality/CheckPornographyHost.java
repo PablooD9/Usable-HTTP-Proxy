@@ -10,7 +10,7 @@ public class CheckPornographyHost extends CheckHost {
 
 	@Override
 	boolean isAnOptionActive() {
-		return UserConfiguration.getInstance().getConfiguration().getOp5().equalsIgnoreCase("true");
+		return UserConfiguration.getInstance().getConfiguration().getCheckIfPornographicHosts().equalsIgnoreCase("true");
 	}
 
 }

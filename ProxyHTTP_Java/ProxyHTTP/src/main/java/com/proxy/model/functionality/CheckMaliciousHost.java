@@ -10,7 +10,7 @@ public class CheckMaliciousHost extends CheckHost {
 
 	@Override
 	boolean isAnOptionActive() {
-		return UserConfiguration.getInstance().getConfiguration().getOp3().equalsIgnoreCase("true");
+		return UserConfiguration.getInstance().getConfiguration().getCheckIfMaliciousHosts().equalsIgnoreCase("true");
 	}
 
 }

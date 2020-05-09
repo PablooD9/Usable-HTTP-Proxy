@@ -1,6 +1,5 @@
 package com.proxy;
 
-import java.util.List;
 import java.util.Locale;
 
 import org.springframework.context.annotation.Bean;

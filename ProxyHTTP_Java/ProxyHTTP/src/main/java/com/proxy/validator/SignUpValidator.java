@@ -1,5 +1,7 @@
 package com.proxy.validator;
 
+import java.util.regex.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -23,6 +25,7 @@ public class SignUpValidator implements Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 		User user = (User) target;
+		user.setName( user.getName().trim() );
 		boolean existEmailErrors = false;
 		
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "Error.emptyEmail");
@@ -33,7 +36,14 @@ public class SignUpValidator implements Validator {
 		if(user.getName().length() > 15) {
 			errors.rejectValue("name", "Error.nameLength");
 		}
-		if(!user.getEmail().contains( "@" ) && !existEmailErrors) {
+		else {
+			String patternAttacker = "[a-zA-Z0-9]+";
+			if(!Pattern.compile(patternAttacker).matcher(user.getName()).find() && !existEmailErrors) {
+				errors.rejectValue("name", "Error.invalidName");
+			}
+		}
+		String emailVerification = "[a-zA-Z0-9_]+@[a-zA-Z0-9.]+";
+		if(!Pattern.compile(emailVerification).matcher(user.getEmail()).find() && !existEmailErrors) {
 			errors.rejectValue("email", "Error.invalidEmail");
 			existEmailErrors = true;
 		}
@@ -43,6 +53,9 @@ public class SignUpValidator implements Validator {
 		}
 		if (user.getPassword().length() < 6) {
 			errors.rejectValue("password", "Error.passLength");
+		}
+		else if (!Pattern.compile("\\d+").matcher(user.getPassword()).find()){
+			errors.rejectValue("password", "Error.passNumber");
 		}
 		
 	}

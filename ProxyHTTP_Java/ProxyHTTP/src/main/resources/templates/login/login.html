@@ -16,8 +16,8 @@
 	  
 	    <p th:text="#{Login.title}">Iniciar sesión</p>
 	    <form class="login-form"  method="post" th:action="@{/login}">
-	      <input type="text" name="username" th:placeholder="#{Login.email}"/>
-	      <input type="password" name="password" th:placeholder="#{Login.password}"/>
+	      <input type="text" name="username" th:placeholder="#{Login.email}" maxlength="50"/>
+	      <input type="password" name="password" th:placeholder="#{Login.password}" maxlength="24"/>
 	      <span class="text-danger" th:if="${error == 'true'}"
 						th:text="#{Error.login}"></span>
 	      
