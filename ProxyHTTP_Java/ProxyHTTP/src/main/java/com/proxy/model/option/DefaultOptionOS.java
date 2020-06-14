@@ -3,6 +3,10 @@ package com.proxy.model.option;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Clase que representa las opciones de sistemas operativos por defecto.
+ * @author Pablo
+ *
+ */
 public class DefaultOptionOS extends AbstractDefaultOption {
 
 	public DefaultOptionOS(String filePath) {

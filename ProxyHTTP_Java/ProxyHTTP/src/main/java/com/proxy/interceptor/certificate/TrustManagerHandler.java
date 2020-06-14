@@ -17,10 +17,10 @@ import javax.net.ssl.X509TrustManager;
 public class TrustManagerHandler {
 	
 	private X509TrustManager trustManager;
-	private KeyStore ks;
+	private KeyStore keyStore;
 	
 	public TrustManagerHandler(KeyStore ks) {
-		this.ks = ks;
+		this.keyStore = ks;
 	}
 	
 	public X509TrustManager getTrustManager() {
@@ -29,7 +29,7 @@ public class TrustManagerHandler {
 
 	public void initTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance( "X509" );
-		tmf.init((KeyStore) ks);
+		tmf.init((KeyStore) keyStore);
 		TrustManager trustManagers[] = tmf.getTrustManagers();
         for (int i = 0; i < trustManagers.length; i++) {
             if (trustManagers[i] instanceof X509TrustManager) {

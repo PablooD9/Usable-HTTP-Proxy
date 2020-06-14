@@ -5,14 +5,21 @@ import java.util.List;
 
 import com.proxy.interceptor.httpOperation.request.Header;
 
+/** Clase abstracta que implementa las operaciones comunes de las peticiones
+ * y las respuestas HTTP.
+ * @author Pablo
+ *
+ */
 public abstract class AbstractHttpOperation implements IHttpOperation {
 
 	private String host;
 	private byte[] body;
 	private List<Header> headers;
+	private List<String> errorMessages;
 	
 	public AbstractHttpOperation() {
 		headers = new ArrayList<>();
+		errorMessages = new ArrayList<>();
 	}
 	
 	@Override
@@ -56,4 +63,28 @@ public abstract class AbstractHttpOperation implements IHttpOperation {
 		this.body = body;
 	}
 
+	public List<String> getErrorMessages() {
+		return errorMessages;
+	}
+
+	public void setErrorMessages(List<String> errorMessages) {
+		this.errorMessages = errorMessages;
+	}
+
+	@Override
+	public void addErrorMessage(String message) {
+		if (message != null) {
+			errorMessages.add(message);
+		}
+	}
+
+	public String getAllMessages() {
+		String allMessages = "";
+		String newLine = "\r\n";
+		for (String errorMessage : getErrorMessages()) {
+			System.out.println(errorMessage);
+			allMessages = allMessages.concat(errorMessage).concat(newLine);
+		}
+		return allMessages;
+	}
 }

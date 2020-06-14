@@ -28,6 +28,11 @@ import com.proxy.model.option.OptionUserAgent;
 import com.proxy.repository.ConfigurationRepository;
 import com.proxy.repository.SecurityExceptionRepository;
 
+/** Servicio encargado de cargar en la aplicación las opciones de configuración
+ * de los distintos ficheros, y de guardar las configuraciones establecidas por los usuarios.
+ * @author Pablo
+ *
+ */
 @Service
 public class ConfigurationService {
 
@@ -59,6 +64,9 @@ public class ConfigurationService {
 	public List<Option> getUAOptions(){ return UAOptions; }
 	public List<Option> getSecurityHeaders(){ return securityHeaders; }
 	
+	/**
+	 * Carga las opciones de la aplicación a partir de los distintos ficheros.
+	 */
 	@PostConstruct
 	private void loadOptionsInfo() {
 		OSOptions = readOptionsFile(OS_FILE_PATH, OPTION_TYPES[0]);
@@ -71,12 +79,17 @@ public class ConfigurationService {
 	}
 	
 	private boolean optionsAreNull() {
-		if (OSOptions == null || browserOptions == null || UAOptions == null)
+		if (OSOptions == null || browserOptions == null || UAOptions == null || securityHeaders == null)
 			return true;
 		
 		return false;
 	}
 	
+	/** Devuelve una lista de opciones a partir de la ruta de un fichero.
+	 * @param file_path Ruta al fichero que contiene las opciones.
+	 * @param optionType Tipo de la opción a leer.
+	 * @return Lista de opciones.
+	 */
 	private List<Option> readOptionsFile(String file_path, String optionType){
 		List<Option> optionsList = new ArrayList<>();
 		
@@ -116,13 +129,29 @@ public class ConfigurationService {
 		return optionsList;
 	}
 	
+	/** Construye y devuelve un objeto de tipo Configuration a partir de las opciones
+	 * establecidas por el usuario desde la página de configuración de la aplicación.
+	 * @param op1_os Sistema operativo.
+	 * @param op1_browser Navegador.
+	 * @param op2 Opción 2.
+	 * @param op3 Opción 3.
+	 * @param op4 Opción 4.
+	 * @param op5 Opción 5.
+	 * @param op6 Opción 6.
+	 * @return Configuración.
+	 */
 	public Configuration buildConfigurationObject(String op1_os, String op1_browser, String op2,
-												  String op3, String op4, String op5, String op6) {
+												  String op3, String op4, String op5, String op6, String op7) {
 		String userEmail = userService.getEmailOfLoggedInUser();
-		Configuration configuration = new Configuration(userEmail, op1_os, op1_browser, op2, op3, op4, op5, op6);
+		Configuration configuration = new Configuration(userEmail, op1_os, op1_browser, op2, op3, op4, op5, op6, op7);
 		return configuration;
 	}
 	
+	/** Guarda en la aplicación y en la base de datos (este último solo si el usuario está autenticado)
+	 * la excepción de seguridad aplicada sobre un Host.
+	 * @param host Host al que aplicar la excepción de seguridad.
+	 * @return True si se ha guardado correctamente, False en otro caso.
+	 */
 	public boolean saveSecurityException(String host) {
 		String email = userService.getEmailOfLoggedInUser();
 		SecurityException secException = secExceptionRepository.findByEmail( email );
@@ -205,6 +234,10 @@ public class ConfigurationService {
 			secExceptionRepository.save( se );
 	}
 	
+	/** Método que guarda en la aplicación y en la base de datos (si el usuario está autenticado) la
+	 * configuración establecida por el mismo.
+	 * @param configuration Configuración a guardar.
+	 */
 	public void saveConfiguration(Configuration configuration) {
 		UserConfiguration.getInstance().setConfiguration( configuration );
 		String ua = getUserAgent(configuration);
@@ -218,15 +251,22 @@ public class ConfigurationService {
 		Optional<Configuration> optionalConf = confRepository.findById( userService.getEmailOfLoggedInUser() );
 		SecurityException secException = secExceptionRepository.findByEmail( userService.getEmailOfLoggedInUser() );
 		List<String> secExceptionList = new ArrayList<>();
-		if (secException != null)
+		if (secException != null) {
 			secExceptionList = getExceptionsList( secException );
+		}
 		if (!optionalConf.isEmpty()) {
 			UserConfiguration.getInstance().setConfiguration(optionalConf.get());
 			UserConfiguration.getInstance().getConfiguration().setHostExceptions(secExceptionList);
 			return optionalConf.get();
 		}
-		else if (configurationIsActive) // Anonymous user
+		else if (configurationIsActive) { // Anonymous user
 			return UserConfiguration.getInstance().getConfiguration();
+		}
+		else if (!secExceptionList.isEmpty()) {
+			Configuration configuration = new Configuration();
+			configuration.setHostExceptions(secExceptionList);
+			return configuration;
+		}
 			
 		return null;
 	}
@@ -245,16 +285,24 @@ public class ConfigurationService {
 		UAOptions = defUAOption.getOptions();
 	}
 	
+	/** Obtiene el valor de la cabecera User-Agent correspondiente al sistema operativo
+	 * y navegador establecidos en la configuración del usuario.
+	 * @param configuration Configuración.
+	 * @return Valor de la cabecera User-Agent.
+	 */
 	private String getUserAgent(Configuration configuration) {
-		
 		String OS, browser;
 		if (configuration != null) {
 			OS = configuration.getOS();
 			browser = configuration.getBrowser();
 		}
-		else{
+		else {
 			OS = UserConfiguration.getInstance().getConfiguration().getOS();
 			browser = UserConfiguration.getInstance().getConfiguration().getBrowser();
+		}
+		
+		if (OS.trim().equals("-") || browser.trim().equals("-")) { // Load the default User-Agent header given by browser.
+			return null;
 		}
 		
 		for (Option option : UAOptions) {
@@ -289,4 +337,13 @@ public class ConfigurationService {
 		
 		return list;
 	}
+	
+	
+	public void setSecurityExceptionRepository(SecurityExceptionRepository secExcRepositoryMock) {
+		this.secExceptionRepository = secExcRepositoryMock;
+	}
+	public void setConfRepository(ConfigurationRepository confRepositoryMock) {
+		this.confRepository = confRepositoryMock;
+	}
+	
 }

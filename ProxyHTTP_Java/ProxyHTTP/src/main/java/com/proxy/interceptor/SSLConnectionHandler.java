@@ -10,6 +10,10 @@ import javax.net.ssl.SSLSocketFactory;
 
 import com.proxy.interceptor.certificate.SSLManager;
 
+/** Clase encargada de manejar las peticiones hacia hosts que implementan HTTPS.
+ * @author Pablo
+ *
+ */
 public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 
 	private ConnectionHandler connHandler;
@@ -21,12 +25,12 @@ public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 	
 	@Override
 	public void handleConnection(Socket socket, InetSocketAddress hostTarget, boolean sslConn) {
-		SSLManager.getInstance().generateEndEntityCert(hostTarget.getHostName());
+		SSLManager.getInstance().generateEndEntityCertificate(hostTarget.getHostName());
 		
 		SSLSocket sslSocket = createSSLSocketConnection(socket, hostTarget.getHostName());
 		
 		if (sslSocket == null)
-			return;
+			return; // cuidao.
 		
 		connHandler.handleConnection(sslSocket, hostTarget, true);
 	}
@@ -43,6 +47,11 @@ public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 	}
 	
 	
+	/** Método encargado de iniciar la comunicación segura con un Host que implementa HTTPS.
+	 * @param sf Crea un SSLSocket a partir de un Socket.
+	 * @param socket Socket que será transformado en un SSLSocket.
+	 * @return SSLSocket.
+	 */
 	private SSLSocket startHandshake(SSLSocketFactory sf, Socket socket) {
 		
 		SSLSocket sslSocket = null;
@@ -50,7 +59,7 @@ public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 			sslSocket = (SSLSocket) sf.createSocket(socket, socket
 					.getInetAddress().getHostName(), socket.getPort(), true); // true -> autoclose SSLSocket
 			sslSocket.setUseClientMode(false);
-			sslSocket.setEnabledProtocols( getEnabledProtocols() );
+			sslSocket.setEnabledProtocols(getEnabledProtocols());
 			sslSocket.startHandshake();
 			return sslSocket;
 		} catch (IOException e) {

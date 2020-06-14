@@ -3,6 +3,10 @@ package com.proxy.model.option;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Clase que representa las opciones de navegadores por defecto.
+ * @author Pablo
+ *
+ */
 public class DefaultOptionBrowser extends AbstractDefaultOption {
 
 	public DefaultOptionBrowser(String filePath) {

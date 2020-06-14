@@ -5,6 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+/** Clase abstracta que implementa las operaciones de DefaultOption.
+ * @author Pablo
+ *
+ */
 public abstract class AbstractDefaultOption implements DefaultOption {
 
 	private String filePath;
@@ -13,6 +17,7 @@ public abstract class AbstractDefaultOption implements DefaultOption {
 		this.filePath = filePath;
 	}
 	
+	@Override
 	public List<Option> getOptions(){
 		BufferedWriter writer = null;
 		List<Option> options = null;
@@ -42,6 +47,10 @@ public abstract class AbstractDefaultOption implements DefaultOption {
 		return options;
 	}
 	
+	/** Método abstracto a implementar por las subclases que devuelve una lista 
+	 * de opciones por defecto.
+	 * @return Lista de opciones.
+	 */
 	abstract List<Option> loadOptions();
 	
 }

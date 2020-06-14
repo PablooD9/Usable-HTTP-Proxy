@@ -20,6 +20,9 @@ function save(){
 	
 	var op6_value = this.getSecurityHeaders();
 	
+	var op7 = document.getElementById("op7");
+	var op7_value = String( op7.checked );
+	
 	this.changeStateButton();
 	
 	$.ajax({
@@ -31,7 +34,8 @@ function save(){
 	    	 	 _op3: op3_value,
 	    	 	 _op4: op4_value,
 	    	 	 _op5: op5_value,
-	    	 	 _op6: op6_value } // parameters
+	    	 	 _op6: op6_value,
+	    	 	 _op7: op7_value} // parameters
 	})
 }
 

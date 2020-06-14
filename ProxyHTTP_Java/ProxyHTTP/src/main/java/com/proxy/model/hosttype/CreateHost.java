@@ -6,13 +6,13 @@ public class CreateHost implements CreateHostFactory {
 	public Host createHost(HostType hostType) {
 
 		if (hostType.equals( HostType.Malicious_Hosts ))
-			return new MaliciousHostType();
+			return new MaliciousHost();
 		else if (hostType.equals( HostType.Trackers_Hosts ))
-			return new TrackerHostType();
-		else if (hostType.equals( HostType.Spam_Hosts ))
-			return new SpamHostType();
+			return new TrackerHost();
 		else if (hostType.equals( HostType.Pornography_Hosts ))
-			return new PornographyHostType();
+			return new PornographyHost();
+		else if (hostType.equals(HostType.Spanish_Malicious_Hosts))
+			return new SpanishMaliciousHost();
 		
 		throw new IllegalStateException("Class not implemented yet!");
 	}

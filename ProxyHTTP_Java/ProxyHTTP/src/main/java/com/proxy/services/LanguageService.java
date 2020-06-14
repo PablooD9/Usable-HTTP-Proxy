@@ -2,6 +2,10 @@ package com.proxy.services;
 
 import org.springframework.stereotype.Service;
 
+/** Clase encargada de controlar el idioma actual de la aplicación.
+ * @author Pablo
+ *
+ */
 @Service
 public class LanguageService {
 	

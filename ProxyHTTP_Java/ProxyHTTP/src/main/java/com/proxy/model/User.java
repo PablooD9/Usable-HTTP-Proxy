@@ -4,6 +4,14 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/** Clase que modela un Usuario en la aplicación. Los usuarios
+ * tienen un Email (representa su username), una contraseña y un
+ * nombre.
+ * Dos usuarios distintos pueden tener el mismo nombre, pero nunca
+ * el mismo Email. 
+ * @author Pablo
+ *
+ */
 @Document(collection = "User")
 public class User {
 	
@@ -16,6 +24,15 @@ public class User {
 	
 	public User() {}
 	
+	// For tests.
+	public User(ObjectId id, String email, String password, String name) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.password = password;
+		this.name = name;
+	}
+
 	public ObjectId getId() {
 		return id;
 	}

@@ -7,6 +7,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/** Clase que representa una Configuración de un usuario en la aplicación.
+ * Esta clase contiene las opciones que pueden ser aplicadas por un usuario
+ * desde la página de configuración de la aplicación.
+ * @author Pablo
+ *
+ */
 @Document(collection = "Configuration")
 public class Configuration {
 	@Id
@@ -15,25 +21,27 @@ public class Configuration {
 	private String OS;
 	private String browser;
 	private String userAgent;
-	private String op2;
+	private String checkIfSpanishMaliciousHosts;
 	private String checkIfMaliciousHosts;
 	private String checkIfTrackersHosts;
 	private String checkIfPornographicHosts;
+	private String checkIfCookieHeader;
 	private String securityHeaders;
-	@Transient private List<String> hostExceptions;
+	@Transient private List<String> hostExceptions = new ArrayList<String>();
 	
 	public Configuration() {}
 	
-	public Configuration(String userEmail, String op1_os, String op1_browser, String op2, String op3, String op4, String op5, String op6) {
+	public Configuration(String userEmail, String op1_os, String op1_browser, String op2, String op3, String op4, String op5, String op6, String op7) {
 		setEmail(userEmail);
 		setOS(op1_os);
 		setBrowser(op1_browser);
-		setOp2(op2);
+		setCheckIfSpanishMaliciousHosts(op2);
 		setCheckIfMaliciousHosts(op3);
 		setCheckIfTrackersHosts(op4);
 		setCheckIfPornographicHosts(op5);
 		setSecurityHeaders(op6);
-		hostExceptions = new ArrayList<>();
+		setCheckIfCookieHeader(op7);
+//		hostExceptions = new ArrayList<>();
 	}
 	
 
@@ -68,12 +76,12 @@ public class Configuration {
 		this.userAgent = op1;
 	}
 
-	public String getOp2() {
-		return op2;
+	public String getCheckIfSpanishMaliciousHosts() {
+		return checkIfSpanishMaliciousHosts;
 	}
 
-	public void setOp2(String op2) {
-		this.op2 = op2;
+	public void setCheckIfSpanishMaliciousHosts(String op2) {
+		this.checkIfSpanishMaliciousHosts = op2;
 	}
 
 	public String getCheckIfMaliciousHosts() {
@@ -115,6 +123,13 @@ public class Configuration {
 	public void setHostExceptions(List<String> hostExceptions) {
 		this.hostExceptions = hostExceptions;
 	}
-	
+
+	public String getCheckIfCookieHeader() {
+		return checkIfCookieHeader;
+	}
+
+	public void setCheckIfCookieHeader(String checkIfCookieHeader) {
+		this.checkIfCookieHeader = checkIfCookieHeader;
+	}
 	
 }

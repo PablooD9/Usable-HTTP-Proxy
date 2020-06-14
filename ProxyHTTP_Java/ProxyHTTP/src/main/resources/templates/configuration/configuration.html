@@ -121,7 +121,7 @@
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal2"></i>
-				<span class="feature" th:text="#{Config.option2}">Quiero que no se sepa desde dónde navego</span>
+				<span class="feature" th:text="#{Config.option2}">No quiero navegar por sitios con mala reputación en España</span>
 				<div class="configOption">
 					<div class="row">
 						<label class="switch">
@@ -131,7 +131,7 @@
 									<span class="slider round"></span>
 								</div>
 								<div th:case="*">
-									<div th:switch="${userConfig.op2}">
+									<div th:switch="${userConfig.checkIfSpanishMaliciousHosts}">
 				  						<input th:case="'true'" id="op2" class="isOption" type="checkbox" checked>
 				  						<input th:case="*" id="op2" class="isOption" type="checkbox">
 				  						<span class="slider round"></span>
@@ -246,10 +246,9 @@
 			<div class="col-sm-12">
 				<div class="shadow p-3 mb-5 bg-white rounded">
 					<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal6"></i>
-					<span class="feature">Quiero que las respuestas de los sitios web contengan las siguientes cabeceras:</span>
+					<span class="feature" th:text="#{Config.option6}">Quiero que las respuestas de los sitios web contengan las siguientes cabeceras:</span>
 					<div class="isOption configOption">
 						<div class="row">
-							
 							<select id="op6" class="selectpicker" multiple>
 								<th:block th:each="secHeader : ${securityHeaders}">
 									<div th:switch="${userConfig}">
@@ -267,33 +266,32 @@
 					</div>
 				</div>
 			</div>
-			<!--
+			
 			<div class="col-sm-12">
-				<div class="shadow p-3 mb-5 bg-white rounded">
-					<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal7"></i>
-					<span class="feature">Quiero bloquear los sitios con una mala reputación (cabecera "Referer")</span>
-					<div class="configOption">
-						<div class="row">
-							<label class="switch">
-				  				<div th:switch="${userConfig}">
-									<div th:case="null">
-										<input id="op3" class="isOption" type="checkbox">
-										<span class="slider round"></span>
-									</div>
-									<div th:case="*">
-										<div th:switch="${userConfig.op3}">
-					  						<input th:case="'true'" id="op3" class="isOption" type="checkbox" checked>
-					  						<input th:case="*" id="op3" class="isOption" type="checkbox">
-					  						<span class="slider round"></span>
-					  					</div>
-					  				</div>
+			<div class="shadow p-3 mb-5 bg-white rounded">
+				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal7"></i>
+				<span class="feature" th:text="#{Config.option7}">No quiero enviar ni recibir cookies de los sitios web que visito</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<div th:switch="${userConfig}">
+								<div th:case="null">
+									<input id="op7" class="isOption" type="checkbox">
+									<span class="slider round"></span>
+								</div>
+								<div th:case="*">
+									<div th:switch="${userConfig.checkIfCookieHeader}">
+				  						<input th:case="'true'" id="op7" class="isOption" type="checkbox" checked>
+				  						<input th:case="*" id="op7" class="isOption" type="checkbox">
+				  						<span class="slider round"></span>
+				  					</div>
 				  				</div>
-				  			</label>
-				  		</div>
-				  	</div>
-				</div>
+			  				</div>
+			  			</label>
+			  		</div>
+			  	</div>
 			</div>
-			-->
+		</div>
 		</div>
 	
 	<div class="preferenceButton row">
@@ -303,7 +301,7 @@
 		<button type="button" id="savePrefState2" class="btn btn-success" th:text="#{Config.savePref_2}" disabled>
 		  	Guardado con éxito
 		</button>
-		<button type="button" id="manageExceptions" class="btn btn-success" data-toggle="modal" data-target="#portfolioModal6" th:text="#{Config.manageExceptionsButton}">
+		<button type="button" id="manageExceptions" class="btn btn-success" data-toggle="modal" data-target="#portfolioModal8" th:text="#{Config.manageExceptionsButton}">
 			Configurar excepciones de seguridad
 		</button>
 	</div>

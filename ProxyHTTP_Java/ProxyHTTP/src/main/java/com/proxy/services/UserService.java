@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 import com.proxy.model.User;
 import com.proxy.repository.UserRepository;
 
+/** Clase encargada de controlar todo el acceso a datos relacionados con los usuarios.
+ * @author Pablo
+ *
+ */
 @Service
 public class UserService implements UserDetailsService {
 
@@ -26,6 +30,17 @@ public class UserService implements UserDetailsService {
 	
 	private final static String ROLE_USER = "ROLE_USER";
 	
+	public UserService() {
+		super();
+	}
+	
+	/** Constructor usado para las pruebas con Mockito.
+	 * @param userRepositoryMock Mock de UserRepository.
+	 */
+	public UserService(UserRepository userRepositoryMock) {
+		this.userRepository = userRepositoryMock;
+	}
+
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		
@@ -45,25 +60,36 @@ public class UserService implements UserDetailsService {
 	    return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
 	}
 	
+	/** Devuelve el usuario cuyo Email coincide con el pasado por parámetro.
+	 * @param email Email del usuario.
+	 * @return Usuario.
+	 */
 	public User findUserByEmail(String email) {
 	    return userRepository.findByEmail(email);
 	}
 	
-	public User findUserByCreds(String email, String pass) {
-		return userRepository.findByCreds(email, pass);
-	}
-	
-	public void saveUser(User user) {
+	/** Almacena un usuario en la base de datos. Antes de eso, se cifra su contraseña.
+	 * @param user Usuario a añadir.
+	 */
+	public User saveUser(User user) {
+		if (bCryptPasswordEncoder == null) {
+			bCryptPasswordEncoder = new BCryptPasswordEncoder();
+		}
 	    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-	    userRepository.save(user);
+	    if (userRepository.findByEmail(user.getEmail()) == null) {
+	    	return userRepository.save(user);
+	    }
+	    else {
+	    	return null;
+	    }
 	}
 	
 	public String getEmailOfLoggedInUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String username;
-		if (auth.getPrincipal() instanceof UserDetails) {
+		String username=null;
+		if (auth != null && auth.getPrincipal() instanceof UserDetails) {
 			username = ((UserDetails) auth.getPrincipal()).getUsername();
-		} else {
+		} else if (auth != null) {
 			username = auth.getPrincipal().toString();
 		}
 		
@@ -76,6 +102,6 @@ public class UserService implements UserDetailsService {
 	}
 	
 	public boolean userIsLoggedIn() {
-		return (getUserLoggedIn() != null) ? true : false;
+		return (getEmailOfLoggedInUser() != null) ? true : false;
 	}
 }

@@ -117,9 +117,16 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 	}
 	
 	
-	/** CONNECT www.google.com:443 HTTP/1.1
-	 *  GET /test.html HTTP/1.1
-	 * @param firstLine
+	/** Método que carga en las correspondientes propiedades el contenido de la primera línea de
+	 * una petición HTTP. La primera línea contiene:
+	 * - Método HTTP utilizado.
+	 * - Recurso solicitado al Host.
+	 * - Puerto remoto.
+	 * - Versión del protocolo HTTP.
+	 * Ejemplos:
+	 * 		CONNECT www.google.com:443 HTTP/1.1
+	 *  	GET /test.html HTTP/1.1
+	 * @param firstLine Primera línea de una petición HTTP.
 	 */
 	private void loadFirstReqLine(String firstLine) {
 		String[] splittedFirstLine = firstLine.trim().split("[ ]+");
@@ -143,8 +150,11 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 		
 		this.httpVersion = splittedFirstLine[2];
 	}
-
 	
+	/** Método que comprueba que el recurso solicitado tiene un formato
+	 * correcto.
+	 * @param resource Recurso a parsear.
+	 */
 	private void parseResource(String resource) {
 		if (!resource.startsWith("/")) {
 			URI uri;
@@ -162,10 +172,15 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 				e.printStackTrace();
 			}
 		}
-		else
+		else {
 			requestedResource = resource;
+		}
 	}
 
+	/** Método que carga en la lista de cabeceras definida en la superclase la
+	 * cabecera pasada por parámetro.
+	 * @param headerLine Cabecera a añadir en la lista de cabeceras.
+	 */
 	private void loadHeader(String headerLine) {
 		String key = getKeyOfHeader(headerLine);
 		String values = getValuesOfHeader(headerLine);

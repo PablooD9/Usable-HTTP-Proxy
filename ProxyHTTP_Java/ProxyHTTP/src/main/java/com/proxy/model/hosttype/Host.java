@@ -11,7 +11,11 @@ import java.util.List;
 
 import com.proxy.parser.HostParser;
 
-public abstract class Host implements Cloneable{
+/** Clase abstracta que define un Host dentro de la aplicación.
+ * @author Pablo
+ *
+ */
+public abstract class Host implements Cloneable {
 	private Integer _id;
 	private String hostName;
 	private List<Host> hostList = new ArrayList<>();
@@ -38,8 +42,9 @@ public abstract class Host implements Cloneable{
 		this.hostList = hostList;
 	}
 	
-	/** Obtiene la lista de hosts desde una URL
+	/** Obtiene la lista de hosts a partir de una URL.
 	 * Los hosts obtenidos son parseados e insertados en una lista.
+	 * @return Lista de Host.
 	 */
 	public List<Host> loadHostsList(){
 		HostParser parser = new HostParser();
@@ -78,7 +83,6 @@ public abstract class Host implements Cloneable{
 		return hostList;
 	}
 	
-	
 	private Host clone(Integer _id, String host) {
 		Object clone = null;
 		this._id = _id;
@@ -103,5 +107,9 @@ public abstract class Host implements Cloneable{
         return otherMember._id.equals(this._id);
     }
 	
+	/** Método a implementar por parte de las subclases, que permite establecer la
+	 * URL a partir de la cual se obtienen los hosts de un tipo concreto.
+	 * @return una URL.
+	 */
 	public abstract String getURLOfHostList();
 }

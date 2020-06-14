@@ -25,7 +25,7 @@ public class SignUpValidator implements Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 		User user = (User) target;
-		user.setName( user.getName().trim() );
+		user.setName(user.getName().trim());
 		boolean existEmailErrors = false;
 		
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "Error.emptyEmail");
@@ -47,11 +47,15 @@ public class SignUpValidator implements Validator {
 			errors.rejectValue("email", "Error.invalidEmail");
 			existEmailErrors = true;
 		}
+		if(user.getEmail().length() > 50 && !existEmailErrors) {
+			errors.rejectValue("email", "Error.emailLength");
+			existEmailErrors = true;
+		}
 		if (userService.findUserByEmail(user.getEmail()) != null && !existEmailErrors) {
 			errors.rejectValue("email", "Error.emailExists");
 			existEmailErrors = true;
 		}
-		if (user.getPassword().length() < 6) {
+		if (user.getPassword().length() < 6 || user.getPassword().length() > 23) {
 			errors.rejectValue("password", "Error.passLength");
 		}
 		else if (!Pattern.compile("\\d+").matcher(user.getPassword()).find()){

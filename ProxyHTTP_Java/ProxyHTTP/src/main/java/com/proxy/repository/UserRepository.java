@@ -1,14 +1,19 @@
 package com.proxy.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
 import com.proxy.model.User;
 
+/** Interfaz que representa el repositorio correspondiente a la entidad User.
+ * @author Pablo
+ *
+ */
 public interface UserRepository extends MongoRepository<User, String>{
 	
+	/**Busca y devuelve un usuario a partir de su Email.
+	 * @param email Email del usuario.
+	 * @return Usuario encontrado.
+	 */
 	User findByEmail(String email);
 	
-	@Query("{ 'email' : ?0, 'password' : ?1 }")
-	User findByCreds(String email, String pass);
 }
