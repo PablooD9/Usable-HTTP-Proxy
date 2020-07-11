@@ -5,6 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
+
 /** Clase abstracta que implementa las operaciones de DefaultOption.
  * @author Pablo
  *
@@ -12,6 +15,8 @@ import java.util.List;
 public abstract class AbstractDefaultOption implements DefaultOption {
 
 	private String filePath;
+	
+	private final static Logger LOG = Logger.getLogger(AbstractDefaultOption.class);
 	
 	public AbstractDefaultOption(String filePath) {
 		this.filePath = filePath;
@@ -32,15 +37,13 @@ public abstract class AbstractDefaultOption implements DefaultOption {
 					writer.write(option.getOptName() + "\r\n");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 		} finally {
 			try {
 				if (writer != null)
 					writer.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			}
 		}
 	    

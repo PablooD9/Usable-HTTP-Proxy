@@ -54,6 +54,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
 import org.springframework.util.ResourceUtils;
 
 /** Clase encargada del manejo de certificados, desde su creación y emisión hasta su almacenamiento en un almacén
@@ -175,14 +176,11 @@ public class SSLManager {
 
 				saveCertToKeyStore(CAAlias, CAkp.getPrivate(), certsChain);
 			} catch (CertificateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 			} catch (OperatorCreationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			}
 
 		} else {
@@ -198,7 +196,6 @@ public class SSLManager {
 
 		InputStream in = null;
 		try {
-//			in = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
 			in = getKeyStoreAsInputStream();
 
 			KeyStore keyStore = KeyStore.getInstance(ksType);
@@ -206,7 +203,6 @@ public class SSLManager {
 
 			if (!keyStore.containsAlias(CAAlias)) {
 				generateCACertificate(true);
-				// return;
 			} else {
 				caPrivateKey = (PrivateKey) keyStore.getKey(CAAlias,
 						System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
@@ -220,25 +216,20 @@ public class SSLManager {
 			}
 
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + ioe.getMessage());
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error en la KeyStore. " + e.getMessage());
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error con el algoritmo seleccionado para la keystore. " + e.getMessage());
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 		} catch (UnrecoverableKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al recuperar la clave de la keystore. " + e.getMessage());
 		} finally {
 			try {
 				in.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			}
 		}
 	}
@@ -247,7 +238,6 @@ public class SSLManager {
 	 * @param hostname Host al que emitir el certificado.
 	 */
 	public void generateEndEntityCertificate(String hostname) {
-
 		queueLock.lock();
 		if (!isCertAlreadyGeneratedForHost(hostname)) {
 			// create end user cert signed
@@ -280,14 +270,11 @@ public class SSLManager {
 				X509Certificate[] certsChain = getCertChain(endUserCert);
 				saveCertToKeyStore(hostname, endEntityCertKeyPair.getPrivate(), certsChain);
 			} catch (CertificateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 			} catch (OperatorCreationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 			} catch (CertIOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida relacionado con el certificado. " + e.getMessage());
 			}
 
 		}
@@ -310,7 +297,6 @@ public class SSLManager {
 		InputStream is = null;
 		boolean contains = false;
 		try {
-//			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
 			is = getKeyStoreAsInputStream();
 
 			KeyStore keystore = KeyStore.getInstance(ksType);
@@ -320,26 +306,20 @@ public class SSLManager {
 				contains = true;
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al buscar el fichero. " + e.getMessage());
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error con la keystore. " + e.getMessage());
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al seleccionarl el algoritmo para la keystore. " + e.getMessage());
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 		} finally {
 			try {
 				is.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			}
 		}
 
@@ -352,11 +332,9 @@ public class SSLManager {
 			kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 			kpGen.initialize(1024);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al seleccionar algoritmo. " + e.getMessage());
 		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al seleccionar el proveedor para generar claves. " + e.getMessage());
 		}
 		return kpGen.generateKeyPair();
 	}
@@ -372,17 +350,14 @@ public class SSLManager {
 			fw.write(getCACert());
 			fw.flush();
 		} catch (CertificateEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error de codificación de certificados. " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 		} finally {
 			try {
 				fw.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			}
 		}
 	}
@@ -393,12 +368,10 @@ public class SSLManager {
 	 * @param certsChain Cadena de certificados (certificado de la AC y el certificado emitido para el Host).
 	 */
 	private void saveCertToKeyStore(String hostnameAsAlias, PrivateKey certPrivKey, X509Certificate[] certsChain) {
-//		File file = new File(System.getProperty("javax.net.ssl.keyStore"));
 		File file = getKeyStoreAsFile();
 		InputStream is = null;
 		try {
 			// Load the Java Default KeyStore content into an auxiliar "keystore"
-//			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
 			is = getKeyStoreAsInputStream();
 			
 			KeyStore keystore = KeyStore.getInstance(ksType);
@@ -418,26 +391,20 @@ public class SSLManager {
 			out.close();
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al buscar el fichero. " + e.getMessage());
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error con la keystore. " + e.getMessage());
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al seleccionarl el algoritmo para la keystore. " + e.getMessage());
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 		} finally {
 			try {
 				is.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			}
 		}
 
@@ -475,20 +442,16 @@ public class SSLManager {
 			queueLock.unlock();
 
 			return sslContext;
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnrecoverableKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error con la keystore. " + e.getMessage());
+		} catch (NoSuchAlgorithmException e) {
+			LOG.log(Level.ERROR, "Error al seleccionarl el algoritmo para la keystore. " + e.getMessage());
+		} catch (UnrecoverableKeyException e) {
+			LOG.log(Level.ERROR, "Error al recuperar clave de la keystore. " + e.getMessage());
 		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error con las claves de la keystore. " + e.getMessage());
 		}
-
+			
 		return null;
 	}
 
@@ -496,37 +459,28 @@ public class SSLManager {
 	 * @return KeyStore.
 	 */
 	private KeyStore getKeyStore() {
-//		File file = new File(System.getProperty("javax.net.ssl.keyStore"));
-//		File file = getKeyStoreAsFile();
 		InputStream in = null;
 		KeyStore ks = null;
 		try {
-//			in = new FileInputStream(file);
 			in = getKeyStoreAsInputStream();
 			ks = KeyStore.getInstance(ksType);
 			ks.load(in, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al buscar el fichero. " + e.getMessage());
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error con la keystore. " + e.getMessage());
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al seleccionarl el algoritmo para la keystore. " + e.getMessage());
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al generar el certificado. " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 		} finally {
 			try {
 				in.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			}
 		}
 		return ks;
@@ -549,8 +503,7 @@ public class SSLManager {
 		try {
 			is = new FileInputStream(ResourceUtils.getFile(cacerts));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al buscar el fichero. " + e.getMessage());
 		}
 		return is;
 	}
@@ -561,8 +514,7 @@ public class SSLManager {
 		try {
 			file = ResourceUtils.getFile(cacerts);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al buscar el fichero. " + e.getMessage());
 		}
 		return file;
 	}

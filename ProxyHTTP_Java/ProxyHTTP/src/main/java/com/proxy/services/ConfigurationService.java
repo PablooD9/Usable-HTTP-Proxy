@@ -12,6 +12,8 @@ import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
+import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +61,8 @@ public class ConfigurationService {
 	private List<Option> UAOptions;
 	
 	private final static String[] OPTION_TYPES = new String[] { "Default", "User-Agent" };
+	
+	private final static Logger LOG = Logger.getLogger(ConfigurationService.class);
 	
 	private boolean configurationIsActive = false;
 	
@@ -112,18 +116,15 @@ public class ConfigurationService {
 					}
 				}
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Fichero no encontrado. " + e.getMessage());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
 			} finally {
 				if (reader != null) {
 					try {
 						reader.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.log(Level.ERROR, "Error al cerrar el bufferedreader. " + e.getMessage());
 					}
 				}
 			}

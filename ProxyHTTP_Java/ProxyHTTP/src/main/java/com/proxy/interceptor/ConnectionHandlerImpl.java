@@ -115,7 +115,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			}
 
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + ioe.getMessage());
 		} finally {
 			closeSocket(socket);
 		}

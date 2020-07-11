@@ -9,6 +9,9 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
+
 import com.proxy.parser.HostParser;
 
 /** Clase abstracta que define un Host dentro de la aplicación.
@@ -19,6 +22,7 @@ public abstract class Host implements Cloneable {
 	private Integer _id;
 	private String hostName;
 	private List<Host> hostList = new ArrayList<>();
+	private final static Logger LOG = Logger.getLogger(Host.class);
 
 	public Host() {}
 	
@@ -66,18 +70,15 @@ public abstract class Host implements Cloneable {
 				}
 			}
 		} catch (MalformedURLException e) {
-			// TODO Almacenar error en log
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "La URL está mal formada." + e.getMessage());
 		} catch (IOException e) {
-			// TODO Almacenar error en log
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error de entrada/salida." + e.getMessage());
 		} finally {
 			if (reader != null)
 				try {
 					reader.close();
 				} catch (IOException e) {
-					// TODO Almacenar error en log
-					e.printStackTrace();
+					LOG.log(Level.ERROR, "Error de entrada/salida." + e.getMessage());
 				}
 		}
 		return hostList;
@@ -91,8 +92,7 @@ public abstract class Host implements Cloneable {
 		try {
 			clone = super.clone();
 		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "La clase no permite ser clonada. " + e.getMessage());
 		}
 		
 		return (Host) clone;

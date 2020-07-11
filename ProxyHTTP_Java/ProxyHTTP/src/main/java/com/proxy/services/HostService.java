@@ -1,15 +1,16 @@
 package com.proxy.services;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.jboss.logging.Logger;
 import org.jboss.logging.Logger.Level;
@@ -35,6 +36,11 @@ import com.proxy.model.hosttype.HostType;
  */
 @Service
 public class HostService {
+	
+	private final static File MALICIOUS_HOSTS_FILE = new File( "src/main/resources/static/otherFiles/MaliciousHosts.txt" );
+	private final static File PORNOGRAPHY_HOSTS_FILE = new File( "src/main/resources/static/otherFiles/PornographyHosts.txt" );
+	private final static File SPANISH_MALICIOUS_HOSTS_FILE = new File( "src/main/resources/static/otherFiles/SpanishMaliciousHosts.txt" );
+	private final static File TRACKERS_HOSTS_FILE = new File( "src/main/resources/static/otherFiles/TrackersHosts.txt" );
 
 	private final static String MALICIOUS_HOSTS = "static/otherFiles/MaliciousHosts.txt";
 	private final static String PORNOGRAPHY_HOSTS = "static/otherFiles/PornographyHosts.txt";
@@ -57,6 +63,45 @@ public class HostService {
 		
 //		hostComposite.updateMongoHostsList();
 		createHostFiles();
+	}
+	
+	/**
+	 * Crea los ficheros de hosts.
+	 */
+	private void createHostFiles() {
+		createFile(MALICIOUS_HOSTS_FILE, HostType.Malicious_Hosts);
+		createFile(PORNOGRAPHY_HOSTS_FILE, HostType.Pornography_Hosts);
+		createFile(SPANISH_MALICIOUS_HOSTS_FILE, HostType.Spanish_Malicious_Hosts);
+		createFile(TRACKERS_HOSTS_FILE, HostType.Trackers_Hosts);
+	}
+	
+	/** Crea un fichero de hosts.
+	 * @param file Fichero donde se va a escribir.
+	 * @param hostType Tipo de los hosts a escribir en fichero. Utilizado para cargar la correspondiente
+	 * lista de hosts.
+	 */
+	private void createFile(File file, HostType hostType) {
+		BufferedWriter writer=null;
+		try {
+			writer = new BufferedWriter(new FileWriter(file));
+			HostComposite hostComposite = new HostComposite();
+			List<Host> hosts = hostComposite.loadHostListFromHostType(hostType);
+			int counter=0;
+			for (Host host : hosts) {
+				if (counter++ == hosts.size()-1) // last host
+					writer.write(host.get_id() + " " + host.getHostName());
+				else
+					writer.write(host.get_id() + " " + host.getHostName() + "\r\n");
+			}
+		} catch (IOException e) {
+			LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
+		} finally {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				LOG.log(Level.ERROR, "Error de entrada/salida. " + e.getMessage());
+			}
+		}
 	}
 	
 	/** Carga el contenido de un fichero dentro de la aplicación.

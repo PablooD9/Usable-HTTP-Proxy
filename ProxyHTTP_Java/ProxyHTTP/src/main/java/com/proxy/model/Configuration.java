@@ -41,7 +41,6 @@ public class Configuration {
 		setCheckIfPornographicHosts(op5);
 		setSecurityHeaders(op6);
 		setCheckIfCookieHeader(op7);
-//		hostExceptions = new ArrayList<>();
 	}
 	
 

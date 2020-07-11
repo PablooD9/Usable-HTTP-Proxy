@@ -35,7 +35,7 @@ public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 		SSLSocket sslSocket = createSSLSocketConnection(socket, hostTarget.getHostName());
 		
 		if (sslSocket == null)
-			return; // cuidao.
+			return;
 		
 		connHandler.handleConnection(sslSocket, hostTarget, true);
 	}
@@ -68,7 +68,7 @@ public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 			sslSocket.startHandshake();
 			return sslSocket;
 		} catch (IOException e) {
-			LOG.log(Level.ERROR, "Error al empezar la conexión mediante SSL. " + e.getMessage());
+//			LOG.log(Level.ERROR, "Error al empezar la conexión mediante SSL. " + e.getMessage());
 		}
 		return null;
 	}
