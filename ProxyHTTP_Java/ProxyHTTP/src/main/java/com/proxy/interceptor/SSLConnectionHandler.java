@@ -8,9 +8,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.jboss.logging.Logger;
-import org.jboss.logging.Logger.Level;
-
 import com.proxy.interceptor.certificate.SSLManager;
 
 /** Clase encargada de manejar las peticiones hacia hosts que implementan HTTPS.
@@ -20,8 +17,6 @@ import com.proxy.interceptor.certificate.SSLManager;
 public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 
 	private ConnectionHandler connHandler;
-	
-	private final static Logger LOG = Logger.getLogger(SSLConnectionHandler.class);
 	
 	@Override
 	public void setConnectionHandler(ConnectionHandler connHandler) {
