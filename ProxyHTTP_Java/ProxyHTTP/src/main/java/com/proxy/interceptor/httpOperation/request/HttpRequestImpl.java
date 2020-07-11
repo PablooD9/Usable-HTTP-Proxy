@@ -3,6 +3,9 @@ package com.proxy.interceptor.httpOperation.request;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
+
 import com.proxy.interceptor.AbstractHttpOperation;
 
 /**
@@ -16,6 +19,7 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 	private String httpVersion;
 	private int port = -1;
 	private boolean isSSL;
+	private final static Logger LOG = Logger.getLogger(HttpRequestImpl.class);
 	
 	public int getPort() {
 		return port;
@@ -78,11 +82,8 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 		
 		try {
 			loadFirstReqLine(headersSplitted[0]);
-		} catch(IllegalStateException ise) {
-			// TODO
-//			System.err.println("EMPTY REQUEST");
+		} catch(IllegalStateException ignore) {
 			return ;
-//			ise.printStackTrace();
 		}
 		
 		int counter=1;
@@ -90,7 +91,7 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 				&& headersSplitted[counter] != null 
 				&& !headersSplitted[counter].equals("") )
 		{
-			loadHeader( headersSplitted[counter++] );
+			loadHeader(headersSplitted[counter++]);
 		}
 		
 		if (port == -1){
@@ -168,8 +169,7 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 				else
 					requestedResource = resourcePath;
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "La URI no está correctamente formateada. " + e.getMessage());
 			}
 		}
 		else {
@@ -185,7 +185,6 @@ public class HttpRequestImpl extends AbstractHttpOperation implements IHttpReque
 		String key = getKeyOfHeader(headerLine);
 		String values = getValuesOfHeader(headerLine);
 		if (values == null) {
-			System.err.println("NULL FOUND FOR HEADER " + key);
 			getHeaders().add(new Header(key, "null"));
 		}
 		else

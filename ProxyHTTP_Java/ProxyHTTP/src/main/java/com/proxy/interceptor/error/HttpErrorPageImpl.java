@@ -2,6 +2,9 @@ package com.proxy.interceptor.error;
 
 import java.io.UnsupportedEncodingException;
 
+import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
+
 public class HttpErrorPageImpl implements IHttpErrorPage {
 
 	private String host, message;
@@ -19,7 +22,7 @@ public class HttpErrorPageImpl implements IHttpErrorPage {
 					+ "<h1>Proxy Error</h1>";
 
 	private final String ERROR_BODY2 = "</body></html>";
-	
+	private final static Logger LOG = Logger.getLogger(HttpErrorPageImpl.class);
 	
 	public HttpErrorPageImpl(String message, String host) {
 		this.message = message;
@@ -48,7 +51,7 @@ public class HttpErrorPageImpl implements IHttpErrorPage {
 		try {
 			return string.getBytes("ASCII");
 		} catch (UnsupportedEncodingException uee) {
-			uee.printStackTrace();
+			LOG.log(Level.INFO, "No se ha podido codificar correctamente la cadena pasada por parámetro.");
 			return null;
 		}
 	}

@@ -40,8 +40,17 @@ function save(){
 }
 
 function changeStateButton(){
+	var elementsState1 = document.getElementsByClassName("savePrefState1");
+	var elementsState2 = document.getElementsByClassName("savePrefState2");
+	for (var j=0; j<elementsState1.length; j++){
+		elementsState1[j].style.display="none";
+		elementsState2[j].style.display="inline-block";
+	}
+	
+	/*
 	document.getElementById("savePrefState1").style.display="none";
 	document.getElementById("savePrefState2").style.display="inline-block";
+	*/
 }
 
 function getSecurityHeaders(){
@@ -72,11 +81,27 @@ function getSecurityHeaders(){
 }
 
 $('.isOption').click(function(){
+	var elementsState1 = document.getElementsByClassName("savePrefState1");
+	var elementsState2 = document.getElementsByClassName("savePrefState2");
+	for (var j=0; j<elementsState1.length; j++){
+		elementsState1[j].style.display="inline-block";
+		elementsState2[j].style.display="none";
+	}
+	/*
 	document.getElementById("savePrefState1").style.display="inline-block";
-	document.getElementById("savePrefState2").style.display="none";	
+	document.getElementById("savePrefState2").style.display="none";
+	*/	
 });
 
 $('#op6').click(function(){
+	var elementsState1 = document.getElementsByClassName("savePrefState1");
+	var elementsState2 = document.getElementsByClassName("savePrefState2");
+	for (var j=0; j<elementsState1.length; j++){
+		elementsState1[j].style.display="inline-block";
+		elementsState2[j].style.display="none";
+	}
+	/*
 	document.getElementById("savePrefState1").style.display="inline-block";
-	document.getElementById("savePrefState2").style.display="none";	
+	document.getElementById("savePrefState2").style.display="none";
+	*/	
 });

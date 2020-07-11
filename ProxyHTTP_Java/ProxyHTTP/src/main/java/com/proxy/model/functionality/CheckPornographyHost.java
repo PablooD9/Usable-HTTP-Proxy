@@ -8,13 +8,20 @@ import com.proxy.model.UserConfiguration;
  */
 public class CheckPornographyHost extends CheckProxyFunctionality {
 
+	public CheckPornographyHost() {}
+	
 	public CheckPornographyHost(IProxyFunctionality functionality) {
 		super(functionality);
 	}
 
 	@Override
-	boolean isAnOptionActive() {
-		return UserConfiguration.getInstance().getConfiguration().getCheckIfPornographicHosts().equalsIgnoreCase("true");
+	public boolean isAnOptionActive() {
+		if (UserConfiguration.getInstance().getConfiguration().getCheckIfPornographicHosts() != null) {
+			return UserConfiguration.getInstance().getConfiguration().getCheckIfPornographicHosts().equalsIgnoreCase("true");
+		}
+		else {
+			return false;
+		}
 	}
 
 }

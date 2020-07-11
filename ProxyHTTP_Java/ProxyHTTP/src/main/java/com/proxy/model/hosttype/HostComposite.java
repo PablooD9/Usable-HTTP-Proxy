@@ -45,12 +45,9 @@ public class HostComposite extends AbstractHostComposite {
 				List<Host> hostList = loadHostListFromHostType( hType );
 				UserConfiguration.getInstance().getMaliciousHostsToScan().addAll(hostList);
 				List<Document> hostDocuments = hostsListToDocument( hostList );
-				if (hostDocuments.size() == 0)
-					System.err.println("Empty: " + hType);
-				else if (hostDocuments != null)
+				if (hostDocuments != null) {
 					collection.insertMany( hostDocuments );
-				
-				System.out.println("Collection " + hType.name() + " has " + collection.countDocuments() + " documents.");
+				}
 			}};
 			threads[counter.getAndIncrement()].start();
 		});
@@ -107,7 +104,6 @@ public class HostComposite extends AbstractHostComposite {
 		for (int i = 0; i < hostsList.size(); i++) {
 		    documents.add(new Document(String.valueOf(i+1), hostsList.get( i ).getHostName()));
 		}
-		System.out.println(documents);
 		return documents;
 	}
 

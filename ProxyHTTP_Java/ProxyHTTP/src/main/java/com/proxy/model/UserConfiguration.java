@@ -37,18 +37,5 @@ public class UserConfiguration
 	public void setMaliciousHostsToScan(List<Host> maliciousHostsToScan) {
 		this.maliciousHostsToScan = maliciousHostsToScan;
 	}
-	
-	/** Método que comprueba si un Host se encuentra en la lista de hosts maliciosos.
-	 * @param hostToFind Host a buscar en la lista.
-	 * @return True si el Host se encuentra en la lista, False en otro caso.
-	 */
-	public boolean hostIsInList(String hostToFind) {
-		Host hostFound = maliciousHostsToScan.parallelStream().filter(host -> host.getHostName().equalsIgnoreCase( hostToFind ))
-				 .findFirst()
-				 .orElse(null);
-		
-		if (hostFound == null)
-			return false;
-		return true;
-	}
+
 }

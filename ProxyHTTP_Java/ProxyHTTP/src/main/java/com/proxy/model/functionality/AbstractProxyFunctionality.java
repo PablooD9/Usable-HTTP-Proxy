@@ -4,6 +4,8 @@ public abstract class AbstractProxyFunctionality implements IProxyFunctionality 
 
 	private IProxyFunctionality functionality;
 
+	public AbstractProxyFunctionality() {}
+	
 	public AbstractProxyFunctionality(IProxyFunctionality functionality) {
 		setFunctionality(functionality);
 	}

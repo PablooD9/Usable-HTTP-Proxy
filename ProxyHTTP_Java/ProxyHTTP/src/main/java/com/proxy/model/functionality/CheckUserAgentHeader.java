@@ -15,7 +15,7 @@ public class CheckUserAgentHeader extends CheckProxyFunctionality {
 	}
 
 	@Override
-	boolean isAnOptionActive() {
+	public boolean isAnOptionActive() {
 		return true;
 	}
 	

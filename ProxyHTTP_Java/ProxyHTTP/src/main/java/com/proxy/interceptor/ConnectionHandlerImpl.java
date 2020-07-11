@@ -1,6 +1,9 @@
 package com.proxy.interceptor;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,8 +28,9 @@ import java.util.concurrent.CompletionException;
 import javax.net.ssl.SSLContext;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.commons.io.IOUtils;
+import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
 
 import com.proxy.interceptor.error.HttpErrorPageImpl;
 import com.proxy.interceptor.error.IHttpErrorPage;
@@ -45,22 +49,26 @@ import com.proxy.model.functionality.CheckUserAgentHeader;
 import com.proxy.model.functionality.IProxyFunctionality;
 import com.proxy.model.functionality.ProxyFunctionalityImpl;
 
-/** Clase que implementa las operaciones de ConnectionHandler.
+/**
+ * Clase que implementa las operaciones de ConnectionHandler.
+ * 
  * @author Pablo
  *
  */
 public class ConnectionHandlerImpl implements ConnectionHandler {
 
 	/**
-	 * Línea de estado que se envía en las respuestas HTTP cuando el método
-	 * de la petición es CONNECT (es decir, se trata del inicio de una comunicación
-	 * segura mediante SSL).
+	 * Línea de estado que se envía en las respuestas HTTP cuando el método de la
+	 * petición es CONNECT (es decir, se trata del inicio de una comunicación segura
+	 * mediante SSL).
 	 */
 	private final static byte[] HTTP_OK = "HTTP/1.1 200 OK\r\n\r\n".getBytes();
 
 	private ConnectionHandler connHandler; // useful for SSL communications
 
 	private Socket socket;
+
+	private final static Logger LOG = Logger.getLogger(ConnectionHandlerImpl.class);
 
 	public ConnectionHandlerImpl(Socket socket, ConnectionHandler connHandler) {
 		setConnectionHandler(connHandler);
@@ -80,10 +88,6 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 
 	@Override
 	public void handleConnection(Socket socket, InetSocketAddress hostTarget, boolean sslConnection) {
-
-//		System.out.println("=========================== Starting new request. THREAD: "
-//		s		+ Thread.currentThread().getName() + " =============================");
-
 		InputStream inStream;
 		boolean error = false;
 		try {
@@ -127,12 +131,16 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		}
 	}
 
-	/** Método que, a partir de una URI, una petición HTTPRequest y un Socket donde escribir la respuesta,
-	 * envía la mencionada respuesta dada por un sitio web. Se comprueba también si la petición es maliciosa atendiendo a la configuración del usuario. Si
-	 * lo es, se muestra una página de error.
-	 * @param socket Socket al que escribir la respuesta.
-	 * @param req Petición a partir de la cual se obtendrá cierta información necesaria.
-	 * @param uri URI a la que enviar la petición.
+	/**
+	 * Método que, a partir de una URI, una petición HTTPRequest y un Socket donde
+	 * escribir la respuesta, envía la mencionada respuesta dada por un sitio web.
+	 * Se comprueba también si la petición es maliciosa atendiendo a la
+	 * configuración del usuario. Si lo es, se muestra una página de error.
+	 * 
+	 * @param socket           Socket al que escribir la respuesta.
+	 * @param req              Petición a partir de la cual se obtendrá cierta
+	 *                         información necesaria.
+	 * @param uri              URI a la que enviar la petición.
 	 * @param maliciousRequest Define si una petición es maliciosa o no.
 	 */
 	private void sendResponse(Socket socket, IHttpRequest req, String uri, boolean maliciousRequest) {
@@ -146,41 +154,37 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 					.version(HttpClient.Version.HTTP_2).followRedirects(Redirect.ALWAYS).build();
 
 		String protocolAndHost = ((req.isSSL()) ? "https://" : "http://") + req.getHost();
-		
+
 		if (uri == null) {
 			uri = protocolAndHost + req.getRequestedResource();
-		}
-		else {
+		} else {
 			if (uri.startsWith("/"))
 				uri = protocolAndHost + uri;
-			System.out.println("Aqui:" + uri);
 		}
 
 		if (maliciousRequest) {
 			uri = "http://localhost:8090/";
 		}
-		
-		try {
-			uri = URIUtil.encodeQuery(uri);
-		} catch (URIException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+
 		HttpRequest.Builder preRequest = null;
-		if (req.getMethod().equalsIgnoreCase("GET")) {
-			preRequest = HttpRequest.newBuilder() // GET request!
-					.uri(URI.create(uri)).GET();
-		} else if (req.getMethod().equalsIgnoreCase("POST")) {
-			preRequest = HttpRequest.newBuilder() // POST request!
-					.uri(URI.create(uri)).POST(BodyPublishers.ofByteArray(req.getBody()));
-		} else {
-			if (req.getBody() != null)
-				preRequest = HttpRequest.newBuilder().uri(URI.create(uri)).method(req.getMethod(),
-						BodyPublishers.ofByteArray(req.getBody()));
-			else
-				preRequest = HttpRequest.newBuilder().uri(URI.create(uri)).method(req.getMethod(),
-						BodyPublishers.noBody());
+		try {
+			if (req.getMethod().equalsIgnoreCase("GET")) {
+				preRequest = HttpRequest.newBuilder() // GET request
+						.uri(URI.create(uri)).GET();
+			} else if (req.getMethod().equalsIgnoreCase("POST")) {
+				preRequest = HttpRequest.newBuilder() // POST request
+						.uri(URI.create(uri)).POST(BodyPublishers.ofByteArray(req.getBody()));
+			} else { // PUT, OPTIONS, etc...
+				if (req.getBody() != null)
+					preRequest = HttpRequest.newBuilder().uri(URI.create(uri)).method(req.getMethod(),
+							BodyPublishers.ofByteArray(req.getBody()));
+				else
+					preRequest = HttpRequest.newBuilder().uri(URI.create(uri)).method(req.getMethod(),
+							BodyPublishers.noBody());
+			}
+		}
+		catch (IllegalArgumentException e) { // Illegal characters in URL
+			return ;
 		}
 
 		for (Header header : req.getHeaders()) {
@@ -189,17 +193,13 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 				preRequest.setHeader(header.getKey(), header.getValues());
 			}
 		}
-//		preRequest.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36");
 		HttpRequest request = preRequest.build();
-
-//		System.err.println("Request to: " + uri);
 
 		HttpResponse<byte[]> response;
 		try {
 			response = client.sendAsync(request, BodyHandlers.ofByteArray()).join();
 		} catch (CompletionException ce) {
-			System.err.println("Address " + uri + " is unreachable!");
-//			ce.printStackTrace();
+			LOG.log(Level.ERROR, "Address " + uri + " is unreachable. " + ce.getMessage());
 			return;
 		}
 
@@ -209,7 +209,6 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 																				// moved
 
 		if (!locationHeader.isEmpty()) {
-			System.out.println("Moved permanently to " + locationHeader.get());
 			sendResponse(socket, req, locationHeader.get(), maliciousRequest);
 		} else {
 			IHttpResponse httpResponse = buildResponse(req, response);
@@ -221,10 +220,14 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		}
 	}
 
-	/** Construye una respuesta HTTP.
-	 * @param request Petición HTTP.
-	 * @param response Objeto del paquete java.net que representa una respuesta HTTP.
-	 * @return Una respuesta HTTP propia de la aplicación, NO la del paquete java.net.
+	/**
+	 * Construye una respuesta HTTP.
+	 * 
+	 * @param request  Petición HTTP.
+	 * @param response Objeto del paquete java.net que representa una respuesta
+	 *                 HTTP.
+	 * @return Una respuesta HTTP propia de la aplicación, NO la del paquete
+	 *         java.net.
 	 */
 	private IHttpResponse buildResponse(IHttpRequest request, HttpResponse<byte[]> response) {
 		IHttpResponse httpResponse = new HttpResponseImpl();
@@ -258,25 +261,33 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		return httpResponse;
 	}
 
-	/** Escribe la respuesta en el Stream obtenido de un Socket.
-	 * @param socket Socket al que se escribirá la respuesta.
-	 * @param responseBody Cuerpo de la respuesta.
-	 * @param response Objeto del que se obtendrá la información necesaria para escribir la respuesta.
-	 * @param maliciousRequest Decide si la petición es maliciosa o no. Si lo es, no se escribe nada en
-	 * el Socket.
-	 * @param maliciousResponse Decide si la respuesta es maliciosa o no. Si lo es, se muestra una pantalla
-	 * de error al usuario.
+	/**
+	 * Escribe la respuesta en el Stream obtenido de un Socket.
+	 * 
+	 * @param socket            Socket al que se escribirá la respuesta.
+	 * @param responseBody      Cuerpo de la respuesta.
+	 * @param response          Objeto del que se obtendrá la información necesaria
+	 *                          para escribir la respuesta.
+	 * @param maliciousRequest  Decide si la petición es maliciosa o no. Si lo es,
+	 *                          no se escribe nada en el Socket.
+	 * @param maliciousResponse Decide si la respuesta es maliciosa o no. Si lo es,
+	 *                          se muestra una pantalla de error al usuario.
 	 */
 	private void writeResponse(Socket socket, byte[] responseBody, IHttpResponse response, boolean maliciousRequest,
 			boolean maliciousResponse) {
-//		OutputStream outputStream = null;
 		PrintStream printStream = null;
 		try {
 			printStream = new PrintStream(socket.getOutputStream(), true);
-//			outputStream = socket.getOutputStream();
 
-			if (maliciousRequest)
-				printStream.write("".getBytes());
+			if (maliciousRequest) {
+				byte[] bytesToWrite = getMaliciousRequestPage();
+				if (bytesToWrite != null) {
+					printStream.write(bytesToWrite);
+				}
+				else {
+					printStream.write("".getBytes());
+				}
+			}
 			else {
 				if (maliciousResponse && isAResponseValidForErrorPage(response)) {
 					IHttpErrorPage errorPage = new HttpErrorPageImpl(response.getAllMessages(), response.getHost());
@@ -288,8 +299,8 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 					String firstLine = response.getStatusLine() + "\r\n";
 					printStream.write(firstLine.getBytes());
 					for (Header header : response.getHeaders()) {
-						String h = header.getKey() + ":" + header.getValues() + "\r\n";
-						byte[] headerBytes = h.getBytes();
+						String headerAux = header.getKey() + ":" + header.getValues() + "\r\n";
+						byte[] headerBytes = headerAux.getBytes();
 						printStream.write(headerBytes);
 					}
 					printStream.write("\r\n".getBytes());
@@ -299,9 +310,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Writing error...");
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al escribir en Socket. " + e.getMessage());
 		} finally {
 			try {
 				if (!socket.isClosed()) {
@@ -309,8 +318,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 				}
 				printStream.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.log(Level.ERROR, "Error al cerrar Socket. " + e.getMessage());
 			}
 
 		}
@@ -319,7 +327,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 	private boolean isAResponseValidForErrorPage(IHttpResponse response) {
 		if (response.getRequest().getHeader("Referer") == null
 				|| (response.getRequest().getHeader("Referer") != null && response.getHeader("Content-type") != null
-						&& response.getHeader("Content-type").getValues().contains("text/html"))) { // Block only HTML documents, ignoring JS or XML files.
+						&& response.getHeader("Content-type").getValues().contains("text/html"))) {
 			return true;
 		}
 
@@ -332,16 +340,15 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 	 * indica un fin de línea, termina de leer. Devuelve cadenas del siguiente
 	 * estilo:
 	 * 
-	 * CONNECT clients4.google.com:443 HTTP/1.1 
-	 * Host: clients4.google.com:443
-	 * Proxy-Connection: keep-alive 
-	 * User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) 
-	 * Chrome/72.0.3626.96 Safari/537.36
+	 * CONNECT clients4.google.com:443 HTTP/1.1 Host: clients4.google.com:443
+	 * Proxy-Connection: keep-alive User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64;
+	 * x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 Safari/537.36
 	 * 
-	 * @param in Stream a partir del cual se obtiene toda la información necesaria para
-	 * construir una petición.
+	 * @param in    Stream a partir del cual se obtiene toda la información
+	 *              necesaria para construir una petición.
 	 * 
-	 * @param isSSL Valor que define si una petición se dirige hacia un Host que implementa HTTPS o no.
+	 * @param isSSL Valor que define si una petición se dirige hacia un Host que
+	 *              implementa HTTPS o no.
 	 * 
 	 * @return La petición HTTP construida.
 	 */
@@ -366,8 +373,6 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		{
 			int contentLength = Integer.parseInt(request.getHeader("Content-Length").getValues());
 
-			System.out.println("Method: " + request.getMethod() + ", content-length: " + contentLength);
-
 			StringBuilder body = new StringBuilder();
 			int c = 0;
 			for (int i = 0; i < contentLength; i++) {
@@ -375,14 +380,11 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 				try {
 					c = in.read();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.log(Level.ERROR, "Error al leer de Socket. " + e.getMessage());
 				}
 
 				body.append((char) c);
 			}
-
-//	        System.out.println( body.toString() );
 			request.setBody(body.toString().getBytes());
 		}
 
@@ -410,24 +412,25 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 				}
 			}
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			LOG.log(Level.ERROR, "Error al leer del Socket. " + ioe.getMessage());
 		}
 
 		try {
 			return contentClientRequest.toString("ISO-8859-1");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Codificación no soportada. " + e.getMessage());
 		}
 
 		return null;
 	}
 
-	/** Método que maneja las peticiones cuyo método HTTP es CONNECT.
-	 * Este método indica que la petición se dirige hacia un Host que implementa HTTPS, 
-	 * por lo que se delega la responsabilidad de la comunicación en un objeto de tipo
+	/**
+	 * Método que maneja las peticiones cuyo método HTTP es CONNECT. Este método
+	 * indica que la petición se dirige hacia un Host que implementa HTTPS, por lo
+	 * que se delega la responsabilidad de la comunicación en un objeto de tipo
 	 * AbstractSecureConnectionHandler.
-	 * @param socket Socket del que se obtiene la información.
+	 * 
+	 * @param socket  Socket del que se obtiene la información.
 	 * @param request Petición HTTP.
 	 */
 	private void connectMethod(Socket socket, IHttpRequest request) {
@@ -441,14 +444,17 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			connHandler.handleConnection(socket, hostTarget, request.isSSL());
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.ERROR, "Error al escribir en Socket. " + e.getMessage());
 		}
 	}
 
-	/** Método que, haciendo uso del patrón de diseño Decorator, envuelve varias funcionalidades relacionadas
-	 * con la comprobación de si un Host pertenece a las diferentes listas de hosts peligrosos.
-	 * @param request Petición HTTP a partir de la cual obtendremos la información necesaria.
+	/**
+	 * Método que, haciendo uso del patrón de diseño Decorator, envuelve varias
+	 * funcionalidades relacionadas con la comprobación de si un Host pertenece a
+	 * las diferentes listas de hosts peligrosos.
+	 * 
+	 * @param request Petición HTTP a partir de la cual obtendremos la información
+	 *                necesaria.
 	 * @return True si la petición es maliciosa, False si no.
 	 */
 	private boolean configureRequest(IHttpOperation request) {
@@ -458,6 +464,7 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		functionality = new CheckTrackerHost(functionality);
 		functionality = new CheckPornographyHost(functionality);
 		functionality = new CheckSpanishMaliciousHost(functionality);
+		functionality = new CheckCookieHeader(functionality);
 
 		boolean maliciousRequest = false;
 		IHttpOperation operation = functionality.modify(request);
@@ -467,10 +474,14 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 		return maliciousRequest;
 	}
 
-	/** Método que, haciendo uso del patrón de diseño Decorator, envuelve las funcionalidades relacionadas
-	 * con la comprobación de si una respuesta HTTP cumple los criterios de seguridad avanzados establecidos 
-	 * por el usuario en la pantalla de configuración.
-	 * @param response Respuesta HTTP a partir de la cual obtendremos la información necesaria.
+	/**
+	 * Método que, haciendo uso del patrón de diseño Decorator, envuelve las
+	 * funcionalidades relacionadas con la comprobación de si una respuesta HTTP
+	 * cumple los criterios de seguridad avanzados establecidos por el usuario en la
+	 * pantalla de configuración.
+	 * 
+	 * @param response Respuesta HTTP a partir de la cual obtendremos la información
+	 *                 necesaria.
 	 * @return True si la respuesta es maliciosa, False si no.
 	 */
 	private boolean configureResponse(IHttpOperation response) {
@@ -484,5 +495,19 @@ public class ConnectionHandlerImpl implements ConnectionHandler {
 			maliciousResponse = true;
 
 		return maliciousResponse;
+	}
+	
+	private byte[] getMaliciousRequestPage() {
+		InputStream is;
+		byte[] fileToByteArray=null;
+		try {
+			is = new FileInputStream(new File("src/main/resources/templates/error/maliciousRequest.html"));
+			fileToByteArray = IOUtils.toByteArray(is);
+		} catch (FileNotFoundException e) {
+			LOG.log(Level.ERROR, "El fichero 'maliciousRequest.html' no se ha podido encontrar. " + e.getMessage());
+		} catch (IOException e) {
+			LOG.log(Level.ERROR, "Error al convertir el fichero a array de bytes. " + e.getMessage());
+		}
+		return fileToByteArray;
 	}
 }

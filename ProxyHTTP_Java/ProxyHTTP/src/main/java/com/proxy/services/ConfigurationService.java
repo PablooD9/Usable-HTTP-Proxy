@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.proxy.model.Configuration;
 import com.proxy.model.SecurityException;
 import com.proxy.model.UserConfiguration;
+import com.proxy.model.hosttype.Host;
 import com.proxy.model.option.DefaultOption;
 import com.proxy.model.option.DefaultOptionBrowser;
 import com.proxy.model.option.DefaultOptionOS;
@@ -40,6 +41,8 @@ public class ConfigurationService {
 	private UserService userService;
 	@Autowired
 	private ConfigurationRepository confRepository;
+	@Autowired
+	private HostService hostService;
 	@Autowired
 	private SecurityExceptionRepository secExceptionRepository;
 	
@@ -140,10 +143,11 @@ public class ConfigurationService {
 	 * @param op6 Opción 6.
 	 * @return Configuración.
 	 */
-	public Configuration buildConfigurationObject(String op1_os, String op1_browser, String op2,
-												  String op3, String op4, String op5, String op6, String op7) {
+	public Configuration buildConfigurationObject(String op1_os, String op1_browser, String op2_spanish_hosts,
+												  String op3_malicious_hosts, String op4_tracker_hosts, String op5_porn_hosts, String op6_sec_headers, String op7_cookie_headers) {
 		String userEmail = userService.getEmailOfLoggedInUser();
-		Configuration configuration = new Configuration(userEmail, op1_os, op1_browser, op2, op3, op4, op5, op6, op7);
+		Configuration configuration = new Configuration(userEmail, op1_os, op1_browser, op2_spanish_hosts, op3_malicious_hosts, op4_tracker_hosts, op5_porn_hosts, op6_sec_headers, op7_cookie_headers);
+		configuration.setHostExceptions(UserConfiguration.getInstance().getConfiguration().getHostExceptions());
 		return configuration;
 	}
 	
@@ -245,11 +249,23 @@ public class ConfigurationService {
 		if (userService.userIsLoggedIn())
 			confRepository.save( configuration );
 		configurationIsActive = true;
+		loadHostsFromFile(configuration);
+	}
+	
+	private void loadHostsFromFile(Configuration config) {
+		UserConfiguration.getInstance().setMaliciousHostsToScan(new ArrayList<Host>());
+		List<Host> hostsToScan = hostService.getHostsFromActiveOptions();
+		UserConfiguration.getInstance().getMaliciousHostsToScan().addAll(hostsToScan);
 	}
 	
 	public Configuration getConfigOfUser() {
-		Optional<Configuration> optionalConf = confRepository.findById( userService.getEmailOfLoggedInUser() );
-		SecurityException secException = secExceptionRepository.findByEmail( userService.getEmailOfLoggedInUser() );
+		String emailUser = userService.getEmailOfLoggedInUser();
+		Optional<Configuration> optionalConf = Optional.empty();
+		SecurityException secException = null;
+		if (emailUser != null) {
+			optionalConf = confRepository.findById( emailUser );
+			secException = secExceptionRepository.findByEmail( emailUser );
+		}
 		List<String> secExceptionList = new ArrayList<>();
 		if (secException != null) {
 			secExceptionList = getExceptionsList( secException );

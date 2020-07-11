@@ -8,13 +8,20 @@ import com.proxy.model.UserConfiguration;
  */
 public class CheckMaliciousHost extends CheckProxyFunctionality {
 
+	public CheckMaliciousHost() {}
+	
 	public CheckMaliciousHost(IProxyFunctionality functionality) {
 		super(functionality);
 	}
 
 	@Override
-	boolean isAnOptionActive() {
-		return UserConfiguration.getInstance().getConfiguration().getCheckIfMaliciousHosts().equalsIgnoreCase("true");
+	public boolean isAnOptionActive() {
+		if(UserConfiguration.getInstance().getConfiguration().getCheckIfMaliciousHosts() != null) {
+			return UserConfiguration.getInstance().getConfiguration().getCheckIfMaliciousHosts().equalsIgnoreCase("true");
+		}
+		else {
+			return false;
+		}
 	}
 
 }

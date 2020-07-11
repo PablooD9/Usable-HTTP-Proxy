@@ -17,7 +17,7 @@ public class CheckSecurityHeaders extends CheckProxyFunctionality {
 	}
 
 	@Override
-	boolean isAnOptionActive() {
+	public boolean isAnOptionActive() {
 		String headers = UserConfiguration.getInstance().getConfiguration().getSecurityHeaders();
 		return (headers != null && headers.length() > 1);
 	}

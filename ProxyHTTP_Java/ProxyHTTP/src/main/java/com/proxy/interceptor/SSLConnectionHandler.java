@@ -8,6 +8,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
+
 import com.proxy.interceptor.certificate.SSLManager;
 
 /** Clase encargada de manejar las peticiones hacia hosts que implementan HTTPS.
@@ -17,6 +20,8 @@ import com.proxy.interceptor.certificate.SSLManager;
 public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 
 	private ConnectionHandler connHandler;
+	
+	private final static Logger LOG = Logger.getLogger(SSLConnectionHandler.class);
 	
 	@Override
 	public void setConnectionHandler(ConnectionHandler connHandler) {
@@ -59,12 +64,11 @@ public class SSLConnectionHandler extends AbstractSecureConnectionHandler {
 			sslSocket = (SSLSocket) sf.createSocket(socket, socket
 					.getInetAddress().getHostName(), socket.getPort(), true); // true -> autoclose SSLSocket
 			sslSocket.setUseClientMode(false);
-			sslSocket.setEnabledProtocols(getEnabledProtocols());
+			sslSocket.setEnabledProtocols( getEnabledProtocols() );
 			sslSocket.startHandshake();
 			return sslSocket;
 		} catch (IOException e) {
-			e.printStackTrace();
-			// TODO Auto-generated catch block
+			LOG.log(Level.ERROR, "Error al empezar la conexión mediante SSL. " + e.getMessage());
 		}
 		return null;
 	}

@@ -30,7 +30,7 @@ public interface IHttpOperation {
 	 * @return Lista de cabeceras.
 	 */
 	List<Header> getHeaders();
-
+	
 	/** Establece el nuevo valor de una cabecera.
 	 * @param headerName Nombre de la cabecera.
 	 * @param newValue Nuevo valor a establecer a la cabecera.

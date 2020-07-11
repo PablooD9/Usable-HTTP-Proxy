@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.KeyManagementException;
 import java.security.KeyPair;
@@ -52,6 +53,8 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.jboss.logging.Logger;
+import org.springframework.util.ResourceUtils;
 
 /** Clase encargada del manejo de certificados, desde su creación y emisión hasta su almacenamiento en un almacén
  * de claves. También se encarga de generar el certificado de la Autoridad Certificadora de la aplicación.
@@ -79,6 +82,8 @@ public class SSLManager {
 	private final Lock queueLock = new ReentrantLock();
 	private static SSLManager instance = new SSLManager();
 
+	private final static Logger LOG = Logger.getLogger(SSLManager.class);
+	
 	private SSLManager() {
 		setDates();
 
@@ -193,7 +198,8 @@ public class SSLManager {
 
 		InputStream in = null;
 		try {
-			in = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+//			in = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+			in = getKeyStoreAsInputStream();
 
 			KeyStore keyStore = KeyStore.getInstance(ksType);
 			keyStore.load(in, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
@@ -301,10 +307,11 @@ public class SSLManager {
 	 * @return True si el certificado del Host se encuentra en el almacén de claves, False en otro caso.
 	 */
 	private boolean isCertAlreadyGeneratedForHost(String hostname) {
-		FileInputStream is = null;
+		InputStream is = null;
 		boolean contains = false;
 		try {
-			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+//			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+			is = getKeyStoreAsInputStream();
 
 			KeyStore keystore = KeyStore.getInstance(ksType);
 			keystore.load(is, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
@@ -386,31 +393,29 @@ public class SSLManager {
 	 * @param certsChain Cadena de certificados (certificado de la AC y el certificado emitido para el Host).
 	 */
 	private void saveCertToKeyStore(String hostnameAsAlias, PrivateKey certPrivKey, X509Certificate[] certsChain) {
-
-		File keystoreFile = new File(System.getProperty("javax.net.ssl.keyStore"));
-		FileInputStream is = null;
+//		File file = new File(System.getProperty("javax.net.ssl.keyStore"));
+		File file = getKeyStoreAsFile();
+		InputStream is = null;
 		try {
 			// Load the Java Default KeyStore content into an auxiliar "keystore"
-			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+//			is = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
+			is = getKeyStoreAsInputStream();
+			
 			KeyStore keystore = KeyStore.getInstance(ksType);
 			keystore.load(is, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
 
 			if (keystore.containsAlias(hostnameAsAlias)) {
-				System.out.println("Alias is in the KS! ");
 				keystore.deleteEntry(hostnameAsAlias);
 			}
-//			else
-//			{
 			// Add the certificate to the auxiliar keystore
 			keystore.setKeyEntry(hostnameAsAlias, certPrivKey,
 					System.getProperty("javax.net.ssl.keyStorePassword").toCharArray(), certsChain);
 
 			// Save the new keystore content from the auxiliar to the "real" Java Default
 			// KeyStore
-			FileOutputStream out = new FileOutputStream(keystoreFile);
+			OutputStream out = new FileOutputStream(file);
 			keystore.store(out, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
 			out.close();
-//			}
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -491,11 +496,13 @@ public class SSLManager {
 	 * @return KeyStore.
 	 */
 	private KeyStore getKeyStore() {
-		File file = new File(System.getProperty("javax.net.ssl.keyStore"));
+//		File file = new File(System.getProperty("javax.net.ssl.keyStore"));
+//		File file = getKeyStoreAsFile();
 		InputStream in = null;
 		KeyStore ks = null;
 		try {
-			in = new FileInputStream(file);
+//			in = new FileInputStream(file);
+			in = getKeyStoreAsInputStream();
 			ks = KeyStore.getInstance(ksType);
 			ks.load(in, System.getProperty("javax.net.ssl.keyStorePassword").toCharArray());
 
@@ -536,6 +543,30 @@ public class SSLManager {
 				+ "\n-----END CERTIFICATE-----";
 	}
 
+	private InputStream getKeyStoreAsInputStream() {
+		String cacerts = System.getProperty("javax.net.ssl.keyStore");
+		InputStream is=null;
+		try {
+			is = new FileInputStream(ResourceUtils.getFile(cacerts));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return is;
+	}
+	
+	private File getKeyStoreAsFile() {
+		String cacerts = System.getProperty("javax.net.ssl.keyStore");
+		File file=null;
+		try {
+			file = ResourceUtils.getFile(cacerts);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return file;
+	}
+	
 }
 
 class DefaultTrustManager implements X509TrustManager {

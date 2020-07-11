@@ -14,6 +14,8 @@ import com.proxy.model.hosttype.Host;
  */
 public abstract class CheckProxyFunctionality extends AbstractProxyFunctionality {
 	
+	public CheckProxyFunctionality() {}
+	
 	public CheckProxyFunctionality(IProxyFunctionality functionality) {
 		super(functionality);
 	}
@@ -38,16 +40,12 @@ public abstract class CheckProxyFunctionality extends AbstractProxyFunctionality
 		if (hostsToScan == null || hostsToScan.isEmpty()) {
 			return false;
 		}
-
-		Host hostFound = hostsToScan.stream().filter(host -> host.getHostName().equalsIgnoreCase(hostToFind)).findFirst()
+		Host hostFound = hostsToScan.stream().filter(host -> hostToFind.contains(host.getHostName())).findFirst()
 				.orElse(null);
 
 		if (hostFound == null) { // Host not found (that is good)
-			System.out.println("Host no está!!");
 			return false;
-		} else
-			System.out.println("Ø PELIGRO Ø" + hostFound.getHostName());
-
+		}
 		return true;
 	}
 
@@ -62,5 +60,5 @@ public abstract class CheckProxyFunctionality extends AbstractProxyFunctionality
 	 * por parte del usuario. Será implementado por las subclases.
 	 * @return True si la opción está activa, False en otro caso.
 	 */
-	abstract boolean isAnOptionActive();
+	public abstract boolean isAnOptionActive();
 }

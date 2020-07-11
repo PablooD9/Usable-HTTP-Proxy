@@ -1,6 +1,6 @@
 package com.proxy.model.functionality;
 
-import java.util.List;
+import java.util.Iterator;
 
 import com.proxy.interceptor.IHttpOperation;
 import com.proxy.interceptor.httpOperation.request.Header;
@@ -20,8 +20,13 @@ public class CheckCookieHeader extends CheckProxyFunctionality {
 	}
 
 	@Override
-	boolean isAnOptionActive() {
-		return UserConfiguration.getInstance().getConfiguration().getCheckIfCookieHeader().equalsIgnoreCase("true");
+	public boolean isAnOptionActive() {
+		if (UserConfiguration.getInstance().getConfiguration().getCheckIfCookieHeader() != null) {
+			return UserConfiguration.getInstance().getConfiguration().getCheckIfCookieHeader().equalsIgnoreCase("true");
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
@@ -29,10 +34,11 @@ public class CheckCookieHeader extends CheckProxyFunctionality {
 		if (UserConfiguration.getInstance().getConfiguration() != null && isAnOptionActive()) {
 			String cookie = "Cookie";
 			String set_cookie = "Set-Cookie";
-			List<Header> headers = operation.getHeaders();
-			for (Header header : headers) {
+			Iterator<Header> headers = operation.getHeaders().iterator();
+			while (headers.hasNext()) {
+				Header header = headers.next();
 				if (header.getKey().equalsIgnoreCase(cookie) || header.getKey().equalsIgnoreCase(set_cookie)) {
-					operation.getHeaders().remove(header);
+					headers.remove();
 				}
 			}
 		}

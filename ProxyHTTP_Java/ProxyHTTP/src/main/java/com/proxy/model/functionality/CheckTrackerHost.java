@@ -8,13 +8,20 @@ import com.proxy.model.UserConfiguration;
  */
 public class CheckTrackerHost extends CheckProxyFunctionality {
 
+	public CheckTrackerHost(){}
+	
 	public CheckTrackerHost(IProxyFunctionality functionality) {
 		super(functionality);
 	}
 	
 	@Override
-	boolean isAnOptionActive() {
-		return UserConfiguration.getInstance().getConfiguration().getCheckIfTrackersHosts().equalsIgnoreCase("true");
+	public boolean isAnOptionActive() {
+		if (UserConfiguration.getInstance().getConfiguration().getCheckIfTrackersHosts() != null) {
+			return UserConfiguration.getInstance().getConfiguration().getCheckIfTrackersHosts().equalsIgnoreCase("true");
+		}
+		else {
+			return false;
+		}
 	}
 
 }

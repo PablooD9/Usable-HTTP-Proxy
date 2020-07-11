@@ -82,7 +82,6 @@ public abstract class AbstractHttpOperation implements IHttpOperation {
 		String allMessages = "";
 		String newLine = "\r\n";
 		for (String errorMessage : getErrorMessages()) {
-			System.out.println(errorMessage);
 			allMessages = allMessages.concat(errorMessage).concat(newLine);
 		}
 		return allMessages;

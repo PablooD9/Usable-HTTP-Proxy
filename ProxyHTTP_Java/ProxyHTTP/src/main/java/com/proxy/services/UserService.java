@@ -89,7 +89,7 @@ public class UserService implements UserDetailsService {
 		String username=null;
 		if (auth != null && auth.getPrincipal() instanceof UserDetails) {
 			username = ((UserDetails) auth.getPrincipal()).getUsername();
-		} else if (auth != null) {
+		} else if (auth != null && auth.getName() != "anonymousUser") {
 			username = auth.getPrincipal().toString();
 		}
 		

@@ -37,7 +37,12 @@
       <img class="masthead-avatar mb-5" src="/img/icon_proxy.png" alt="">
 
       <!-- Masthead Heading -->
-      <h1 class="masthead-heading text-uppercase mb-0" th:text="#{Config.h1Title}">Página de Configuración del Proxy</h1>
+      <div class="row">
+	      <i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal9"></i>
+	  </div>
+	  <div class="row">
+	      <h1 class="masthead-heading text-uppercase mb-0" th:text="#{Config.h1Title}">Página de Configuración del Proxy</h1>
+	  </div>
 
       <!-- Icon Divider -->
       <div class="divider-custom divider-light">
@@ -56,7 +61,7 @@
       <button class="buttonLoading" disabled>
       	 <div>
       	 	<i class="fa fa-spinner fa-spin"></i>
-      	 	<span th:text="#{Config.updateButtonState2}" >Recargando lista...</span>
+      	 	<span th:text="#{Config.updateButtonState2}">Recargando lista...</span>
       	 </div>
   		 
 	  </button>
@@ -67,6 +72,18 @@
   <!-- Portfolio Section -->
   <section class="page-section portfolio" id="portfolio">
     <div class="container">
+    
+    <div class="preferenceButton preferenceButton2 row">
+		<button type="button" id="savePrefState1A" class="btn btn-success savePrefState1" onclick="save()" th:text="#{Config.savePref_1}">
+			Guardar preferencias
+		</button>
+		<button type="button" id="savePrefState2A" class="btn btn-success savePrefState2" th:text="#{Config.savePref_2}" disabled>
+		  	Guardado con éxito
+		</button>
+		<button type="button" id="manageExceptionsA" class="btn btn-success manageExceptions" data-toggle="modal" data-target="#portfolioModal8" th:text="#{Config.manageExceptionsButton}">
+			Configurar excepciones de seguridad
+		</button>
+	</div>
 
       <!-- Portfolio Section Heading -->
       <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0" th:text="#{Config.basicConfig}">Configuración básica</h2>
@@ -85,7 +102,15 @@
 		<div class="col-sm-12">
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal1"></i>
-				<span class="feature" th:text="#{Config.option1}">Quiero hacerme pasar por...</span>
+				<span class="feature" th:text="#{Config.option1}">Quiero hacerme pasar por el siguiente sistema operativo y navegador:</span>
+				<div class="row headerOption1">
+					<div class="col">
+				    	<label id="op1Label1" for="op1_os" th:text="#{Config.option1_OS}">Sistema Operativo</label>
+				    </div>
+				    <div class="col">
+				    	<label id="op1Label2" for="op1_browser" th:text="#{Config.option1_Nav}">Navegador</label>
+				    </div>
+				</div>
 				<div class="configOption">
 					<div class="row option1">
 						<select id="op1_os" class="isOption custom-select custom-select-sm">
@@ -108,7 +133,7 @@
 										<option th:text="${browserOption.optName}">Navegador</option>
 									</div>
 									<div th:case="*">
-										<option th:if="${userConfig.browser == browserOption.optName}" th:text="${browserOption.optName}" selected>Navegador</option>
+										<option  th:if="${userConfig.browser == browserOption.optName}" th:text="${browserOption.optName}" selected>Navegador</option>
 										<option th:unless="${userConfig.browser == browserOption.optName}" th:text="${browserOption.optName}">Navegador</option>
 									</div>
 								</div>
@@ -249,7 +274,7 @@
 					<span class="feature" th:text="#{Config.option6}">Quiero que las respuestas de los sitios web contengan las siguientes cabeceras:</span>
 					<div class="isOption configOption">
 						<div class="row">
-							<select id="op6" class="selectpicker" multiple>
+							<select id="op6" class="selectpicker" multiple th:title="#{Config.selectionDefaultText}">
 								<th:block th:each="secHeader : ${securityHeaders}">
 									<div th:switch="${userConfig}">
 										<div th:case="null">
@@ -261,7 +286,6 @@
 										</div>
 								</th:block>
 							</select>
-
 						</div>
 					</div>
 				</div>
@@ -294,14 +318,14 @@
 		</div>
 		</div>
 	
-	<div class="preferenceButton row">
-		<button type="button" id="savePrefState1" class="btn btn-success" onclick="save()" th:text="#{Config.savePref_1}">
+	<div class="preferenceButton lastPreferenceButtons row">
+		<button type="button" id="savePrefState1" class="btn btn-success savePrefState1" onclick="save()" th:text="#{Config.savePref_1}">
 			Guardar preferencias
 		</button>
-		<button type="button" id="savePrefState2" class="btn btn-success" th:text="#{Config.savePref_2}" disabled>
+		<button type="button" id="savePrefState2" class="btn btn-success savePrefState2" th:text="#{Config.savePref_2}" disabled>
 		  	Guardado con éxito
 		</button>
-		<button type="button" id="manageExceptions" class="btn btn-success" data-toggle="modal" data-target="#portfolioModal8" th:text="#{Config.manageExceptionsButton}">
+		<button type="button" id="manageExceptions" class="btn btn-success manageExceptions" data-toggle="modal" data-target="#portfolioModal10" th:text="#{Config.manageExceptionsButton}">
 			Configurar excepciones de seguridad
 		</button>
 	</div>
