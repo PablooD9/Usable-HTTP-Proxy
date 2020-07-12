@@ -46,7 +46,7 @@ public class HttpProxyApplication {
 	 * Establece las propiedades del sistema.
 	 */
 	private static void setSystemProperties(SpringApplication app, String[] args) {
-		System.setProperty("restrictedHeaders", "host,connection,content-length,expect,upgrade"); // HttpClient does not
+		System.setProperty("restrictedHeaders", "host,connection,date,content-length,expect,upgrade"); // HttpClient does not
 																							// support this headers
 
 //		System.setProperty("javax.net.ssl.keyStore", System.getenv("JAVA_HOME") + "/lib/security/cacerts");
