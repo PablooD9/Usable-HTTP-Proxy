@@ -82,7 +82,7 @@
                 	<th:block th:each="hostException : ${hostExceptions}">
                 		<div class="col-sm-12">
 	                		<span th:text="${hostException}"></span>
-	                		<button th:data1="${hostException}" th:onclick="javascript:deleteException(this)" class="secExceptionInfo btn btn-primary">Eliminar excepción</button>
+	                		<button th:id="'button-' + ${hostException}" th:data1="${hostException}" th:onclick="javascript:deleteException(this)" class="secExceptionInfo btn btn-primary">Eliminar excepción</button>
 	                		<button th:data1="${hostException}" th:class="'secExceptionConfirmed host-reference-' + ${hostException} + ' btn btn-primary'" disabled>Excepción eliminada</button>
                 		</div>
                 	</th:block>

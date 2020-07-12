@@ -27,4 +27,17 @@ public class TestController {
 		return "test/userAgent";
 	}
 	
+	@RequestMapping("/testCookieHeader")
+	public String testCookieHeader(Model model) {
+		String noCookieHeaderIsApplied = UserConfiguration.getInstance().getConfiguration().getCheckIfCookieHeader();
+		if (noCookieHeaderIsApplied != null && noCookieHeaderIsApplied.equalsIgnoreCase("true")) {
+			model.addAttribute("cookieHeader", "Cookies are not sent or recieved.");
+		}
+		else {
+			model.addAttribute("cookieHeader", "Cookies are sent.");
+		}
+
+		return "test/cookieHeader";
+	}
+	
 }
