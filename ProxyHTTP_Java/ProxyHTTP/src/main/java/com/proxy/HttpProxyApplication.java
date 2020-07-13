@@ -44,6 +44,8 @@ public class HttpProxyApplication {
 
 	/**
 	 * Establece las propiedades del sistema.
+	 * @param app Referencia a la aplicación Spring.
+	 * @param args Argumentos pasados al programa.
 	 */
 	private static void setSystemProperties(SpringApplication app, String[] args) {
 		System.setProperty("restrictedHeaders", "host,connection,date,content-length,expect,upgrade"); // HttpClient does not

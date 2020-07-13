@@ -70,6 +70,7 @@ public class UserService implements UserDetailsService {
 	
 	/** Almacena un usuario en la base de datos. Antes de eso, se cifra su contraseña.
 	 * @param user Usuario a añadir.
+	 * @return Usuario guardado.
 	 */
 	public User saveUser(User user) {
 		if (bCryptPasswordEncoder == null) {

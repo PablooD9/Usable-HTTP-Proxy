@@ -105,8 +105,9 @@ public class HostService {
 	}
 	
 	/** Carga el contenido de un fichero dentro de la aplicación.
-	 * @param file Fichero del cual se leerá y cargará el contenido.
+	 * @param filepath Ruta del fichero del cual se leerá y cargará el contenido.
 	 * @param hostType Tipo de los hosts que se cargarán.
+	 * @return Lista de hosts cargados.
 	 */
 	private List<Host> loadFromFile(String filepath, HostType hostType) {
 		InputStream is = loadLocalFile(filepath);

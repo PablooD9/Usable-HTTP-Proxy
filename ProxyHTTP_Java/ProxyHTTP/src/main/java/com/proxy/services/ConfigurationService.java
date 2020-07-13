@@ -137,12 +137,13 @@ public class ConfigurationService {
 	 * establecidas por el usuario desde la página de configuración de la aplicación.
 	 * @param op1_os Sistema operativo.
 	 * @param op1_browser Navegador.
-	 * @param op2 Opción 2.
-	 * @param op3 Opción 3.
-	 * @param op4 Opción 4.
-	 * @param op5 Opción 5.
-	 * @param op6 Opción 6.
-	 * @return Configuración.
+	 * @param op2_spanish_hosts Opción 2 - Hosts españoles.
+	 * @param op3_malicious_hosts Opción 3 - Hosts maliciosos.
+	 * @param op4_tracker_hosts Opción 4 - Hosts rastreadores.
+	 * @param op5_porn_hosts Opción 5 - Hosts pornográficos.
+	 * @param op6_sec_headers Opción 6 - Cabeceras de seguridad.
+	 * @param op7_cookie_headers Opción 7 - Cabecera "cookie"
+	 * @return Configuración construida.
 	 */
 	public Configuration buildConfigurationObject(String op1_os, String op1_browser, String op2_spanish_hosts,
 												  String op3_malicious_hosts, String op4_tracker_hosts, String op5_porn_hosts, String op6_sec_headers, String op7_cookie_headers) {
