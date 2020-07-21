@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<th:block th:include="fragments/header"></th:block>
+	<link href="css/login.css" rel="stylesheet"/>
+	
+	<title th:text="#{Login.title}">Iniciar sesión</title>
+</head>
+<body>
+
+	<!-- Language Menu -->
+  	<div th:replace="fragments/languageMenu"/>
+
+	<div class="login-page">
+	  <div class="form">
+	  
+	    <p th:text="#{Login.title}">Iniciar sesión</p>
+	    <form class="login-form"  method="post" th:action="@{/login}">
+	      <input type="text" name="username" th:placeholder="#{Login.email}" maxlength="50"/>
+	      <input type="password" name="password" th:placeholder="#{Login.password}" maxlength="24"/>
+	      <span class="text-danger" th:if="${error == 'true'}"
+						th:text="#{Error.login}"></span>
+	      
+	      <button id="login-button" th:text="#{Login.loginButton}">Iniciar sesión</button>
+	      <p class="message" th:text="#{Login.notRegistered}">¿No registrado aún?</p>
+	      <a href="/signup" th:text="#{Login.createAccount}">Crear una cuenta</a>
+	    </form>
+	    
+	  </div>
+	</div>
+	
+	<div class="skip-login-page">
+		<p th:text="#{Login.skip}">Si quieres continuar sin iniciar sesión, </p>
+		<a href="/" th:text="#{Login.skipLink}">haz clic aquí.</a>
+	</div>
+
+  	<!-- Copyright Section -->
+  	<section th:replace="fragments/copyright"/>
+  	
+	<th:block th:include="fragments/footerScripts"></th:block>
+	<script src="js/login.js"></script>
+
+</body>
+
+</html>

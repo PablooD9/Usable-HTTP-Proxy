@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<th:block th:include="fragments/header"></th:block>
+	<link href="css/login.css" rel="stylesheet"/>
+	
+	<title th:text="#{SecurityException.title}">¡Excepción añadida con éxito!</title>
+</head>
+<body>
+	
+	<div class="col-sm-12">
+		<div class="shadow p-3 mb-5 bg-white rounded">
+			<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal8"></i>
+			<span th:if="${securityExceptionExists}" class="feature" th:text="#{SecurityException.message}">¡Excepción añadida con éxito! Ahora puede visitar el siguiente sitio web sin recibir ninguna alerta:</span>
+			<span th:unless="${securityExceptionExists}" class="feature" th:text="#{SecurityException.messageError}">La excepción de seguridad ya ha sido añadida anteriormente (o no puede añadirse) para el host:</span>
+			<span class="feature" th:text="${host}">Sitio web</span>
+		</div>
+	</div>
+
+	<!-- Copyright Section -->
+  	<section th:replace="fragments/copyright"/>
+  	<th:block th:include="fragments/modalWindows"></th:block>
+	<th:block th:include="fragments/footerScripts"></th:block>
+</body>
+</html>

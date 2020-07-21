@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<th:block th:include="fragments/header"></th:block>
+	
+	<title th:text="#{Config.title}">Configurar el Proxy</title>
+</head>
+
+<body id="page-top">
+
+  <!-- Navigation -->
+  <nav th:replace="fragments/navigation"/>
+  
+  <!-- Language Menu -->
+  <div th:replace="fragments/languageMenu"/>
+
+  <div th:if="${userLoggedIn != null}" class="welcome-message position-absolute">
+	  	<p th:text="#{Config.welcome} + ', ' + ${userLoggedIn.name}">Bienvenid@, usuari@</p>
+	  	<a href="/logout" th:text="#{Config.exit}">Desconectarme</a>
+	  	<div class="divider-custom divider-light">
+        	<div class="divider-custom-line"></div>
+        </div>
+  </div>
+  <div th:unless="${userLoggedIn != null}" id="signinMessage" class="welcome-message position-absolute">
+  		<a href="/login" th:text="#{Config.signin}">Iniciar sesión</a>
+  		<div class="divider-custom divider-light">
+        	<div class="divider-custom-line"></div>
+        </div>
+  </div>
+
+  <!-- Masthead -->
+  <header class="masthead bg-primary text-white text-center">
+    <div class="container d-flex align-items-center flex-column">
+
+      <!-- Masthead Avatar Image -->
+      <img class="masthead-avatar mb-5" src="/img/icon_proxy.png" alt="">
+
+      <!-- Masthead Heading -->
+      <div class="row">
+	      <i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal9"></i>
+	  </div>
+	  <div class="row">
+	      <h1 class="masthead-heading text-uppercase mb-0" th:text="#{Config.h1Title}">Página de Configuración del Proxy</h1>
+	  </div>
+
+      <!-- Icon Divider -->
+      <div class="divider-custom divider-light">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="divider-custom-line"></div>
+      </div>
+      
+      <div class="col-sm-12">
+      	<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal0"></i>
+      	<button class="buttonUpdate" onclick="hideUpdateButton();" th:text="#{Config.updateButtonState1}">Actualizar lista de sitios web</button>
+      </div>
+      
+      <button class="buttonLoading" disabled>
+      	 <div>
+      	 	<i class="fa fa-spinner fa-spin"></i>
+      	 	<span th:text="#{Config.updateButtonState2}">Recargando lista...</span>
+      	 </div>
+  		 
+	  </button>
+
+    </div>
+  </header>
+
+  <!-- Portfolio Section -->
+  <section class="page-section portfolio" id="portfolio">
+    <div class="container">
+    
+    <div class="preferenceButton preferenceButton2 row">
+		<button type="button" id="savePrefState1A" class="btn btn-success savePrefState1" onclick="save()" th:text="#{Config.savePref_1}">
+			Guardar preferencias
+		</button>
+		<button type="button" id="savePrefState2A" class="btn btn-success savePrefState2" th:text="#{Config.savePref_2}" disabled>
+		  	Guardado con éxito
+		</button>
+		<button type="button" id="manageExceptionsA" class="btn btn-success manageExceptions" data-toggle="modal" data-target="#portfolioModal10" th:text="#{Config.manageExceptionsButton}">
+			Configurar excepciones de seguridad
+		</button>
+	</div>
+
+      <!-- Portfolio Section Heading -->
+      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0" th:text="#{Config.basicConfig}">Configuración básica</h2>
+
+      <!-- Icon Divider -->
+      <div class="divider-custom">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="divider-custom-line"></div>
+      </div>
+
+	<!-- Opciones config básicas -->
+	<div class="row" id="basicFeatures">
+		<div class="col-sm-12">
+			<div class="shadow p-3 mb-5 bg-white rounded">
+				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal1"></i>
+				<span class="feature" th:text="#{Config.option1}">Quiero hacerme pasar por el siguiente sistema operativo y navegador:</span>
+				<div class="row headerOption1">
+					<div class="col">
+				    	<label id="op1Label1" for="op1_os" th:text="#{Config.option1_OS}">Sistema Operativo</label>
+				    </div>
+				    <div class="col">
+				    	<label id="op1Label2" for="op1_browser" th:text="#{Config.option1_Nav}">Navegador</label>
+				    </div>
+				</div>
+				<div class="configOption">
+					<div class="row option1">
+						<select id="op1_os" class="isOption custom-select custom-select-sm">
+							<th:block th:each="osOption : ${OSOptions}">
+								<div th:switch="${userConfig}">
+									<div th:case="null">
+										<option th:text="${osOption.optName}">Sistema operativo</option>
+									</div>
+									<div th:case="*">
+										<option th:if="${userConfig.OS == osOption.optName}" th:text="${osOption.optName}" selected>Sistema operativo</option>
+										<option th:unless="${userConfig.OS == osOption.optName}" th:text="${osOption.optName}">Sistema operativo</option>
+									</div>
+								</div>
+							</th:block>
+						</select>
+						<select id="op1_browser" class="isOption custom-select custom-select-sm">
+							<th:block th:each="browserOption : ${BrowserOptions}">
+								<div th:switch="${userConfig}">
+									<div th:case="null">
+										<option th:text="${browserOption.optName}">Navegador</option>
+									</div>
+									<div th:case="*">
+										<option  th:if="${userConfig.browser == browserOption.optName}" th:text="${browserOption.optName}" selected>Navegador</option>
+										<option th:unless="${userConfig.browser == browserOption.optName}" th:text="${browserOption.optName}">Navegador</option>
+									</div>
+								</div>
+							</th:block>
+						</select>	 
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-12">
+			<div class="shadow p-3 mb-5 bg-white rounded">
+				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal2"></i>
+				<span class="feature" th:text="#{Config.option2}">No quiero navegar por sitios con mala reputación en España</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<div th:switch="${userConfig}">
+								<div th:case="null">
+									<input id="op2" class="isOption" type="checkbox">
+									<span class="slider round"></span>
+								</div>
+								<div th:case="*">
+									<div th:switch="${userConfig.checkIfSpanishMaliciousHosts}">
+				  						<input th:case="'true'" id="op2" class="isOption" type="checkbox" checked>
+				  						<input th:case="*" id="op2" class="isOption" type="checkbox">
+				  						<span class="slider round"></span>
+				  					</div>
+				  				</div>
+			  				</div>
+			  			</label>
+		  			</div>
+	  			</div>
+			</div>
+		</div>
+		<div class="col-sm-12">
+			<div class="shadow p-3 mb-5 bg-white rounded">
+				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal3"></i>
+				<span class="feature" th:text="#{Config.option3}">No quiero navegar por sitios potencialmente peligrosos</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<div th:switch="${userConfig}">
+								<div th:case="null">
+									<input id="op3" class="isOption" type="checkbox">
+									<span class="slider round"></span>
+								</div>
+								<div th:case="*">
+									<div th:switch="${userConfig.checkIfMaliciousHosts}">
+				  						<input th:case="'true'" id="op3" class="isOption" type="checkbox" checked>
+				  						<input th:case="*" id="op3" class="isOption" type="checkbox">
+				  						<span class="slider round"></span>
+				  					</div>
+				  				</div>
+			  				</div>
+			  			</label>
+			  		</div>
+			  	</div>
+			</div>
+		</div>
+		<div class="col-sm-12">
+			<div class="shadow p-3 mb-5 bg-white rounded">
+				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal4"></i>
+				<span class="feature" th:text="#{Config.option4}">No quiero que me rastreen sitios de publicidad</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+							<div th:switch="${userConfig}">
+								<div th:case="null">
+									<input id="op4" class="isOption" type="checkbox">
+									<span class="slider round"></span>
+								</div>
+								<div th:case="*">
+									<div th:switch="${userConfig.checkIfTrackersHosts}">
+				  						<input th:case="'true'" id="op4" class="isOption" type="checkbox" checked>
+				  						<input th:case="*" id="op4" class="isOption" type="checkbox">
+				  						<span class="slider round"></span>
+				  					</div>
+				  				</div>
+			  				</div>
+			  			</label>
+			  		</div>
+			  	</div>
+	  		</div>
+		</div>
+		<div class="col-sm-12">
+			<div class="shadow p-3 mb-5 bg-white rounded">
+				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal5"></i>
+				<span class="feature" th:text="#{Config.option5}">No quiero visitar sitios con contenido pornográfico</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+							<div th:switch="${userConfig}">
+								<div th:case="null">
+									<input id="op5" class="isOption" type="checkbox">
+									<span class="slider round"></span>
+								</div>
+								<div th:case="*">
+									<div th:switch="${userConfig.checkIfPornographicHosts}">
+				  						<input th:case="'true'" id="op5" class="isOption" type="checkbox" checked>
+				  						<input th:case="*" id="op5" class="isOption" type="checkbox">
+				  						<span class="slider round"></span>
+				  					</div>
+				  				</div>
+			  				</div>
+			  			</label>
+			  		</div>
+			  	</div>
+			</div>
+		</div>
+	</div>
+
+    </div>
+  </section>
+  
+  <hr>
+
+  <!-- About Section -->
+  <section class="page-section portfolio" id="about">
+    <div class="container">
+
+      <!-- Portfolio Section Heading -->
+      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0" th:text="#{Config.advancedConfig}">Configuración avanzada</h2>
+
+      <!-- Icon Divider -->
+      <div class="divider-custom">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="divider-custom-line"></div>
+      </div>
+
+		<!-- Opciones avanzadas -->
+		<div class="row" id="advancedFeatures">
+			<div class="col-sm-12">
+				<div class="shadow p-3 mb-5 bg-white rounded">
+					<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal6"></i>
+					<span class="feature" th:text="#{Config.option6}">Quiero que las respuestas de los sitios web contengan las siguientes cabeceras:</span>
+					<div class="isOption configOption">
+						<div class="row">
+							<select id="op6" class="selectpicker" multiple th:title="#{Config.selectionDefaultText}">
+								<th:block th:each="secHeader : ${securityHeaders}">
+									<div th:switch="${userConfig}">
+										<div th:case="null">
+											<option th:text="${secHeader.optName}">Cabecera</option>
+										</div>
+										<div th:case="*">
+											<option th:if="${userConfig.securityHeaders.contains(secHeader.optName)}" th:text="${secHeader.optName}" selected>Cabecera</option>
+											<option th:unless="${userConfig.securityHeaders.contains(secHeader.optName)}" th:text="${secHeader.optName}">Cabecera</option>
+										</div>
+								</th:block>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-sm-12">
+			<div class="shadow p-3 mb-5 bg-white rounded">
+				<i class="far fa-question-circle" data-toggle="modal" data-target="#portfolioModal7"></i>
+				<span class="feature" th:text="#{Config.option7}">No quiero enviar ni recibir cookies de los sitios web que visito</span>
+				<div class="configOption">
+					<div class="row">
+						<label class="switch">
+			  				<div th:switch="${userConfig}">
+								<div th:case="null">
+									<input id="op7" class="isOption" type="checkbox">
+									<span class="slider round"></span>
+								</div>
+								<div th:case="*">
+									<div th:switch="${userConfig.checkIfCookieHeader}">
+				  						<input th:case="'true'" id="op7" class="isOption" type="checkbox" checked>
+				  						<input th:case="*" id="op7" class="isOption" type="checkbox">
+				  						<span class="slider round"></span>
+				  					</div>
+				  				</div>
+			  				</div>
+			  			</label>
+			  		</div>
+			  	</div>
+			</div>
+		</div>
+		</div>
+	
+	<div class="preferenceButton lastPreferenceButtons row">
+		<button type="button" id="savePrefState1" class="btn btn-success savePrefState1" onclick="save()" th:text="#{Config.savePref_1}">
+			Guardar preferencias
+		</button>
+		<button type="button" id="savePrefState2" class="btn btn-success savePrefState2" th:text="#{Config.savePref_2}" disabled>
+		  	Guardado con éxito
+		</button>
+		<button type="button" id="manageExceptions" class="btn btn-success manageExceptions" data-toggle="modal" data-target="#portfolioModal10" th:text="#{Config.manageExceptionsButton}">
+			Configurar excepciones de seguridad
+		</button>
+	</div>
+		
+    </div>
+  </section>
+  
+  <th:block th:include="fragments/footer"></th:block>
+  <!-- Copyright Section -->
+  <section th:replace="fragments/copyright"/>
+  
+  <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+  <div class="scroll-to-top d-lg-none position-fixed ">
+    <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+  
+  <th:block th:include="fragments/modalWindows"></th:block>
+  
+  <th:block th:include="fragments/footerScripts"></th:block>
+  <!-- Save preferences button -->
+  <script src="js/savePreferences.js"></script>
+  <!-- Delete security exception -->
+  <script src="js/deleteException.js"></script>
+
+  <!-- Checkbox style for advanced config -->
+  <script src="js/checkboxAdvancedConfig.js"></script>
+  
+</body>
+
+</html>

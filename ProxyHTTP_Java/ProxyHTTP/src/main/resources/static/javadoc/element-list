@@ -1,0 +1,17 @@
+com.proxy
+com.proxy.configuration
+com.proxy.controllers
+com.proxy.interceptor
+com.proxy.interceptor.certificate
+com.proxy.interceptor.error
+com.proxy.interceptor.httpOperation.request
+com.proxy.interceptor.httpOperation.response
+com.proxy.model
+com.proxy.model.functionality
+com.proxy.model.hosttype
+com.proxy.model.option
+com.proxy.parser
+com.proxy.repository
+com.proxy.services
+com.proxy.validator
+com.uniovi
