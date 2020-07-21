@@ -51,9 +51,6 @@ public class HttpProxyApplication {
 		System.setProperty("restrictedHeaders", "host,connection,date,content-length,expect,upgrade"); // HttpClient does not
 																							// support this headers
 
-//		System.setProperty("javax.net.ssl.keyStore", System.getenv("JAVA_HOME") + "/lib/security/cacerts");
-//		System.setProperty("javax.net.ssl.keyStore", "src/main/resources/static/security/cacerts");
-//		System.setProperty("javax.net.ssl.keyStore", "static/security/cacerts");
 		System.setProperty("javax.net.ssl.keyStore", "cacerts");
 		System.setProperty("javax.net.ssl.keyStorePassword", "changeit");
 		System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
