@@ -1,6 +1,6 @@
 # Usable-HTTP-Proxy
 
-## ¿Qué es un Proxy?
+## What is a Proxy?
 A Proxy allows a user to intercept and manipulate requests (sent through a browser) and responses (received through a server). For example, we can visit certain websites to see news that, fraudulently, obtain information from us (how often we visit the page, how much time we spend on it, etc.). Using the Proxy and configuring it in a very simple way, we will prevent this type of thing from happening.
 
 ## Introduction
